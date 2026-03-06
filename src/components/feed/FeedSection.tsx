@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Eye, Check } from "lucide-react";
+import { Check } from "lucide-react";
 import { SECTIONS } from "@/lib/constants";
 import PostModal, { PostItem } from "./PostModal";
 
@@ -61,10 +61,6 @@ function PostCard({ post, onClick }: { post: Post; onClick: () => void }) {
           {post.category}
         </span>
         <div className="flex items-center gap-3 text-[#CBD5E1]" style={{ fontSize: "12px", fontFamily: "Inter, sans-serif" }}>
-          <span className="flex items-center gap-1">
-            <Eye size={11} />
-            {post.viewCount}
-          </span>
           <span className="flex items-center gap-1">
             <Check size={11} />
             {post._count.likes}

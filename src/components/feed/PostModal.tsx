@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { X, Check, Eye } from "lucide-react";
+import { X, Check, Lock } from "lucide-react";
 import { useSession } from "next-auth/react";
 
 export interface PostItem {
@@ -124,33 +124,44 @@ export default function PostModal({ post, onClose }: PostModalProps) {
           )}
         </div>
 
-        {/* 푸터: 조회수 + 체크 */}
-        <div className="border-t border-[#E2E8F0] flex-shrink-0 flex items-center justify-between"
+        {/* 푸터: 체크 */}
+        <div className="border-t border-[#E2E8F0] flex-shrink-0 flex items-center justify-end"
           style={{ padding: "16px 32px" }}>
-          <div className="flex items-center gap-1 text-[#94A3B8]"
-            style={{ fontSize: "13px", fontFamily: "Inter, sans-serif" }}>
-            <Eye size={14} />
-            <span style={{ marginLeft: "4px" }}>{(post.viewCount ?? 0) + 1}</span>
-          </div>
-          <button
-            onClick={handleLike}
-            disabled={!session || likeLoading}
-            title={session ? (liked ? "체크 취소" : "체크하기") : "로그인 후 체크할 수 있습니다"}
-            style={{
-              display: "flex", alignItems: "center", gap: "6px",
-              padding: "6px 14px",
-              backgroundColor: liked ? "#0F172A" : "white",
-              color: liked ? "white" : "#94A3B8",
-              border: `1px solid ${liked ? "#0F172A" : "#E2E8F0"}`,
-              cursor: session ? "pointer" : "default",
-              fontSize: "13px", fontFamily: "Inter, sans-serif",
-              transition: "all 0.15s ease",
-              opacity: likeLoading ? 0.6 : 1,
-            }}
-          >
-            <Check size={14} />
-            <span>{likeCount}</span>
-          </button>
+          {session ? (
+            <button
+              onClick={handleLike}
+              disabled={likeLoading}
+              title={liked ? "체크 취소" : "체크하기"}
+              style={{
+                display: "flex", alignItems: "center", gap: "6px",
+                padding: "6px 14px",
+                backgroundColor: liked ? "#0F172A" : "white",
+                color: liked ? "white" : "#94A3B8",
+                border: `1px solid ${liked ? "#0F172A" : "#E2E8F0"}`,
+                cursor: "pointer",
+                fontSize: "13px", fontFamily: "Inter, sans-serif",
+                transition: "all 0.15s ease",
+                opacity: likeLoading ? 0.6 : 1,
+              }}
+            >
+              <Check size={14} />
+              <span>{likeCount}</span>
+            </button>
+          ) : (
+            <div
+              title="로그인 후 체크할 수 있습니다"
+              style={{
+                display: "flex", alignItems: "center", gap: "6px",
+                padding: "6px 14px",
+                backgroundColor: "white", color: "#CBD5E1",
+                border: "1px solid #E2E8F0",
+                fontSize: "13px", fontFamily: "Inter, sans-serif",
+              }}
+            >
+              <Lock size={14} />
+              <span>회원 전용</span>
+            </div>
+          )}
         </div>
       </div>
     </div>
