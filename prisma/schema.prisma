@@ -21,10 +21,11 @@ model User {
   joinReason    String?
   createdAt     DateTime  @default(now())
 
-  accounts Account[]
-  sessions Session[]
-  posts    Post[]
-  likes    Like[]
+  accounts  Account[]
+  sessions  Session[]
+  posts     Post[]
+  likes     Like[]
+  postViews PostView[]
 }
 
 model Account {
@@ -75,8 +76,9 @@ model Post {
   updatedAt DateTime @updatedAt
   authorId  String?
 
-  author User? @relation(fields: [authorId], references: [id])
-  likes  Like[]
+  author    User?      @relation(fields: [authorId], references: [id])
+  likes     Like[]
+  postViews PostView[]
 }
 
 model Like {
@@ -89,6 +91,16 @@ model Like {
   post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@unique([userId, postId])
+}
+
+model PostView {
+  id       String   @id @default(cuid())
+  userId   String
+  postId   String
+  viewedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
 
 model Contact {

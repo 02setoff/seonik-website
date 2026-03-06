@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { Search, LogOut } from "lucide-react";
+import { Search, LogOut, User } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import SearchModal from "./SearchModal";
@@ -100,6 +100,7 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
             {session ? (
               /* 로그인 상태 */
               <div className="flex items-center" style={{ gap: "12px" }}>
+                {/* 데스크탑: 이름 링크 */}
                 <Link
                   href="/mypage"
                   className="hidden md:block text-[#0F172A] font-medium hover:text-[#475569] transition-colors duration-200"
@@ -107,14 +108,23 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
                 >
                   {session.user?.name || session.user?.email?.split("@")[0]}
                 </Link>
+                {/* 모바일: 유저 아이콘 */}
+                <Link
+                  href="/mypage"
+                  className="md:hidden text-[#475569] hover:text-[#0F172A] transition-colors duration-200"
+                  title="마이페이지"
+                >
+                  <User size={20} />
+                </Link>
+                {/* 데스크탑: 로그아웃 */}
                 <button
                   onClick={() => signOut({ callbackUrl: "/" })}
-                  className="flex items-center gap-1 text-[#94A3B8] hover:text-[#0F172A] transition-colors duration-200"
+                  className="hidden md:flex items-center gap-1 text-[#94A3B8] hover:text-[#0F172A] transition-colors duration-200"
                   style={{ fontSize: "13px", fontFamily: "'Pretendard', sans-serif" }}
                   title="로그아웃"
                 >
                   <LogOut size={16} />
-                  <span className="hidden md:inline">로그아웃</span>
+                  <span>로그아웃</span>
                 </button>
               </div>
             ) : (

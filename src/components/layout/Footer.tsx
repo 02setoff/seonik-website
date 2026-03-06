@@ -55,11 +55,11 @@ export default function FeedFooter() {
 
         {/* ── 하단 심플 바 ── */}
         <div
-          className="bg-[#060E1C] flex flex-col md:flex-row items-center justify-between gap-6"
-          style={{ padding: "36px 40px" }}
+          className="bg-[#060E1C] flex flex-col items-center gap-4"
+          style={{ padding: "36px 40px", textAlign: "center" }}
         >
-          {/* 좌측: 브랜드 */}
-          <div className="flex flex-col items-center md:items-start">
+          {/* 브랜드 */}
+          <div className="flex flex-col items-center">
             <p
               className="font-bold text-white leading-none"
               style={{ fontSize: "18px", fontFamily: "'Pretendard', sans-serif" }}
@@ -68,35 +68,24 @@ export default function FeedFooter() {
             </p>
             <p
               className="font-semibold text-[#475569] leading-none"
-              style={{
-                fontSize: "11px",
-                marginTop: "3px",
-                fontFamily: "Inter, sans-serif",
-                letterSpacing: "0.15em",
-              }}
+              style={{ fontSize: "11px", marginTop: "3px", fontFamily: "Inter, sans-serif", letterSpacing: "0.15em" }}
             >
               SEONIK
             </p>
           </div>
 
-          {/* 중앙: 저작권 + 모토 */}
-          <div className="flex flex-col items-center gap-1 text-center">
-            <p
-              className="text-[#475569]"
-              style={{ fontSize: "12px", fontFamily: "'Pretendard', sans-serif" }}
-            >
+          {/* 저작권 + 모토 */}
+          <div className="flex flex-col items-center gap-1">
+            <p className="text-[#475569]" style={{ fontSize: "12px", fontFamily: "'Pretendard', sans-serif" }}>
               &copy; 2026 SEONIK 선익. All rights reserved.
             </p>
-            <p
-              className="text-[#475569]"
-              style={{ fontSize: "12px", fontFamily: "Inter, sans-serif" }}
-            >
+            <p className="text-[#475569]" style={{ fontSize: "12px", fontFamily: "Inter, sans-serif" }}>
               先益 — Know First, Win First.
             </p>
           </div>
 
-          {/* 우측: 연락처 */}
-          <div className="flex flex-col items-center md:items-end gap-1">
+          {/* 연락처 */}
+          <div className="flex flex-col items-center gap-1">
             <button
               onClick={() => setIsContactOpen(true)}
               className="text-[#475569] hover:text-white transition-colors duration-200"

@@ -48,7 +48,11 @@
       "Bash(git add src/components/auth/AuthModal.tsx src/app/api/auth/register/route.ts)",
       "Bash(git add src/components/auth/AuthModal.tsx src/components/feed/PostModal.tsx)",
       "Bash(git add package.json)",
-      "Bash(git push)"
+      "Bash(git push)",
+      "Bash(npx prisma migrate dev --name add_post_view)",
+      "Bash(python3 -c \":*)",
+      "Bash(node -e \"const fs=require\\(''fs''\\); const c=fs.readFileSync\\(''C:/Users/USER/Desktop/창업/선익/선익 웹사이트/src/app/mypage/page.tsx'',''utf8''\\); console.log\\(c.substring\\(0,100\\)\\);\")",
+      "Bash(node:*)"
     ]
   }
 }

@@ -38,10 +38,58 @@ export async function GET() {
         },
         orderBy: { createdAt: "desc" },
       },
+      postViews: {
+        select: {
+          postId: true,
+          viewedAt: true,
+          post: {
+            select: {
+              id: true,
+              title: true,
+              summary: true,
+              content: true,
+              category: true,
+              createdAt: true,
+              viewCount: true,
+              _count: { select: { likes: true } },
+            },
+          },
+        },
+        orderBy: { viewedAt: "desc" },
+        take: 100,
+      },
     },
   });
 
-  return NextResponse.json(user);
+  if (!user) return NextResponse.json(null);
+
+  // 최근 읽은 글: 중복 제거 후 최신 20개
+  const seenPostIds = new Set<string>();
+  const recentViews = [];
+  for (const v of user.postViews) {
+    if (!seenPostIds.has(v.postId)) {
+      seenPostIds.add(v.postId);
+      recentViews.push({ post: v.post, viewedAt: v.viewedAt });
+      if (recentViews.length >= 20) break;
+    }
+  }
+
+  // 카테고리별 읽은 횟수 통계
+  const categoryStats: Record<string, number> = {};
+  for (const v of user.postViews) {
+    const cat = v.post.category;
+    categoryStats[cat] = (categoryStats[cat] || 0) + 1;
+  }
+  const categoryStatsSorted = Object.entries(categoryStats)
+    .sort((a, b) => b[1] - a[1])
+    .map(([category, count]) => ({ category, count }));
+
+  return NextResponse.json({
+    ...user,
+    recentViews,
+    categoryStats: categoryStatsSorted,
+    totalRead: seenPostIds.size,
+  });
 }
 
 export async function PUT(request: Request) {
