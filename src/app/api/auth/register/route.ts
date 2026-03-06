@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
   try {
-    const { name, email, password } = await request.json();
+    const { name, email, password, occupation, howFound, joinReason } = await request.json();
 
     if (!email || !password) {
       return NextResponse.json(
@@ -28,9 +28,24 @@ export async function POST(request: Request) {
       );
     }
 
+    if (name) {
+      const nameExists = await prisma.user.findFirst({ where: { name } });
+      if (nameExists) {
+        return NextResponse.json(
+          { error: "이미 사용 중인 이름입니다." },
+          { status: 400 }
+        );
+      }
+    }
+
     const hashed = await bcrypt.hash(password, 12);
     await prisma.user.create({
-      data: { name: name || null, email, password: hashed },
+      data: {
+        name: name || null, email, password: hashed,
+        occupation: occupation || null,
+        howFound: howFound || null,
+        joinReason: joinReason || null,
+      },
     });
 
     return NextResponse.json({ success: true }, { status: 201 });

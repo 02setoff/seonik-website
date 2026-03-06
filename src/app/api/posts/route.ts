@@ -11,7 +11,10 @@ export async function GET(request: Request) {
       ...(category ? { category } : {}),
     },
     orderBy: { createdAt: "desc" },
-    select: { id: true, title: true, summary: true, content: true, category: true, createdAt: true },
+    select: {
+      id: true, title: true, summary: true, content: true, category: true, createdAt: true,
+      viewCount: true, _count: { select: { likes: true } },
+    },
   });
 
   return NextResponse.json(posts);

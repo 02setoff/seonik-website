@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Eye, Check } from "lucide-react";
 import PostModal, { PostItem } from "./PostModal";
 
 function formatDate(iso: string) {
@@ -45,6 +46,11 @@ export default function CategoryPostGrid({ posts, category }: { posts: PostItem[
                 {post.summary}
               </p>
             )}
+            <div className="flex items-center gap-3 mt-4 text-[#CBD5E1]"
+              style={{ fontSize: "12px", fontFamily: "Inter, sans-serif" }}>
+              <span className="flex items-center gap-1"><Eye size={11} />{post.viewCount ?? 0}</span>
+              <span className="flex items-center gap-1"><Check size={11} />{post.likeCount ?? 0}</span>
+            </div>
           </button>
         ))}
       </div>

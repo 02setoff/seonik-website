@@ -37,6 +37,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               style={{ fontSize: "13px", fontFamily: "'Pretendard', sans-serif" }}>
               회원 관리
             </Link>
+            <Link href="/admin/stats" className="text-[#94A3B8] hover:text-white transition-colors duration-150"
+              style={{ fontSize: "13px", fontFamily: "'Pretendard', sans-serif" }}>
+              통계
+            </Link>
             <Link href="/" className="text-[#94A3B8] hover:text-white transition-colors duration-150"
               style={{ fontSize: "13px", fontFamily: "'Pretendard', sans-serif" }}>
               사이트 보기 →

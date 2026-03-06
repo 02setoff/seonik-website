@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { Eye, Check } from "lucide-react";
 import { SECTIONS } from "@/lib/constants";
 import PostModal, { PostItem } from "./PostModal";
 
@@ -12,6 +13,8 @@ interface Post {
   content: string | null;
   category: string;
   createdAt: string;
+  viewCount: number;
+  _count: { likes: number };
 }
 
 function formatDate(iso: string) {
@@ -52,14 +55,22 @@ function PostCard({ post, onClick }: { post: Post; onClick: () => void }) {
           </p>
         </div>
       </div>
-      <div className="flex items-center justify-between border-t border-[#E2E8F0]" style={{ padding: "16px" }}>
+      <div className="flex items-center justify-between border-t border-[#E2E8F0]" style={{ padding: "12px 16px" }}>
         <span className="text-[#94A3B8] font-medium uppercase tracking-wide"
-          style={{ fontSize: "12px", fontFamily: "Inter, sans-serif" }}>
+          style={{ fontSize: "11px", fontFamily: "Inter, sans-serif" }}>
           {post.category}
         </span>
-        <span className="text-[#94A3B8]" style={{ fontSize: "12px", fontFamily: "'Pretendard', sans-serif" }}>
-          {formatDate(post.createdAt)}
-        </span>
+        <div className="flex items-center gap-3 text-[#CBD5E1]" style={{ fontSize: "12px", fontFamily: "Inter, sans-serif" }}>
+          <span className="flex items-center gap-1">
+            <Eye size={11} />
+            {post.viewCount}
+          </span>
+          <span className="flex items-center gap-1">
+            <Check size={11} />
+            {post._count.likes}
+          </span>
+          <span style={{ fontFamily: "'Pretendard', sans-serif" }}>{formatDate(post.createdAt)}</span>
+        </div>
       </div>
     </button>
   );
@@ -73,6 +84,12 @@ export default function FeedSection() {
     fetch("/api/posts").then(r => r.json()).then(setPosts).catch(() => {});
   }, []);
 
+  const toPostItem = (p: Post): PostItem => ({
+    id: p.id, title: p.title, summary: p.summary, content: p.content,
+    category: p.category, createdAt: p.createdAt,
+    viewCount: p.viewCount, likeCount: p._count.likes,
+  });
+
   return (
     <>
       <div className="bg-[#F8F9FA] pb-16">
@@ -83,7 +100,6 @@ export default function FeedSection() {
 
             return (
               <div key={section.id} style={{ marginTop: idx === 0 ? "32px" : "48px" }}>
-                {/* 섹션 타이틀 */}
                 <div className="flex items-center mb-6">
                   <Link
                     href={`/${section.id.toLowerCase()}`}
@@ -99,13 +115,12 @@ export default function FeedSection() {
                   </span>
                 </div>
 
-                {/* 카드 그리드 */}
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-5 xl:gap-6">
                   {sectionPosts.map(post => (
                     <PostCard
                       key={post.id}
                       post={post}
-                      onClick={() => setSelectedPost(post)}
+                      onClick={() => setSelectedPost(toPostItem(post))}
                     />
                   ))}
                   {Array.from({ length: empties }).map((_, i) => (

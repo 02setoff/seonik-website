@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
-import { X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { X, Check, Eye } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 export interface PostItem {
   id: string;
@@ -10,6 +11,8 @@ export interface PostItem {
   content: string | null;
   category: string;
   createdAt: string;
+  viewCount?: number;
+  likeCount?: number;
 }
 
 function formatDate(iso: string) {
@@ -24,6 +27,11 @@ interface PostModalProps {
 }
 
 export default function PostModal({ post, onClose }: PostModalProps) {
+  const { data: session } = useSession();
+  const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [likeLoading, setLikeLoading] = useState(false);
+
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     if (post) window.addEventListener("keydown", handleKey);
@@ -34,6 +42,27 @@ export default function PostModal({ post, onClose }: PostModalProps) {
     document.body.style.overflow = post ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [post]);
+
+  useEffect(() => {
+    if (!post) return;
+    fetch(`/api/posts/${post.id}/view`, { method: "POST" }).catch(() => {});
+    fetch(`/api/posts/${post.id}/like`)
+      .then(r => r.json())
+      .then(d => { setLiked(d.liked); setLikeCount(d.count ?? post.likeCount ?? 0); })
+      .catch(() => { setLikeCount(post.likeCount ?? 0); });
+  }, [post]);
+
+  const handleLike = async () => {
+    if (!session || likeLoading || !post) return;
+    setLikeLoading(true);
+    try {
+      const res = await fetch(`/api/posts/${post.id}/like`, { method: "POST" });
+      const data = await res.json();
+      if (res.ok) { setLiked(data.liked); setLikeCount(data.count); }
+    } finally {
+      setLikeLoading(false);
+    }
+  };
 
   if (!post) return null;
 
@@ -65,10 +94,8 @@ export default function PostModal({ post, onClose }: PostModalProps) {
                 {post.title}
               </h2>
             </div>
-            <button
-              onClick={onClose}
-              className="text-[#94A3B8] hover:text-[#0F172A] transition-colors duration-200 flex-shrink-0 mt-1"
-            >
+            <button onClick={onClose}
+              className="text-[#94A3B8] hover:text-[#0F172A] transition-colors duration-200 flex-shrink-0 mt-1">
               <X size={20} />
             </button>
           </div>
@@ -89,11 +116,39 @@ export default function PostModal({ post, onClose }: PostModalProps) {
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
           ) : (
-            <p className="text-[#CBD5E1]"
-              style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif" }}>
+            <p className="text-[#CBD5E1]" style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif" }}>
               내용이 없습니다.
             </p>
           )}
+        </div>
+
+        {/* 푸터: 조회수 + 체크 */}
+        <div className="border-t border-[#E2E8F0] flex-shrink-0 flex items-center justify-between"
+          style={{ padding: "16px 32px" }}>
+          <div className="flex items-center gap-1 text-[#94A3B8]"
+            style={{ fontSize: "13px", fontFamily: "Inter, sans-serif" }}>
+            <Eye size={14} />
+            <span style={{ marginLeft: "4px" }}>{(post.viewCount ?? 0) + 1}</span>
+          </div>
+          <button
+            onClick={handleLike}
+            disabled={!session || likeLoading}
+            title={session ? (liked ? "체크 취소" : "체크하기") : "로그인 후 체크할 수 있습니다"}
+            style={{
+              display: "flex", alignItems: "center", gap: "6px",
+              padding: "6px 14px",
+              backgroundColor: liked ? "#0F172A" : "white",
+              color: liked ? "white" : "#94A3B8",
+              border: `1px solid ${liked ? "#0F172A" : "#E2E8F0"}`,
+              cursor: session ? "pointer" : "default",
+              fontSize: "13px", fontFamily: "Inter, sans-serif",
+              transition: "all 0.15s ease",
+              opacity: likeLoading ? 0.6 : 1,
+            }}
+          >
+            <Check size={14} />
+            <span>{likeCount}</span>
+          </button>
         </div>
       </div>
     </div>

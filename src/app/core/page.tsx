@@ -16,6 +16,8 @@ export default async function CorePage() {
     content: p.content,
     category: p.category,
     createdAt: p.createdAt.toISOString(),
+    viewCount: p.viewCount,
+    likeCount: 0,
   }));
 
   return (

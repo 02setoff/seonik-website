@@ -100,12 +100,13 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
             {session ? (
               /* 로그인 상태 */
               <div className="flex items-center" style={{ gap: "12px" }}>
-                <span
-                  className="hidden md:block text-[#0F172A] font-medium"
+                <Link
+                  href="/mypage"
+                  className="hidden md:block text-[#0F172A] font-medium hover:text-[#475569] transition-colors duration-200"
                   style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif" }}
                 >
                   {session.user?.name || session.user?.email?.split("@")[0]}
-                </span>
+                </Link>
                 <button
                   onClick={() => signOut({ callbackUrl: "/" })}
                   className="flex items-center gap-1 text-[#94A3B8] hover:text-[#0F172A] transition-colors duration-200"
