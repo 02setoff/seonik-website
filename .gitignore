@@ -31,3 +31,17 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/src/generated/prisma
+
+# env files (contains secrets)
+.env
+.env.local
+
+# SQLite database
+prisma/*.db
+prisma/*.db-journal
+
+# uploaded images (served locally only)
+/public/uploads/*
+!/public/uploads/.gitkeep

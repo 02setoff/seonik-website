@@ -26,14 +26,9 @@ export default function Footer() {
                   />
                 </svg>
               </div>
-              <div className="flex flex-col leading-none">
-                <span className="text-base font-bold tracking-wider text-paper-white">
-                  SEONIK
-                </span>
-                <span className="text-[9px] tracking-[0.2em] text-slate-400 mt-0.5">
-                  선익
-                </span>
-              </div>
+              <span className="text-base font-bold tracking-wider text-paper-white">
+                선익 SEONIK
+              </span>
             </div>
             <p className="text-sm text-slate-400 leading-relaxed max-w-xs">
               먼저 아는 자가 이긴다.
@@ -98,7 +93,7 @@ export default function Footer() {
         <div className="mt-16 pt-8 border-t border-white/10">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-xs text-slate-400">
-              &copy; {new Date().getFullYear()} SEONIK 선익. All rights reserved.
+              &copy; {new Date().getFullYear()} 선익 SEONIK. All rights reserved.
             </p>
             <p className="text-xs text-slate-400">
               先益 &mdash; Know First, Win First.

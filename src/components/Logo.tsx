@@ -23,14 +23,9 @@ export default function Logo({ className = "" }: { className?: string }) {
         </svg>
       </div>
       {/* Wordmark */}
-      <div className="flex flex-col leading-none">
-        <span className="text-lg font-bold tracking-wider text-midnight-slate font-display">
-          SEONIK
-        </span>
-        <span className="text-[10px] tracking-[0.2em] text-slate-400 mt-0.5">
-          선익
-        </span>
-      </div>
+      <span className="text-lg font-bold tracking-wider text-midnight-slate font-display">
+        선익 SEONIK
+      </span>
     </Link>
   );
 }

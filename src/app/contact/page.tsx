@@ -1,178 +1,109 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, Instagram, Send, CheckCircle } from "lucide-react";
+import Link from "next/link";
 
 export default function ContactPage() {
-  const [formState, setFormState] = useState({
-    name: "",
-    email: "",
-    message: "",
-  });
-  const [submitted, setSubmitted] = useState(false);
+  const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
+  const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handle = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+    setForm(f => ({ ...f, [e.target.name]: e.target.value }));
+
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: 실제 폼 제출 로직 연동 (예: API route, 이메일 서비스)
-    setSubmitted(true);
+    setStatus("sending");
+    const res = await fetch("/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
+    setStatus(res.ok ? "done" : "error");
+  };
+
+  const inputStyle: React.CSSProperties = {
+    width: "100%",
+    padding: "12px 16px",
+    border: "1px solid #E2E8F0",
+    outline: "none",
+    fontSize: "14px",
+    fontFamily: "'Pretendard', sans-serif",
+    color: "#0F172A",
+    backgroundColor: "#F8FAFC",
+    borderRadius: 0,
+    boxSizing: "border-box",
   };
 
   return (
-    <div className="page-transition">
-      {/* Hero */}
-      <section className="pt-32 lg:pt-40 pb-12 lg:pb-16 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-xs tracking-[0.3em] uppercase text-slate-400 mb-6">
-            Contact
-          </p>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-midnight-slate mb-6 leading-tight text-balance">
-            문의하기
-          </h1>
-          <p className="text-base md:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            선익과 함께 정보의 힘을 경험하세요.
-          </p>
-        </div>
-      </section>
+    <div className="bg-[#F8F9FA] min-h-screen">
+      <div className="mx-auto" style={{ maxWidth: "640px", padding: "64px 40px" }}>
+        <Link href="/" className="text-[#94A3B8] hover:text-[#0F172A] transition-colors duration-150"
+          style={{ fontSize: "13px", fontFamily: "Inter, sans-serif" }}>
+          ← 홈으로
+        </Link>
 
-      {/* Contact Info + Form */}
-      <section className="pb-24 lg:pb-32 px-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16">
-            {/* Contact Info */}
-            <div>
-              <h2 className="text-lg font-semibold text-midnight-slate mb-8">
-                연락처
-              </h2>
-              <div className="space-y-6">
-                <a
-                  href="mailto:contact@seonik.kr"
-                  className="flex items-center gap-4 group"
-                >
-                  <div className="w-10 h-10 border border-slate-200 flex items-center justify-center group-hover:border-midnight-slate/30 transition-colors duration-200">
-                    <Mail size={16} className="text-midnight-slate" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-slate-400 mb-1">이메일</p>
-                    <p className="text-sm text-midnight-slate group-hover:text-accent-gold transition-colors duration-200">
-                      contact@seonik.kr
-                    </p>
-                  </div>
-                </a>
+        <h1 className="font-bold text-[#0F172A]"
+          style={{ fontSize: "28px", fontFamily: "'Pretendard', sans-serif", marginTop: "24px", marginBottom: "8px" }}>
+          문의하기
+        </h1>
+        <p className="text-[#64748B]"
+          style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", marginBottom: "40px" }}>
+          궁금한 점이나 협업 제안을 자유롭게 보내주세요.
+        </p>
 
-                <a
-                  href="https://instagram.com/seonik_official"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-4 group"
-                >
-                  <div className="w-10 h-10 border border-slate-200 flex items-center justify-center group-hover:border-midnight-slate/30 transition-colors duration-200">
-                    <Instagram size={16} className="text-midnight-slate" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-slate-400 mb-1">인스타그램</p>
-                    <p className="text-sm text-midnight-slate group-hover:text-accent-gold transition-colors duration-200">
-                      @seonik_official
-                    </p>
-                  </div>
-                </a>
-              </div>
-            </div>
-
-            {/* Contact Form */}
-            <div>
-              <h2 className="text-lg font-semibold text-midnight-slate mb-8">
-                문의 양식
-              </h2>
-
-              {submitted ? (
-                <div className="border border-slate-200 p-8 text-center">
-                  <CheckCircle
-                    size={32}
-                    strokeWidth={1.5}
-                    className="text-midnight-slate mx-auto mb-4"
-                  />
-                  <p className="text-base font-medium text-midnight-slate mb-2">
-                    문의가 접수되었습니다.
-                  </p>
-                  <p className="text-sm text-slate-600">
-                    빠른 시일 내에 답변 드리겠습니다.
-                  </p>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div>
-                    <label
-                      htmlFor="name"
-                      className="block text-xs text-slate-400 mb-2 tracking-wide"
-                    >
-                      이름
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
-                      required
-                      value={formState.name}
-                      onChange={(e) =>
-                        setFormState({ ...formState, name: e.target.value })
-                      }
-                      className="w-full px-4 py-3 bg-paper-white border border-slate-200 text-sm text-midnight-slate placeholder:text-slate-400 focus:outline-none focus:border-midnight-slate transition-colors duration-200"
-                      placeholder="홍길동"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="email"
-                      className="block text-xs text-slate-400 mb-2 tracking-wide"
-                    >
-                      이메일
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      required
-                      value={formState.email}
-                      onChange={(e) =>
-                        setFormState({ ...formState, email: e.target.value })
-                      }
-                      className="w-full px-4 py-3 bg-paper-white border border-slate-200 text-sm text-midnight-slate placeholder:text-slate-400 focus:outline-none focus:border-midnight-slate transition-colors duration-200"
-                      placeholder="example@email.com"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="message"
-                      className="block text-xs text-slate-400 mb-2 tracking-wide"
-                    >
-                      문의 내용
-                    </label>
-                    <textarea
-                      id="message"
-                      required
-                      rows={5}
-                      value={formState.message}
-                      onChange={(e) =>
-                        setFormState({ ...formState, message: e.target.value })
-                      }
-                      className="w-full px-4 py-3 bg-paper-white border border-slate-200 text-sm text-midnight-slate placeholder:text-slate-400 focus:outline-none focus:border-midnight-slate transition-colors duration-200 resize-none"
-                      placeholder="문의하실 내용을 입력해주세요."
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="inline-flex items-center gap-2 px-8 py-4 bg-midnight-slate text-paper-white text-sm font-medium tracking-wide hover:bg-midnight-slate/90 transition-all duration-200 w-full justify-center"
-                  >
-                    <Send size={14} />
-                    전송하기
-                  </button>
-                </form>
-              )}
-            </div>
+        {status === "done" ? (
+          <div className="bg-white border border-[#E2E8F0] p-8 text-center">
+            <p className="text-[#0F172A] font-semibold"
+              style={{ fontSize: "18px", fontFamily: "'Pretendard', sans-serif", marginBottom: "8px" }}>
+              문의가 접수되었습니다.
+            </p>
+            <p className="text-[#64748B]"
+              style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif" }}>
+              빠른 시일 내에 답변 드리겠습니다.
+            </p>
           </div>
-        </div>
-      </section>
+        ) : (
+          <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+              <input name="name" placeholder="이름" required value={form.name} onChange={handle} style={inputStyle} />
+              <input name="email" type="email" placeholder="이메일" required value={form.email} onChange={handle} style={inputStyle} />
+            </div>
+            <input name="subject" placeholder="제목" required value={form.subject} onChange={handle} style={inputStyle} />
+            <textarea
+              name="message"
+              placeholder="내용을 입력해주세요."
+              required
+              value={form.message}
+              onChange={handle}
+              rows={8}
+              style={{ ...inputStyle, resize: "vertical" }}
+            />
+            {status === "error" && (
+              <p style={{ fontSize: "13px", fontFamily: "'Pretendard', sans-serif", color: "#EF4444" }}>
+                오류가 발생했습니다. 다시 시도해주세요.
+              </p>
+            )}
+            <button
+              type="submit"
+              disabled={status === "sending"}
+              style={{
+                padding: "14px",
+                backgroundColor: "#0F172A",
+                color: "white",
+                border: "none",
+                cursor: status === "sending" ? "not-allowed" : "pointer",
+                fontSize: "14px",
+                fontFamily: "'Pretendard', sans-serif",
+                fontWeight: 600,
+                opacity: status === "sending" ? 0.6 : 1,
+                borderRadius: 0,
+              }}
+            >
+              {status === "sending" ? "전송 중..." : "문의 보내기"}
+            </button>
+          </form>
+        )}
+      </div>
     </div>
   );
 }

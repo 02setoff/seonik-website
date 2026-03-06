@@ -1,14 +1,12 @@
+/* Pretendard - 한글 (CDN, OFL 라이선스) */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+
+/* Inter + Noto Sans KR + Noto Serif KR (Google Fonts, OFL 라이선스) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@400;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Pretendard Font */
-@font-face {
-  font-family: "Pretendard";
-  src: url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
-}
-
-@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
 
 :root {
   --midnight-slate: #0F172A;
@@ -17,7 +15,7 @@
   --slate-600: #475569;
   --slate-400: #94A3B8;
   --slate-200: #E2E8F0;
-  --accent-gold: #D4AF37;
+  --slate-100: #F1F5F9;
 }
 
 * {
@@ -31,10 +29,9 @@ html {
 }
 
 body {
-  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
-    system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo",
-    "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji",
-    "Segoe UI Symbol", sans-serif;
+  font-family: 'Pretendard', 'Inter', -apple-system, BlinkMacSystemFont,
+    system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo',
+    'Noto Sans KR', 'Malgun Gothic', sans-serif;
   color: var(--midnight-slate);
   background-color: var(--paper-white);
   -webkit-font-smoothing: antialiased;
@@ -47,24 +44,20 @@ body {
   }
 }
 
-/* Smooth page transitions */
-.page-transition {
-  animation: fadeIn 0.5s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Selection color */
 ::selection {
   background-color: #0F172A;
   color: #F8F9FA;
 }
+
+/* 포스트 본문 HTML 렌더링 스타일 */
+.post-content h2 { font-size: 20px; font-weight: 700; margin: 20px 0 10px; color: #0F172A; }
+.post-content h3 { font-size: 17px; font-weight: 600; margin: 16px 0 8px; color: #0F172A; }
+.post-content p { margin: 0 0 10px; }
+.post-content ul { padding-left: 22px; list-style: disc; margin: 10px 0; }
+.post-content ol { padding-left: 22px; list-style: decimal; margin: 10px 0; }
+.post-content li { margin-bottom: 4px; }
+.post-content strong { font-weight: 700; }
+.post-content em { font-style: italic; }
+.post-content u { text-decoration: underline; }
+.post-content s { text-decoration: line-through; }
+.post-content img { max-width: 100%; height: auto; display: block; margin: 16px 0; }

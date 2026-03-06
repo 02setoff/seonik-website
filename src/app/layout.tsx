@@ -1,19 +1,12 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
+import LayoutWrapper from "@/components/LayoutWrapper";
+import SessionProvider from "@/components/SessionProvider";
 
 export const metadata: Metadata = {
-  title: "선익 SEONIK | 먼저 아는 자가 이긴다",
+  title: "선익 SEONIK",
   description:
-    "AI 네이티브 프라이빗 싱크탱크. 대기업만 누리던 비즈니스 인텔리전스를 1인 사업자와 소규모 창업자에게 제공합니다.",
+    "AI 네이티브 프라이빗 싱크탱크. 앞서나가는 정보로 실행가들을 이롭게.",
   keywords: [
     "선익",
     "SEONIK",
@@ -21,16 +14,16 @@ export const metadata: Metadata = {
     "AI 분석",
     "시장 분석",
     "창업",
-    "컨설팅",
     "싱크탱크",
+    "선익",
   ],
   openGraph: {
-    title: "선익 SEONIK | 먼저 아는 자가 이긴다",
+    title: "선익 SEONIK",
     description:
-      "AI 네이티브 프라이빗 싱크탱크. 대기업만 누리던 비즈니스 인텔리전스를 당신의 사업에도.",
+      "AI 네이티브 프라이빗 싱크탱크. 앞서나가는 정보로 실행가들을 이롭게.",
     type: "website",
     locale: "ko_KR",
-    siteName: "SEONIK 선익",
+    siteName: "선익 SEONIK",
   },
   robots: {
     index: true,
@@ -45,10 +38,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className={`${inter.variable} antialiased`}>
-        <Header />
-        <main className="min-h-screen">{children}</main>
-        <Footer />
+      <body className="antialiased">
+        <SessionProvider>
+          <LayoutWrapper>{children}</LayoutWrapper>
+        </SessionProvider>
       </body>
     </html>
   );
