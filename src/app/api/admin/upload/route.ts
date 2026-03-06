@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { writeFile } from "fs/promises";
-import path from "path";
+import { put } from "@vercel/blob";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -28,16 +27,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "파일 크기는 5MB 이하여야 합니다." }, { status: 400 });
   }
 
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
+  const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
+  const filename = `posts/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
-  // Generate unique filename
-  const ext = file.name.split(".").pop() ?? "jpg";
-  const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-  const uploadDir = path.join(process.cwd(), "public", "uploads");
-  const filePath = path.join(uploadDir, filename);
+  const blob = await put(filename, file, {
+    access: "public",
+    contentType: file.type,
+  });
 
-  await writeFile(filePath, buffer);
-
-  return NextResponse.json({ url: `/uploads/${filename}` });
+  return NextResponse.json({ url: blob.url });
 }
