@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { signIn } from "next-auth/react";
 import { X } from "lucide-react";
 
@@ -15,6 +15,7 @@ const HOW_FOUND_OPTIONS = ["지인 추천", "SNS", "검색엔진", "뉴스/미�
 const JOIN_REASON_OPTIONS = ["비즈니스 인텔리전스", "시장 분석", "트렌드 파악", "AI 활용 정보", "기타"];
 
 export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: AuthModalProps) {
+  const backdropMouseDown = useRef(false);
   const [tab, setTab] = useState<"login" | "signup">(defaultTab);
   const [signupStep, setSignupStep] = useState<1 | 2>(1);
   const [loading, setLoading] = useState(false);
@@ -133,7 +134,8 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
         alignItems: "center", justifyContent: "center", padding: "20px",
         backgroundColor: "rgba(15, 23, 42, 0.6)", backdropFilter: "blur(4px)",
       }}
-      onClick={(e) => e.target === e.currentTarget && onClose()}
+      onMouseDown={(e) => { backdropMouseDown.current = e.target === e.currentTarget; }}
+      onClick={(e) => { if (backdropMouseDown.current && e.target === e.currentTarget) onClose(); }}
     >
       <div style={{
         backgroundColor: "white", width: "100%", maxWidth: "420px",

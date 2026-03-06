@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { X, Check, Eye } from "lucide-react";
 import { useSession } from "next-auth/react";
 
@@ -27,6 +27,7 @@ interface PostModalProps {
 }
 
 export default function PostModal({ post, onClose }: PostModalProps) {
+  const backdropMouseDown = useRef(false);
   const { data: session } = useSession();
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
@@ -74,7 +75,8 @@ export default function PostModal({ post, onClose }: PostModalProps) {
         padding: "20px",
         backgroundColor: "rgba(15, 23, 42, 0.75)", backdropFilter: "blur(4px)",
       }}
-      onClick={(e) => e.target === e.currentTarget && onClose()}
+      onMouseDown={(e) => { backdropMouseDown.current = e.target === e.currentTarget; }}
+      onClick={(e) => { if (backdropMouseDown.current && e.target === e.currentTarget) onClose(); }}
     >
       <div style={{
         backgroundColor: "#ffffff", width: "100%", maxWidth: "680px",
