@@ -6,9 +6,16 @@ export async function POST(request: Request) {
   try {
     const { name, email, password, occupation, howFound, joinReason } = await request.json();
 
-    if (!email || !password) {
+    if (!name || !email || !password) {
       return NextResponse.json(
-        { error: "이메일과 비밀번호는 필수입니다." },
+        { error: "이름, 이메일, 비밀번호는 필수입니다." },
+        { status: 400 }
+      );
+    }
+
+    if (!occupation || !howFound || !joinReason) {
+      return NextResponse.json(
+        { error: "모든 항목을 입력해 주세요." },
         { status: 400 }
       );
     }

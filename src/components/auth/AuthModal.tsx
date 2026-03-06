@@ -72,6 +72,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
   const handleStep1 = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    if (!signupName.trim()) { setError("이름을 입력해 주세요."); return; }
     if (signupPassword !== signupConfirm) { setError("비밀번호가 일치하지 않습니다."); return; }
     if (signupPassword.length < 6) { setError("비밀번호는 6자 이상이어야 합니다."); return; }
     setSignupStep(2);
@@ -83,6 +84,12 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    if (!occupation) { setError("직업을 선택해 주세요."); return; }
+    if (occupation === "기타" && !occupationOther.trim()) { setError("직업을 직접 입력해 주세요."); return; }
+    if (!howFound) { setError("선익을 알게 된 경로를 선택해 주세요."); return; }
+    if (howFound === "기타" && !howFoundOther.trim()) { setError("알게 된 경로를 직접 입력해 주세요."); return; }
+    if (!joinReason) { setError("가입 이유를 선택해 주세요."); return; }
+    if (joinReason === "기타" && !joinReasonOther.trim()) { setError("가입 이유를 직접 입력해 주세요."); return; }
     setLoading(true);
     const res = await fetch("/api/auth/register", {
       method: "POST",
@@ -183,8 +190,8 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
             <p style={{ fontSize: "11px", color: "#94A3B8", fontFamily: "Inter, sans-serif", textAlign: "center", letterSpacing: "0.05em", marginBottom: "4px" }}>
               1 / 2 · 기본 정보
             </p>
-            <input type="text" placeholder="이름 (선택)" value={signupName}
-              onChange={(e) => setSignupName(e.target.value)} style={inputStyle} />
+            <input type="text" placeholder="이름" value={signupName}
+              onChange={(e) => setSignupName(e.target.value)} required style={inputStyle} />
             <input type="email" placeholder="이메일" value={signupEmail}
               onChange={(e) => setSignupEmail(e.target.value)} required style={inputStyle} />
             <input type="password" placeholder="비밀번호 (6자 이상)" value={signupPassword}
@@ -201,7 +208,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
         {tab === "signup" && signupStep === 2 && (
           <form onSubmit={handleSignup} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
             <p style={{ fontSize: "11px", color: "#94A3B8", fontFamily: "Inter, sans-serif", textAlign: "center", letterSpacing: "0.05em" }}>
-              2 / 2 · 추가 정보 (선택)
+              2 / 2 · 추가 정보 (필수)
             </p>
 
             {[
