@@ -54,13 +54,22 @@ export async function PUT(request: Request, { params }: { params: { id: string }
                   ${safeSummary ? `<p style="font-size:15px;color:#475569;line-height:1.7;border-left:3px solid #E2E8F0;padding-left:16px;margin:0 0 32px;">${safeSummary}</p>` : ""}
                   <a href="${siteUrl}/?p=${post.id}" style="display:inline-block;background:#0F172A;color:white;text-decoration:none;padding:12px 28px;font-size:14px;font-weight:600;letter-spacing:0.02em;">브리핑 읽기 →</a>
                   <div style="margin-top:40px;padding-top:20px;border-top:1px solid #F1F5F9;">
-                    <p style="font-size:11px;color:#CBD5E1;margin:0 0 6px;">
-                      이 메일은 선익 브리핑 알림 수신에 동의하셨기 때문에 발송되었습니다.
+                    <p style="font-size:11px;color:#CBD5E1;margin:0 0 8px;">
+                      이 메일은 회원가입 시 이메일 알림 수신에 동의하셨기 때문에 발송되었습니다.
                     </p>
-                    <a href="${siteUrl}/api/newsletter/unsubscribe?email=${encodeURIComponent(s.email!)}"
-                      style="font-size:11px;color:#94A3B8;text-decoration:underline;">
-                      수신거부 (클릭 시 즉시 처리)
-                    </a>
+                    <p style="font-size:11px;color:#CBD5E1;margin:0 0 8px;">
+                      발신: 선익 SEONIK &lt;${process.env.GMAIL_USER}&gt;
+                    </p>
+                    <div style="display:flex;gap:16px;flex-wrap:wrap;">
+                      <a href="${siteUrl}/api/newsletter/unsubscribe?email=${encodeURIComponent(s.email!)}"
+                        style="font-size:11px;color:#94A3B8;text-decoration:underline;">
+                        수신거부 (클릭 시 즉시 처리)
+                      </a>
+                      <a href="${siteUrl}/privacy"
+                        style="font-size:11px;color:#94A3B8;text-decoration:underline;">
+                        개인정보처리방침
+                      </a>
+                    </div>
                   </div>
                   <p style="font-size:12px;color:#94A3B8;text-align:center;margin-top:16px;">先益 — Know First, Win First.</p>
                 </div>

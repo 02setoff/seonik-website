@@ -17,6 +17,9 @@ export default function EditProfilePage() {
     howFound: "", howFoundOther: "", joinReason: "", joinReasonOther: "",
     email: "",
   });
+  const [newsletterConsent, setNewsletterConsent] = useState(false);
+  const [newsletterSaving, setNewsletterSaving] = useState(false);
+  const [newsletterSuccess, setNewsletterSuccess] = useState(false);
   const [pwForm, setPwForm] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
   const [saving, setSaving] = useState(false);
   const [savingPw, setSavingPw] = useState(false);
@@ -47,6 +50,7 @@ export default function EditProfilePage() {
           joinReason: JOIN_REASON_OPTIONS.includes(jr) ? jr : (jr ? "기타" : ""),
           joinReasonOther: JOIN_REASON_OPTIONS.includes(jr) ? "" : jr,
         });
+        setNewsletterConsent(data.newsletterConsent ?? false);
       })
       .catch(() => {});
   }, [status]);
@@ -80,6 +84,22 @@ export default function EditProfilePage() {
       setSuccess(true);
       setTimeout(() => router.push("/mypage"), 1200);
     }
+  };
+
+  const handleNewsletterSave = async (newValue: boolean) => {
+    setNewsletterConsent(newValue);
+    setNewsletterSaving(true);
+    setNewsletterSuccess(false);
+    try {
+      await fetch("/api/user", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ newsletterConsent: newValue }),
+      });
+      setNewsletterSuccess(true);
+      setTimeout(() => setNewsletterSuccess(false), 3000);
+    } catch {}
+    setNewsletterSaving(false);
   };
 
   const handlePasswordSave = async (e: React.FormEvent) => {
@@ -211,6 +231,49 @@ export default function EditProfilePage() {
           {saving ? "저장 중..." : "저장하기"}
         </button>
       </form>
+
+      {/* 이메일 수신 설정 */}
+      <div style={{ marginBottom: "48px" }}>
+        <p style={sectionTitle}>이메일 알림 설정</p>
+        <div style={{ backgroundColor: "white", border: "1px solid #E2E8F0", padding: "20px 24px" }}>
+          <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer", gap: "16px" }}>
+            <div>
+              <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", fontWeight: 600, color: "#0F172A", marginBottom: "4px" }}>
+                새 브리핑 발행 알림
+              </p>
+              <p style={{ fontSize: "12px", fontFamily: "'Pretendard', sans-serif", color: "#94A3B8", lineHeight: 1.5 }}>
+                새 브리핑이 발행될 때 이메일로 알림을 받습니다.
+              </p>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
+              {newsletterSaving && <span style={{ fontSize: "11px", color: "#94A3B8", fontFamily: "'Pretendard', sans-serif" }}>저장 중...</span>}
+              {newsletterSuccess && <span style={{ fontSize: "11px", color: "#10B981", fontFamily: "'Pretendard', sans-serif" }}>변경됨</span>}
+              <button
+                type="button"
+                onClick={() => handleNewsletterSave(!newsletterConsent)}
+                disabled={newsletterSaving}
+                style={{
+                  width: "44px", height: "24px", borderRadius: "12px", border: "none",
+                  backgroundColor: newsletterConsent ? "#0F172A" : "#E2E8F0",
+                  cursor: newsletterSaving ? "not-allowed" : "pointer",
+                  position: "relative", transition: "background-color 0.2s", padding: 0,
+                }}
+              >
+                <span style={{
+                  position: "absolute", top: "3px",
+                  left: newsletterConsent ? "23px" : "3px",
+                  width: "18px", height: "18px", borderRadius: "50%",
+                  backgroundColor: "white", transition: "left 0.2s",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+                }} />
+              </button>
+            </div>
+          </label>
+          <p style={{ fontSize: "11px", fontFamily: "'Pretendard', sans-serif", color: "#CBD5E1", marginTop: "12px", lineHeight: 1.5 }}>
+            * 동의 철회 후에도 동의 기록은 정보통신망법 제50조의5에 따라 6개월간 보관됩니다.
+          </p>
+        </div>
+      </div>
 
       {/* 비밀번호 변경 폼 */}
       <form onSubmit={handlePasswordSave} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>

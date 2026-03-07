@@ -19,6 +19,7 @@ export async function GET() {
       occupation: true,
       howFound: true,
       joinReason: true,
+      newsletterConsent: true,
       createdAt: true,
       likes: {
         select: {
@@ -99,7 +100,7 @@ export async function PUT(request: Request) {
   }
 
   try {
-    const { name, occupation, howFound, joinReason, email, currentPassword, newPassword } = await request.json();
+    const { name, occupation, howFound, joinReason, email, currentPassword, newPassword, newsletterConsent } = await request.json();
 
     // 이름 중복 확인
     if (name) {
@@ -151,6 +152,16 @@ export async function PUT(request: Request) {
     };
     if (email && email !== session.user.email) updateData.email = email;
     if (hashedPassword) updateData.password = hashedPassword;
+    // 뉴스레터 수신 동의 변경 (마이페이지에서 직접 토글 가능 - 개인정보처리방침 제4조)
+    if (typeof newsletterConsent === "boolean") {
+      updateData.newsletterConsent = newsletterConsent;
+      if (newsletterConsent) {
+        updateData.newsletterConsentAt = new Date(); // 재동의 시 일시 갱신
+        updateData.newsletterUnsubscribedAt = null;
+      } else {
+        updateData.newsletterUnsubscribedAt = new Date(); // 수신거부 일시 기록
+      }
+    }
 
     const user = await prisma.user.update({
       where: { email: session.user.email },

@@ -39,6 +39,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
   const [joinReason, setJoinReason] = useState("");
   const [joinReasonOther, setJoinReasonOther] = useState("");
   const [newsletterConsent, setNewsletterConsent] = useState(false);
+  const [privacyConsent, setPrivacyConsent] = useState(false);
 
   useEffect(() => {
     setTab(defaultTab);
@@ -102,6 +103,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
     if (!signupEmail.trim()) { setError("이메일을 입력해 주세요."); return; }
     if (signupPassword !== signupConfirm) { setError("비밀번호가 일치하지 않습니다."); return; }
     if (signupPassword.length < 6) { setError("비밀번호는 6자 이상이어야 합니다."); return; }
+    if (!privacyConsent) { setError("개인정보처리방침에 동의해 주세요."); return; }
 
     setLoading(true);
     try {
@@ -185,6 +187,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
         howFound: getFinalValue(howFound, howFoundOther),
         joinReason: getFinalValue(joinReason, joinReasonOther),
         newsletterConsent,
+        privacyConsent,
       }),
     });
     const data = await res.json();
@@ -288,6 +291,16 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
               onChange={(e) => setSignupPassword(e.target.value)} required style={inputStyle} />
             <input type="password" placeholder="비밀번호 확인" value={signupConfirm}
               onChange={(e) => setSignupConfirm(e.target.value)} required style={inputStyle} />
+            <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", cursor: "pointer", marginTop: "4px" }}>
+              <input type="checkbox" checked={privacyConsent} onChange={(e) => setPrivacyConsent(e.target.checked)}
+                style={{ width: "14px", height: "14px", cursor: "pointer", marginTop: "2px", flexShrink: 0 }} />
+              <span style={{ fontSize: "12px", color: "#64748B", fontFamily: "'Pretendard', sans-serif", lineHeight: "1.5" }}>
+                <a href="/privacy" target="_blank" rel="noopener noreferrer"
+                  style={{ color: "#0F172A", fontWeight: 600, textDecoration: "underline" }}>
+                  개인정보처리방침
+                </a>에 동의합니다 <span style={{ color: "#EF4444" }}>(필수)</span>
+              </span>
+            </label>
             <button type="submit" disabled={loading} style={{ ...btnPrimary, marginTop: "4px" }}>
               {loading ? "확인 중..." : "다음 →"}
             </button>

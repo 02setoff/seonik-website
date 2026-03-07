@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
   try {
-    const { name, email, password, occupation, howFound, joinReason, newsletterConsent } = await request.json();
+    const { name, email, password, occupation, howFound, joinReason, newsletterConsent, privacyConsent } = await request.json();
 
     if (!name || !email || !password) {
       return NextResponse.json(
@@ -57,6 +57,14 @@ export async function POST(request: Request) {
       }
     }
 
+    // 개인정보처리방침 동의 확인 (개인정보보호법 제15조)
+    if (!privacyConsent) {
+      return NextResponse.json(
+        { error: "개인정보처리방침에 동의해 주세요." },
+        { status: 400 }
+      );
+    }
+
     const hashed = await bcrypt.hash(password, 12);
     await prisma.user.create({
       data: {
@@ -66,6 +74,7 @@ export async function POST(request: Request) {
         joinReason: joinReason || null,
         newsletterConsent: newsletterConsent ?? false,
         newsletterConsentAt: newsletterConsent ? new Date() : null,
+        privacyConsentAt: new Date(), // 개인정보처리방침 동의 일시 기록
       },
     });
 
