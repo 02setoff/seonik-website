@@ -81,10 +81,6 @@ export default function PersonalizedSection({ onSelectPost }: { onSelectPost: (p
   const hasJoinReason = data.byJoinReason.length > 0;
   if (!hasOccupation && !hasJoinReason) return null;
 
-  // 두 섹션 모두 fallback이고 데이터가 같으면 하나만 표시
-  const showBothSections =
-    hasOccupation && hasJoinReason &&
-    !(data.byOccupationFallback && data.byJoinReasonFallback);
 
   const toPostItem = (p: Post): PostItem => ({
     id: p.id, title: p.title, summary: p.summary, content: p.content,
@@ -102,33 +98,19 @@ export default function PersonalizedSection({ onSelectPost }: { onSelectPost: (p
         </p>
 
         {hasOccupation && (
-          <div style={{ marginBottom: showBothSections ? "48px" : "0" }}>
+          <div style={{ marginBottom: hasJoinReason ? "48px" : "0" }}>
             <div className="flex items-center mb-6">
-              {data.byOccupationFallback ? (
-                <>
-                  <span className="font-bold text-[#0F172A] tracking-[0.04em]"
-                    style={{ fontSize: "18px", fontFamily: "Inter, sans-serif" }}>
-                    지금 뜨는 브리핑
-                  </span>
-                  <span className="text-[#94A3B8] mx-3" style={{ fontSize: "18px" }}>—</span>
-                  <span className="text-[#64748B]"
-                    style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif" }}>
-                    회원들이 가장 많이 읽은
-                  </span>
-                </>
-              ) : (
-                <>
-                  <span className="font-bold text-[#0F172A] tracking-[0.04em]"
-                    style={{ fontSize: "18px", fontFamily: "Inter, sans-serif" }}>
-                    {data.userOccupation}
-                  </span>
-                  <span className="text-[#94A3B8] mx-3" style={{ fontSize: "18px" }}>—</span>
-                  <span className="text-[#64748B]"
-                    style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif" }}>
-                    같은 직업 회원이 많이 본
-                  </span>
-                </>
-              )}
+              <span className="font-bold text-[#0F172A] tracking-[0.04em]"
+                style={{ fontSize: "18px", fontFamily: "Inter, sans-serif" }}>
+                {data.byOccupationFallback ? "지금 뜨는 브리핑" : data.userOccupation}
+              </span>
+              <span className="text-[#94A3B8] mx-3" style={{ fontSize: "18px" }}>—</span>
+              <span className="text-[#64748B]"
+                style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif" }}>
+                {data.byOccupationFallback
+                  ? "회원들이 가장 많이 읽은"
+                  : "같은 직업 회원이 많이 본"}
+              </span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-5 xl:gap-6">
               {data.byOccupation.map((post) => (
@@ -138,34 +120,20 @@ export default function PersonalizedSection({ onSelectPost }: { onSelectPost: (p
           </div>
         )}
 
-        {showBothSections && hasJoinReason && (
+        {hasJoinReason && (
           <div>
             <div className="flex items-center mb-6">
-              {data.byJoinReasonFallback ? (
-                <>
-                  <span className="font-bold text-[#0F172A] tracking-[0.04em]"
-                    style={{ fontSize: "18px", fontFamily: "Inter, sans-serif" }}>
-                    놓치지 말아야 할
-                  </span>
-                  <span className="text-[#94A3B8] mx-3" style={{ fontSize: "18px" }}>—</span>
-                  <span className="text-[#64748B]"
-                    style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif" }}>
-                    최신 인기 브리핑
-                  </span>
-                </>
-              ) : (
-                <>
-                  <span className="font-bold text-[#0F172A] tracking-[0.04em]"
-                    style={{ fontSize: "18px", fontFamily: "Inter, sans-serif" }}>
-                    {data.userJoinReason}
-                  </span>
-                  <span className="text-[#94A3B8] mx-3" style={{ fontSize: "18px" }}>—</span>
-                  <span className="text-[#64748B]"
-                    style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif" }}>
-                    같은 목적으로 가입한 회원이 많이 본
-                  </span>
-                </>
-              )}
+              <span className="font-bold text-[#0F172A] tracking-[0.04em]"
+                style={{ fontSize: "18px", fontFamily: "Inter, sans-serif" }}>
+                {data.byJoinReasonFallback ? "최신 브리핑" : data.userJoinReason}
+              </span>
+              <span className="text-[#94A3B8] mx-3" style={{ fontSize: "18px" }}>—</span>
+              <span className="text-[#64748B]"
+                style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif" }}>
+                {data.byJoinReasonFallback
+                  ? "방금 발행된 인텔리전스"
+                  : "같은 목적으로 가입한 회원이 많이 본"}
+              </span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-5 xl:gap-6">
               {data.byJoinReason.map((post) => (
