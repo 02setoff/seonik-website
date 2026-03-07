@@ -6,6 +6,7 @@ import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import SearchModal from "./SearchModal";
 import AuthModal from "@/components/auth/AuthModal";
+import PostModal, { PostItem } from "@/components/feed/PostModal";
 
 interface FeedHeaderProps {
   onLogoClick?: () => void;
@@ -15,10 +16,15 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authTab, setAuthTab] = useState<"login" | "signup">("login");
+  const [selectedPost, setSelectedPost] = useState<PostItem | null>(null);
   const { data: session } = useSession();
 
   const openSearch = useCallback(() => setIsSearchOpen(true), []);
   const closeSearch = useCallback(() => setIsSearchOpen(false), []);
+
+  const handleSelectPost = useCallback((post: PostItem) => {
+    setSelectedPost(post);
+  }, []);
 
   const openLogin = useCallback(() => {
     setAuthTab("login");
@@ -155,8 +161,9 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
         </div>
       </header>
 
-      <SearchModal isOpen={isSearchOpen} onClose={closeSearch} />
+      <SearchModal isOpen={isSearchOpen} onClose={closeSearch} onSelectPost={handleSelectPost} />
       <AuthModal isOpen={isAuthOpen} onClose={closeAuth} defaultTab={authTab} />
+      <PostModal post={selectedPost} onClose={() => setSelectedPost(null)} />
     </>
   );
 }

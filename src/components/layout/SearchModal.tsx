@@ -1,32 +1,43 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import { X, Search } from "lucide-react";
+import { X, Search, Check } from "lucide-react";
+import { PostItem } from "@/components/feed/PostModal";
 
 interface SearchResult {
   id: string;
   title: string;
+  summary: string | null;
+  content: string | null;
   category: string;
   createdAt: string;
+  viewCount: number;
+  _count: { likes: number };
 }
 
 interface SearchModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSelectPost?: (post: PostItem) => void;
 }
+
+const CATEGORY_COLORS: Record<string, string> = {
+  RADAR: "#3B82F6",
+  CORE: "#8B5CF6",
+  FLASH: "#F59E0B",
+};
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("ko-KR", {
     year: "numeric", month: "2-digit", day: "2-digit",
-  }).replace(/\. /g, ".").replace(/\.$/, "");
+  }).replace(/. /g, ".").replace(/.$/, "");
 }
 
-export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
+export default function SearchModal({ isOpen, onClose, onSelectPost }: SearchModalProps) {
   const [query, setQuery] = useState("");
   const [posts, setPosts] = useState<SearchResult[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // 게시된 글 가져오기
   useEffect(() => {
     if (isOpen && posts.length === 0) {
       fetch("/api/posts").then(r => r.json()).then(setPosts).catch(() => {});
@@ -58,6 +69,22 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
   const setCategory = useCallback((cat: string) => setQuery(cat), []);
 
+  const handleSelect = useCallback((result: SearchResult) => {
+    if (onSelectPost) {
+      onSelectPost({
+        id: result.id,
+        title: result.title,
+        summary: result.summary,
+        content: result.content,
+        category: result.category,
+        createdAt: result.createdAt,
+        viewCount: result.viewCount,
+        likeCount: result._count.likes,
+      });
+    }
+    onClose();
+  }, [onSelectPost, onClose]);
+
   if (!isOpen) return null;
 
   return (
@@ -74,7 +101,6 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
         backgroundColor: "#ffffff", width: "100%", maxWidth: "640px",
         borderRadius: "8px", overflow: "hidden", boxShadow: "0 20px 60px rgba(0,0,0,0.2)",
       }}>
-        {/* 입력창 */}
         <div className="flex items-center gap-3 border-b border-[#E2E8F0]" style={{ padding: "16px 20px" }}>
           <Search size={18} className="text-[#94A3B8] shrink-0" />
           <input
@@ -91,7 +117,6 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
           </button>
         </div>
 
-        {/* 결과 */}
         <div className="overflow-y-auto" style={{ maxHeight: "420px" }}>
           {query.trim() === "" ? (
             <div style={{ padding: "32px 20px" }} className="text-center">
@@ -119,19 +144,28 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
           ) : (
             <ul>
               {results.map(result => (
-                <li key={result.id}
+                <li
+                  key={result.id}
+                  onClick={() => handleSelect(result)}
                   className="flex items-center justify-between hover:bg-[#F8F9FA] cursor-pointer transition-colors duration-150 border-b border-[#F1F5F9] last:border-0"
-                  style={{ padding: "14px 20px" }}>
+                  style={{ padding: "14px 20px" }}
+                >
                   <div className="min-w-0 mr-4">
                     <p className="text-[#0F172A] text-sm font-medium truncate" style={{ fontFamily: "'Pretendard', sans-serif" }}>
                       {result.title}
                     </p>
-                    <p className="text-[#94A3B8] text-xs mt-0.5 tracking-wide" style={{ fontFamily: "Inter, sans-serif" }}>
-                      {result.category}
+                    <p className="text-xs mt-0.5 tracking-wide" style={{
+                      fontFamily: "Inter, sans-serif",
+                      color: CATEGORY_COLORS[result.category] || "#94A3B8",
+                      fontWeight: 600,
+                    }}>
+                      {result.category} · {formatDate(result.createdAt)}
                     </p>
                   </div>
-                  <span className="text-[#94A3B8] text-xs shrink-0" style={{ fontFamily: "'Pretendard', sans-serif" }}>
-                    {formatDate(result.createdAt)}
+                  <span className="flex items-center gap-1 text-[#CBD5E1] shrink-0"
+                    style={{ fontSize: "12px", fontFamily: "Inter, sans-serif" }}>
+                    <Check size={11} />
+                    {result._count.likes}
                   </span>
                 </li>
               ))}
@@ -140,7 +174,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
         </div>
 
         <div className="border-t border-[#F1F5F9] flex items-center gap-4" style={{ padding: "10px 20px" }}>
-          <span className="text-[#94A3B8] text-xs" style={{ fontFamily: "Inter, sans-serif" }}>ESC로 닫기</span>
+          <span className="text-[#94A3B8] text-xs" style={{ fontFamily: "Inter, sans-serif" }}>ESC로 닫기 · 클릭하여 글 읽기</span>
         </div>
       </div>
     </div>

@@ -8,7 +8,10 @@ function formatDate(d: Date) {
 
 export default async function AdminDashboard() {
   const [posts, contacts] = await Promise.all([
-    prisma.post.findMany({ orderBy: { createdAt: "desc" } }),
+    prisma.post.findMany({
+      orderBy: { createdAt: "desc" },
+      include: { _count: { select: { likes: true, postViews: true } } },
+    }),
     prisma.contact.findMany({ orderBy: { createdAt: "desc" }, take: 5 }),
   ]);
 
@@ -88,13 +91,25 @@ export default async function AdminDashboard() {
               }}>
                 {post.published ? "게시됨" : "초안"}
               </span>
-              <span style={{ fontSize: "12px", color: "#94A3B8", fontFamily: "Inter, sans-serif", whiteSpace: "nowrap" }}>
-                {formatDate(post.createdAt)}
-              </span>
-              <Link href={`/admin/posts/${post.id}/edit`}
-                style={{ fontSize: "12px", color: "#475569", fontFamily: "'Pretendard', sans-serif", textDecoration: "none" }}>
-                수정
-              </Link>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", flexShrink: 0 }}>
+                <span style={{ fontSize: "11px", color: "#94A3B8", fontFamily: "Inter, sans-serif" }}>
+                  👁 {post.viewCount}
+                </span>
+                <span style={{ fontSize: "11px", color: "#94A3B8", fontFamily: "Inter, sans-serif" }}>
+                  ✓ {post._count.likes}
+                </span>
+                <span style={{ fontSize: "12px", color: "#94A3B8", fontFamily: "Inter, sans-serif", whiteSpace: "nowrap" }}>
+                  {formatDate(post.createdAt)}
+                </span>
+                <Link href={`/admin/posts/${post.id}/stats`}
+                  style={{ fontSize: "12px", color: "#3B82F6", fontFamily: "'Pretendard', sans-serif", textDecoration: "none", fontWeight: 500 }}>
+                  통계
+                </Link>
+                <Link href={`/admin/posts/${post.id}/edit`}
+                  style={{ fontSize: "12px", color: "#475569", fontFamily: "'Pretendard', sans-serif", textDecoration: "none" }}>
+                  수정
+                </Link>
+              </div>
               <AdminDeleteButton postId={post.id} />
             </div>
           ))
