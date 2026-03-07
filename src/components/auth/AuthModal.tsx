@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { X, Lock } from "lucide-react";
 
 interface AuthModalProps {
@@ -54,6 +54,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
   const [newsletterConsent, setNewsletterConsent] = useState(false);
   const [privacyConsent, setPrivacyConsent] = useState(false);
   const [privacyScrolled, setPrivacyScrolled] = useState(false);
+  const [ageConsent, setAgeConsent] = useState(false);
 
   // 잠금 카운트다운
   useEffect(() => {
@@ -89,6 +90,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
     setLockedSeconds(0);
     setPrivacyScrolled(false);
     setPrivacyConsent(false);
+    setAgeConsent(false);
     setFindEmailName("");
     setForgotPwName("");
     setForgotPwEmail("");
@@ -149,6 +151,15 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
         if (rememberEmail) localStorage.setItem("seonik_saved_email", loginEmail);
         else localStorage.removeItem("seonik_saved_email");
       } catch {}
+      // mustResetPassword 여부 확인 후 리다이렉트
+      try {
+        const sess = await getSession();
+        if ((sess?.user as { mustResetPassword?: boolean })?.mustResetPassword) {
+          onClose();
+          window.location.href = "/change-password";
+          return;
+        }
+      } catch {}
       onClose();
       window.location.reload();
     }
@@ -162,19 +173,21 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
     setLoading(true);
     setError("");
     try {
-      await fetch("/api/auth/find-email", {
+      const res = await fetch("/api/auth/find-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: findEmailName }),
       });
-      setLoginView("findEmailDone");
+      const data = await res.json();
+      if (!res.ok) { setError(data.error || "이메일 찾기에 실패했습니다."); }
+      else { setLoginView("findEmailDone"); }
     } catch {
       setError("네트워크 오류가 발생했습니다.");
     }
     setLoading(false);
   };
 
-  // 비밀번호 찾기 (코드 발송)
+  // 비밀번호 찾기 (임시 비밀번호 발송)
   const handleForgotPw = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!forgotPwName.trim()) { setError("이름을 입력해 주세요."); return; }
@@ -182,12 +195,14 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
     setLoading(true);
     setError("");
     try {
-      await fetch("/api/auth/forgot-password", {
+      const res = await fetch("/api/auth/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: forgotPwName, email: forgotPwEmail }),
       });
-      setLoginView("forgotPwDone");
+      const data = await res.json();
+      if (!res.ok) { setError(data.error || "비밀번호 재설정에 실패했습니다."); }
+      else { setLoginView("forgotPwDone"); }
     } catch {
       setError("네트워크 오류가 발생했습니다.");
     }
@@ -202,6 +217,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
     if (!signupEmail.trim()) { setError("이메일을 입력해 주세요."); return; }
     if (signupPassword !== signupConfirm) { setError("비밀번호가 일치하지 않습니다."); return; }
     if (signupPassword.length < 6) { setError("비밀번호는 6자 이상이어야 합니다."); return; }
+    if (!ageConsent) { setError("만 14세 이상인 경우에만 가입하실 수 있습니다."); return; }
     if (!privacyScrolled) { setError("개인정보처리방침을 끝까지 읽어주세요."); return; }
     if (!privacyConsent) { setError("개인정보처리방침에 동의해 주세요."); return; }
 
@@ -354,7 +370,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
           <div style={{ display: "flex", borderBottom: "1px solid #E2E8F0", marginBottom: "28px" }}>
             {(["login", "signup"] as const).map((t) => (
               <button key={t}
-                onClick={() => { setTab(t); setSignupStep(1); setVerifyCode(""); setResendCooldown(0); setError(""); setLoginView("form"); setShowRecovery(false); setLockedSeconds(0); setPrivacyScrolled(false); setPrivacyConsent(false); }}
+                onClick={() => { setTab(t); setSignupStep(1); setVerifyCode(""); setResendCooldown(0); setError(""); setLoginView("form"); setShowRecovery(false); setLockedSeconds(0); setPrivacyScrolled(false); setPrivacyConsent(false); setAgeConsent(false); }}
                 style={{
                   flex: 1, padding: "10px", background: "none", border: "none", cursor: "pointer",
                   fontSize: "14px", fontFamily: "'Pretendard', sans-serif",
@@ -473,7 +489,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
             <div style={{ marginBottom: "20px" }}>
               <p style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif", fontWeight: 700, color: "#0F172A", marginBottom: "6px" }}>비밀번호 재설정</p>
               <p style={{ fontSize: "13px", fontFamily: "'Pretendard', sans-serif", color: "#94A3B8", lineHeight: "1.6" }}>
-                이름과 이메일을 입력하면 6자리 재설정 코드를 이메일로 보내드립니다.
+                이름과 이메일이 일치하면 임시 비밀번호를 이메일로 보내드립니다.
               </p>
             </div>
             <form onSubmit={handleForgotPw} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
@@ -492,25 +508,22 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
           </div>
         )}
 
-        {/* ── 로그인: 비밀번호 재설정 코드 발송 완료 ── */}
+        {/* ── 로그인: 임시 비밀번호 발송 완료 ── */}
         {tab === "login" && loginView === "forgotPwDone" && (
           <div style={{ textAlign: "center" }}>
             <div style={{ width: "48px", height: "48px", backgroundColor: "#F0FDF4", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: "22px" }}>✓</div>
-            <p style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif", fontWeight: 700, color: "#0F172A", marginBottom: "8px" }}>코드를 발송했습니다</p>
-            <p style={{ fontSize: "13px", fontFamily: "'Pretendard', sans-serif", color: "#64748B", lineHeight: "1.7", marginBottom: "24px" }}>
-              이메일로 6자리 재설정 코드를 보내드렸습니다.<br />
-              <strong style={{ color: "#0F172A" }}>/reset-password</strong> 페이지에서 코드를 입력하세요.
-            </p>
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              <a href="/reset-password" target="_blank" rel="noopener noreferrer"
-                style={{ ...btnPrimary, display: "block", textDecoration: "none", textAlign: "center", lineHeight: "1" }}>
-                비밀번호 재설정 →
-              </a>
-              <button onClick={() => { setLoginView("form"); setError(""); }}
-                style={{ ...subLinkStyle, textAlign: "center", width: "100%" }}>
-                로그인 화면으로 돌아가기
-              </button>
+            <p style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif", fontWeight: 700, color: "#0F172A", marginBottom: "8px" }}>임시 비밀번호를 발송했습니다</p>
+            <div style={{ background: "#F8F9FA", border: "1px solid #E2E8F0", padding: "14px 16px", marginBottom: "20px", textAlign: "left" }}>
+              <p style={{ fontSize: "13px", fontFamily: "'Pretendard', sans-serif", color: "#475569", lineHeight: "1.75", margin: 0 }}>
+                <strong style={{ color: "#0F172A" }}>① 이메일</strong>에서 임시 비밀번호를 확인하세요.<br />
+                <strong style={{ color: "#0F172A" }}>② 임시 비밀번호로 로그인</strong>하면<br />
+                &nbsp;&nbsp;&nbsp;새 비밀번호 설정 화면으로 이동합니다.
+              </p>
             </div>
+            <button onClick={() => { setLoginView("form"); setError(""); }}
+              style={{ ...btnPrimary }}>
+              로그인 화면으로
+            </button>
           </div>
         )}
 
@@ -528,6 +541,18 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
               onChange={(e) => setSignupPassword(e.target.value)} required style={inputStyle} />
             <input type="password" placeholder="비밀번호 확인" value={signupConfirm}
               onChange={(e) => setSignupConfirm(e.target.value)} required style={inputStyle} />
+
+            {/* 만 14세 이상 확인 (정보통신망법 제31조) */}
+            <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", cursor: "pointer", padding: "10px 12px", backgroundColor: "#F8FAFC", border: `1px solid ${ageConsent ? "#10B981" : "#E2E8F0"}`, transition: "border-color 0.2s" }}>
+              <input type="checkbox" checked={ageConsent} onChange={(e) => setAgeConsent(e.target.checked)}
+                style={{ width: "14px", height: "14px", cursor: "pointer", marginTop: "1px", flexShrink: 0 }} />
+              <span style={{ fontSize: "12px", color: "#0F172A", fontFamily: "'Pretendard', sans-serif", lineHeight: "1.6" }}>
+                본인은 <strong>만 14세 이상</strong>임을 확인합니다.{" "}
+                <span style={{ color: "#EF4444", fontWeight: 600 }}>(필수)</span>
+                <br />
+                <span style={{ color: "#94A3B8", fontSize: "11px" }}>만 14세 미만은 「정보통신망법」에 따라 가입이 제한됩니다.</span>
+              </span>
+            </label>
 
             {/* 개인정보처리방침 필독 영역 */}
             <div>

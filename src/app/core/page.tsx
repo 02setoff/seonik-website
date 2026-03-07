@@ -7,6 +7,7 @@ export default async function CorePage() {
   const raw = await prisma.post.findMany({
     where: { category: "CORE", published: true },
     orderBy: { createdAt: "desc" },
+    include: { _count: { select: { likes: true } } },
   });
 
   const posts = raw.map(p => ({
@@ -17,7 +18,7 @@ export default async function CorePage() {
     category: p.category,
     createdAt: p.createdAt.toISOString(),
     viewCount: p.viewCount,
-    likeCount: 0,
+    likeCount: p._count.likes,
   }));
 
   return (

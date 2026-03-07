@@ -15,10 +15,11 @@ export interface PostItem {
   likeCount?: number;
 }
 
-const CATEGORY_META: Record<string, { color: string; label: string; bg: string }> = {
-  RADAR: { color: "#3B82F6", label: "RADAR INTEL", bg: "#EFF6FF" },
-  CORE:  { color: "#8B5CF6", label: "CORE BRIEF",  bg: "#F5F3FF" },
-  FLASH: { color: "#F59E0B", label: "FLASH ALERT", bg: "#FFFBEB" },
+// 선익 메인 컬러 팔레트만 사용
+const CATEGORY_META: Record<string, { accent: string; label: string; bg: string; border: string }> = {
+  RADAR: { accent: "#0F172A",  label: "RADAR INTEL",  bg: "#F1F5F9", border: "#CBD5E1" },
+  CORE:  { accent: "#334155",  label: "CORE BRIEF",   bg: "#F8F9FA", border: "#E2E8F0" },
+  FLASH: { accent: "#64748B",  label: "FLASH ALERT",  bg: "#F8F9FA", border: "#E2E8F0" },
 };
 
 function formatDate(iso: string) {
@@ -33,26 +34,30 @@ interface PostModalProps {
 }
 
 export default function PostModal({ post, onClose }: PostModalProps) {
-  const backdropMouseDown = useRef(false);
   const { data: session } = useSession();
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [likeLoading, setLikeLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
+  // ESC 키 닫기
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     if (post) window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
   }, [post, onClose]);
 
+  // 바디 스크롤 잠금
   useEffect(() => {
     document.body.style.overflow = post ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [post]);
 
+  // 조회/저장 상태 로드
   useEffect(() => {
     if (!post) return;
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
     fetch(`/api/posts/${post.id}/view`, { method: "POST" }).catch(() => {});
     fetch(`/api/posts/${post.id}/like`)
       .then(r => r.json())
@@ -82,88 +87,84 @@ export default function PostModal({ post, onClose }: PostModalProps) {
 
   if (!post) return null;
 
-  const meta = CATEGORY_META[post.category] || { color: "#64748B", label: post.category, bg: "#F8F9FA" };
+  const meta = CATEGORY_META[post.category] || CATEGORY_META.RADAR;
 
   return (
-    <div
-      style={{
-        position: "fixed", inset: 0, zIndex: 300,
-        display: "flex", alignItems: "center", justifyContent: "center",
-        padding: "20px",
-        backgroundColor: "rgba(15, 23, 42, 0.8)", backdropFilter: "blur(6px)",
-      }}
-      onMouseDown={(e) => { backdropMouseDown.current = e.target === e.currentTarget; }}
-      onClick={(e) => { if (backdropMouseDown.current && e.target === e.currentTarget) onClose(); }}
-    >
+    /* 전체 화면 오버레이 */
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 400,
+      backgroundColor: "white",
+      display: "flex", flexDirection: "column",
+      overflowY: "hidden",
+    }}>
+
+      {/* ── 상단 바 ── */}
       <div style={{
-        backgroundColor: "#ffffff", width: "100%", maxWidth: "760px",
-        maxHeight: "88vh", overflow: "hidden",
-        display: "flex", flexDirection: "column",
-        boxShadow: "0 24px 64px rgba(15,23,42,0.25)",
+        borderBottom: "1px solid #E2E8F0", flexShrink: 0,
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "0 32px", height: "56px",
+        backgroundColor: "white",
       }}>
+        {/* 카테고리 배지 */}
+        <span style={{
+          fontSize: "10px", fontFamily: "Inter, sans-serif",
+          fontWeight: 700, letterSpacing: "0.12em",
+          padding: "4px 12px",
+          backgroundColor: meta.bg, color: meta.accent,
+          border: `1px solid ${meta.border}`,
+        }}>
+          {meta.label}
+        </span>
 
-        {/* 카테고리 컬러 탑 바 */}
-        <div style={{ height: "4px", backgroundColor: meta.color, flexShrink: 0 }} />
-
-        {/* 헤더 */}
-        <div style={{ padding: "24px 36px 20px", flexShrink: 0, borderBottom: "1px solid #F1F5F9" }}>
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              {/* 카테고리 배지 + 날짜 */}
-              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
-                <span style={{
-                  display: "inline-block", padding: "3px 10px",
-                  backgroundColor: meta.bg, color: meta.color,
-                  fontSize: "10px", fontFamily: "Inter, sans-serif",
-                  fontWeight: 700, letterSpacing: "0.1em",
-                }}>
-                  {meta.label}
-                </span>
-                <span style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "#94A3B8", letterSpacing: "0.05em" }}>
-                  INTEL DATE: {formatDate(post.createdAt)}
-                </span>
-              </div>
-              {/* 제목 */}
-              <h2 style={{
-                fontSize: "24px", fontFamily: "'Pretendard', sans-serif",
-                fontWeight: 800, color: "#0F172A", lineHeight: "1.3",
-                letterSpacing: "-0.02em",
-              }}>
-                {post.title}
-              </h2>
-            </div>
-            <button onClick={onClose}
-              style={{ background: "none", border: "none", cursor: "pointer", color: "#CBD5E1", flexShrink: 0, padding: "4px", marginTop: "2px" }}
-              onMouseEnter={e => (e.currentTarget.style.color = "#0F172A")}
-              onMouseLeave={e => (e.currentTarget.style.color = "#CBD5E1")}
-            >
-              <X size={20} />
-            </button>
-          </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <span style={{ fontSize: "12px", fontFamily: "Inter, sans-serif", color: "#94A3B8" }}>
+            {formatDate(post.createdAt)}
+          </span>
+          {/* 닫기 */}
+          <button onClick={onClose}
+            className="hover:bg-[#F8F9FA] transition-colors"
+            style={{
+              background: "none", border: "none", cursor: "pointer",
+              color: "#94A3B8", padding: "6px", display: "flex", alignItems: "center",
+              borderRadius: "4px",
+            }}>
+            <X size={18} />
+          </button>
         </div>
+      </div>
 
-        {/* 본문 스크롤 영역 */}
-        <div style={{ overflowY: "auto", flex: 1, padding: "28px 36px 24px" }}>
+      {/* ── 본문 영역 (스크롤) ── */}
+      <div ref={scrollRef} style={{ flex: 1, overflowY: "auto" }}>
+        <div style={{ maxWidth: "760px", margin: "0 auto", padding: "48px 32px 80px" }}>
+
+          {/* 제목 */}
+          <h1 style={{
+            fontSize: "clamp(22px, 4vw, 32px)",
+            fontFamily: "'Pretendard', sans-serif",
+            fontWeight: 800, color: "#0F172A",
+            lineHeight: "1.35", letterSpacing: "-0.02em",
+            marginBottom: "32px",
+          }}>
+            {post.title}
+          </h1>
 
           {/* EXECUTIVE SUMMARY */}
           {post.summary && (
-            <div style={{ marginBottom: "28px" }}>
+            <div style={{ marginBottom: "36px" }}>
               <p style={{
                 fontSize: "10px", fontFamily: "Inter, sans-serif", fontWeight: 700,
-                letterSpacing: "0.12em", color: meta.color, marginBottom: "10px",
+                letterSpacing: "0.15em", color: "#94A3B8", marginBottom: "12px",
               }}>
                 EXECUTIVE SUMMARY
               </p>
               <div style={{
-                borderLeft: `3px solid ${meta.color}`,
-                paddingLeft: "16px",
+                borderLeft: `3px solid ${meta.accent}`,
+                padding: "16px 20px",
                 backgroundColor: meta.bg,
-                padding: "14px 16px 14px 18px",
               }}>
                 <p style={{
                   fontSize: "15px", fontFamily: "'Pretendard', sans-serif",
-                  color: "#374151", lineHeight: "1.75", fontWeight: 500,
-                  margin: 0,
+                  color: "#334155", lineHeight: "1.8", fontWeight: 500, margin: 0,
                 }}>
                   {post.summary}
                 </p>
@@ -171,12 +172,12 @@ export default function PostModal({ post, onClose }: PostModalProps) {
             </div>
           )}
 
-          {/* BRIEFING 구분선 */}
+          {/* 구분선 */}
           {post.content && (
-            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "28px" }}>
               <p style={{
                 fontSize: "10px", fontFamily: "Inter, sans-serif", fontWeight: 700,
-                letterSpacing: "0.12em", color: "#94A3B8", flexShrink: 0, margin: 0,
+                letterSpacing: "0.15em", color: "#CBD5E1", flexShrink: 0, margin: 0,
               }}>
                 BRIEFING DETAILS
               </p>
@@ -188,7 +189,10 @@ export default function PostModal({ post, onClose }: PostModalProps) {
           {post.content ? (
             <div
               className="post-content"
-              style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif", lineHeight: "1.9", color: "#374151" }}
+              style={{
+                fontSize: "15px", fontFamily: "'Pretendard', sans-serif",
+                lineHeight: "1.95", color: "#374151",
+              }}
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
           ) : (
@@ -197,70 +201,65 @@ export default function PostModal({ post, onClose }: PostModalProps) {
             </p>
           )}
         </div>
+      </div>
 
-        {/* 푸터 */}
-        <div style={{
-          borderTop: "1px solid #F1F5F9", flexShrink: 0,
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-          padding: "14px 36px", backgroundColor: "#FAFAFA",
-        }}>
-          {/* 링크 복사 */}
-          <button
-            onClick={handleCopy}
+      {/* ── 하단 고정 바 ── */}
+      <div style={{
+        borderTop: "1px solid #E2E8F0", flexShrink: 0,
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "12px 32px", backgroundColor: "#FAFAFA",
+      }}>
+        {/* 링크 복사 */}
+        <button onClick={handleCopy}
+          className="transition-all"
+          style={{
+            display: "flex", alignItems: "center", gap: "6px",
+            padding: "7px 14px",
+            backgroundColor: copied ? "#0F172A" : "white",
+            color: copied ? "white" : "#64748B",
+            border: `1px solid ${copied ? "#0F172A" : "#E2E8F0"}`,
+            cursor: "pointer",
+            fontSize: "12px", fontFamily: "Inter, sans-serif",
+          }}>
+          <Link2 size={12} />
+          <span>{copied ? "복사됨!" : "링크 복사"}</span>
+        </button>
+
+        {/* 저장하기 */}
+        {session ? (
+          <button onClick={handleLike} disabled={likeLoading}
             style={{
-              display: "flex", alignItems: "center", gap: "6px",
-              padding: "6px 12px",
-              backgroundColor: copied ? "#0F172A" : "white",
-              color: copied ? "white" : "#94A3B8",
-              border: `1px solid ${copied ? "#0F172A" : "#E2E8F0"}`,
-              cursor: "pointer",
-              fontSize: "12px", fontFamily: "Inter, sans-serif",
-              transition: "all 0.15s ease",
-            }}
-          >
-            <Link2 size={12} />
-            <span>{copied ? "복사됨!" : "링크 복사"}</span>
-          </button>
-
-          {/* 저장하기 */}
-          {session ? (
-            <button
-              onClick={handleLike}
-              disabled={likeLoading}
-              style={{
-                display: "flex", alignItems: "center", gap: "7px",
-                padding: "7px 18px",
-                backgroundColor: liked ? meta.color : "white",
-                color: liked ? "white" : "#94A3B8",
-                border: `1px solid ${liked ? meta.color : "#E2E8F0"}`,
-                cursor: "pointer",
-                fontSize: "13px", fontFamily: "Inter, sans-serif", fontWeight: 500,
-                transition: "all 0.15s ease",
-                opacity: likeLoading ? 0.6 : 1,
-              }}
-            >
-              <Check size={14} />
-              <span>{liked ? "저장됨" : "저장하기"}</span>
-              <span style={{
-                color: liked ? "rgba(255,255,255,0.55)" : "#CBD5E1",
-                fontSize: "12px", marginLeft: "2px",
-              }}>
-                {likeCount}
-              </span>
-            </button>
-          ) : (
-            <div style={{
-              display: "flex", alignItems: "center", gap: "6px",
-              padding: "7px 14px",
-              backgroundColor: "white", color: "#CBD5E1",
-              border: "1px solid #E2E8F0",
-              fontSize: "13px", fontFamily: "Inter, sans-serif",
+              display: "flex", alignItems: "center", gap: "7px",
+              padding: "8px 20px",
+              backgroundColor: liked ? "#0F172A" : "white",
+              color: liked ? "white" : "#475569",
+              border: `1px solid ${liked ? "#0F172A" : "#E2E8F0"}`,
+              cursor: likeLoading ? "not-allowed" : "pointer",
+              fontSize: "13px", fontFamily: "'Pretendard', sans-serif", fontWeight: 600,
+              opacity: likeLoading ? 0.6 : 1,
+              transition: "all 0.15s",
             }}>
-              <Lock size={13} />
-              <span>회원 전용</span>
-            </div>
-          )}
-        </div>
+            <Check size={14} strokeWidth={2.5} />
+            <span>{liked ? "저장됨" : "저장하기"}</span>
+            <span style={{
+              color: liked ? "rgba(255,255,255,0.5)" : "#0F172A",
+              fontSize: "12px", fontWeight: 700, marginLeft: "2px",
+            }}>
+              {likeCount}
+            </span>
+          </button>
+        ) : (
+          <div style={{
+            display: "flex", alignItems: "center", gap: "6px",
+            padding: "8px 16px",
+            backgroundColor: "white", color: "#94A3B8",
+            border: "1px solid #E2E8F0",
+            fontSize: "13px", fontFamily: "'Pretendard', sans-serif",
+          }}>
+            <Lock size={13} />
+            <span>회원 전용</span>
+          </div>
+        )}
       </div>
     </div>
   );

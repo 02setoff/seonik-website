@@ -69,7 +69,7 @@ export default function MissionPage() {
             1인 사업자·소규모 창업가는?
           </p>
           <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "#475569", lineHeight: "1.7", margin: 0 }}>
-            구조적으로 이와 같은 수준의 전략 컨설팅에 접근하지 못합니다. 결국 검증되지 않은 유튜브, 파편화된 블로그, 그리고 &ldquo;감&rdquo;에 의존하여 회사의 명운이 걸린 결정을 내립니다.
+            구조적으로 이와 같은 수준의 전략 컨설팅에 접근하지 못합니다. 결국 유튜브, 파편화된 블로그, 그리고 &ldquo;감&rdquo;에 의존하여 회사의 명운이 걸린 결정을 내립니다.
           </p>
         </div>
         <p style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif", color: "#475569", lineHeight: "1.9" }}>

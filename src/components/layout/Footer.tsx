@@ -81,7 +81,7 @@ export default function FeedFooter() {
               &copy; 2026 SEONIK 선익. All rights reserved.
             </p>
             <p className="text-[#475569]" style={{ fontSize: "12px", fontFamily: "Inter, sans-serif" }}>
-              先益 — Know First, Win First.
+              先益 — 앞서나가는 정보로 실행가들을 이롭게
             </p>
           </div>
 

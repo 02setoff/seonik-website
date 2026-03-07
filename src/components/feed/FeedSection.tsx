@@ -61,12 +61,13 @@ function PostCard({ post, onClick }: { post: Post; onClick: () => void }) {
           style={{ fontSize: "11px", fontFamily: "Inter, sans-serif" }}>
           {post.category}
         </span>
-        <div className="flex items-center gap-3 text-[#CBD5E1]" style={{ fontSize: "12px", fontFamily: "Inter, sans-serif" }}>
-          <span className="flex items-center gap-1">
-            <Check size={11} />
+        <div className="flex items-center gap-3" style={{ fontSize: "12px", fontFamily: "Inter, sans-serif" }}>
+          {/* 저장 수 강조 */}
+          <span className="flex items-center gap-1 font-bold text-[#0F172A]">
+            <Check size={11} strokeWidth={2.5} />
             {post._count.likes}
           </span>
-          <span style={{ fontFamily: "'Pretendard', sans-serif" }}>{formatDate(post.createdAt)}</span>
+          <span className="text-[#CBD5E1]" style={{ fontFamily: "'Pretendard', sans-serif" }}>{formatDate(post.createdAt)}</span>
         </div>
       </div>
     </button>
@@ -127,7 +128,7 @@ export default function FeedSection() {
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-5 xl:gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-5 xl:gap-6">
                   {sectionPosts.map(post => (
                     <PostCard
                       key={post.id}

@@ -48,18 +48,41 @@ async function getPopularByPeers(field: PostField, value: string | null, exclude
 export async function GET() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) {
-    return NextResponse.json({ byOccupation: [], byJoinReason: [], userOccupation: null, userJoinReason: null });
+    return NextResponse.json({
+      byOccupation: [], byJoinReason: [], mostSaved: [], mySaved: [],
+      userOccupation: null, userJoinReason: null,
+    });
   }
 
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
     select: { id: true, occupation: true, joinReason: true },
   });
-  if (!user) return NextResponse.json({ byOccupation: [], byJoinReason: [], userOccupation: null, userJoinReason: null });
+  if (!user) return NextResponse.json({
+    byOccupation: [], byJoinReason: [], mostSaved: [], mySaved: [],
+    userOccupation: null, userJoinReason: null,
+  });
 
-  const [occResult, joinResult] = await Promise.all([
+  const [occResult, joinResult, mostSaved, mySaved] = await Promise.all([
     getPopularByPeers("occupation", user.occupation, user.id),
     getPopularByPeers("joinReason", user.joinReason, user.id),
+    // 전체 회원이 많이 저장한 브리핑 (저장 수 기준 top 4)
+    prisma.post.findMany({
+      where: { published: true },
+      orderBy: { likes: { _count: "desc" } },
+      take: 4,
+      select: POST_SELECT,
+    }),
+    // 내가 저장한 브리핑 (최신순, 최대 8개)
+    prisma.post.findMany({
+      where: {
+        published: true,
+        likes: { some: { userId: user.id } },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 8,
+      select: POST_SELECT,
+    }),
   ]);
 
   // fallback: 조회수 top 4 (occupation), 최신 top 4 (joinReason) - 서로 다른 데이터
@@ -93,5 +116,7 @@ export async function GET() {
     byJoinReasonFallback,
     userOccupation: user.occupation,
     userJoinReason: user.joinReason,
+    mostSaved,
+    mySaved,
   });
 }

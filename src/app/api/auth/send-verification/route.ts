@@ -1,11 +1,28 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import nodemailer from "nodemailer";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
   try {
+    // Rate limiting: IP당 10분에 10회
+    const ip = getClientIp(request);
+    const rl = rateLimit(`send-verification:${ip}`, 10, 10 * 60 * 1000);
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: "요청이 너무 많습니다. 잠시 후 다시 시도해 주세요." },
+        { status: 429 }
+      );
+    }
+
     const { email } = await request.json();
     if (!email) return NextResponse.json({ error: "이메일이 필요합니다." }, { status: 400 });
+
+    // 이메일 형식 검증
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json({ error: "유효한 이메일 주소를 입력해 주세요." }, { status: 400 });
+    }
 
     // 이미 가입된 이메일 확인
     const existing = await prisma.user.findUnique({ where: { email }, select: { id: true } });
@@ -47,7 +64,9 @@ export async function POST(request: Request) {
             <p style="font-size:12px;color:#CBD5E1;margin:0;">
               이 코드는 10분간 유효합니다. 본인이 요청하지 않은 경우 무시하세요.
             </p>
-            <p style="font-size:12px;color:#94A3B8;text-align:center;margin-top:32px;">先益 — Know First, Win First.</p>
+            <div style="margin-top:40px;padding-top:20px;border-top:1px solid #F1F5F9;">
+              <p style="font-size:11px;color:#CBD5E1;margin:0;">先益 — 앞서나가는 정보로 실행가들을 이롭게</p>
+            </div>
           </div>
         `,
       });

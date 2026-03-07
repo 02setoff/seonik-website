@@ -222,7 +222,7 @@ export default function PrivacyPage() {
           <p style={{ ...pStyle, margin: 0 }}>
             <strong style={{ color: "#0F172A" }}>개인정보 보호책임자:</strong> 선익 운영팀<br />
             <strong style={{ color: "#0F172A" }}>이메일:</strong>{" "}
-            <a href={`mailto:${EMAIL}`} style={{ color: "#3B82F6" }}>{EMAIL}</a>
+            <a href={`mailto:${EMAIL}`} style={{ color: "#0F172A" }}>{EMAIL}</a>
           </p>
         </div>
       </div>
@@ -248,13 +248,18 @@ export default function PrivacyPage() {
         </table>
       </div>
 
-      <div style={{ borderTop: "1px solid #F1F5F9", paddingTop: "32px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ borderTop: "1px solid #F1F5F9", paddingTop: "32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
         <p style={{ fontSize: "12px", color: "#94A3B8", fontFamily: "Inter, sans-serif" }}>
-          先益 — Know First, Win First.
+          先益 — 앞서나가는 정보로 실행가들을 이롭게
         </p>
-        <Link href="/" style={{ fontSize: "13px", color: "#64748B", fontFamily: "'Pretendard', sans-serif", textDecoration: "none" }}>
-          ← 홈으로
-        </Link>
+        <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
+          <Link href="/" style={{ fontSize: "13px", color: "#64748B", fontFamily: "'Pretendard', sans-serif", textDecoration: "none" }}>
+            ← 홈으로
+          </Link>
+          <Link href="/terms" style={{ fontSize: "13px", color: "#0F172A", fontFamily: "'Pretendard', sans-serif", textDecoration: "none", fontWeight: 600 }}>
+            이용약관 →
+          </Link>
+        </div>
       </div>
     </div>
   );

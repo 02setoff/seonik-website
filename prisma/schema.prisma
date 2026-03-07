@@ -25,6 +25,7 @@ model User {
   privacyConsentAt         DateTime?
   loginAttempts            Int       @default(0)
   loginLockedUntil         DateTime?
+  mustResetPassword        Boolean   @default(false)
   createdAt                DateTime  @default(now())
 
   accounts  Account[]

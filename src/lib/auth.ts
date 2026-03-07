@@ -68,6 +68,7 @@ export const authOptions: NextAuthOptions = {
           name: user.name,
           email: user.email,
           image: user.image,
+          mustResetPassword: user.mustResetPassword,
         };
       },
     }),
@@ -76,12 +77,14 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.mustResetPassword = (user as { mustResetPassword?: boolean }).mustResetPassword ?? false;
       }
       return token;
     },
     async session({ session, token }) {
       if (token && session.user) {
-        (session.user as { id?: string }).id = token.id as string;
+        (session.user as { id?: string; mustResetPassword?: boolean }).id = token.id as string;
+        (session.user as { id?: string; mustResetPassword?: boolean }).mustResetPassword = token.mustResetPassword as boolean;
       }
       return session;
     },

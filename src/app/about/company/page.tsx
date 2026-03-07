@@ -46,13 +46,17 @@ export default function CompanyPage() {
 
       {/* 이름 전시 */}
       <div style={{ padding: "40px", backgroundColor: "#0F172A", marginBottom: "48px", textAlign: "center" }}>
-        <p style={{ fontSize: "56px", fontFamily: "'Pretendard', sans-serif", fontWeight: 800, color: "white", lineHeight: 1, marginBottom: "12px" }}>
-          先益
+        {/* 한글 회사명 - 메인 */}
+        <p style={{ fontSize: "64px", fontFamily: "'Pretendard', sans-serif", fontWeight: 800, color: "white", lineHeight: 1, marginBottom: "20px", letterSpacing: "0.05em" }}>
+          선익
         </p>
-        <p style={{ fontSize: "22px", fontFamily: "Inter, sans-serif", fontWeight: 600, color: "#64748B", letterSpacing: "0.3em", marginBottom: "20px" }}>
-          SEONIK
-        </p>
-        <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "#475569", fontStyle: "italic", margin: 0 }}>
+        {/* 한자 + 영어 */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "16px", marginBottom: "16px" }}>
+          <span style={{ fontSize: "28px", fontFamily: "'Pretendard', sans-serif", fontWeight: 700, color: "#475569" }}>先益</span>
+          <span style={{ color: "#334155", fontSize: "18px" }}>·</span>
+          <span style={{ fontSize: "22px", fontFamily: "Inter, sans-serif", fontWeight: 600, color: "#475569", letterSpacing: "0.25em" }}>SEONIK</span>
+        </div>
+        <p style={{ fontSize: "13px", fontFamily: "Inter, sans-serif", color: "#334155", fontStyle: "italic", margin: 0, letterSpacing: "0.05em" }}>
           [선·익] — seon·ik
         </p>
       </div>
@@ -108,7 +112,7 @@ export default function CompanyPage() {
           ← 비전
         </Link>
         <p style={{ fontSize: "12px", color: "#94A3B8", fontFamily: "Inter, sans-serif" }}>
-          先益 — Know First, Win First.
+          先益 — 앞서나가는 정보로 실행가들을 이롭게
         </p>
         <Link href="/about/slogan" style={{ fontSize: "13px", color: "#0F172A", fontFamily: "'Pretendard', sans-serif", textDecoration: "none", fontWeight: 600 }}>
           슬로건 →

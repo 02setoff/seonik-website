@@ -103,19 +103,11 @@ export default function AboutPage() {
               <Link
                 key={page.href}
                 href={page.href}
+                className="block border border-[#E2E8F0] hover:border-[#0F172A] transition-colors duration-150"
                 style={{
-                  display: "block",
                   padding: "20px 22px",
-                  border: "1px solid #E2E8F0",
                   textDecoration: "none",
-                  transition: "border-color 0.15s",
                 }}
-                onMouseEnter={(e) =>
-                  ((e.currentTarget as HTMLElement).style.borderColor = "#0F172A")
-                }
-                onMouseLeave={(e) =>
-                  ((e.currentTarget as HTMLElement).style.borderColor = "#E2E8F0")
-                }
               >
                 <p
                   style={{

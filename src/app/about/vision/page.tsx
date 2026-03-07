@@ -93,7 +93,7 @@ export default function VisionPage() {
           선익은 기존 시장에서 점유율을 다투는 경쟁을 하지 않습니다. 현재 한국 시장에는 <strong style={{ color: "#0F172A" }}>1인 사업자와 중소기업에 특화된 정보기관</strong> 형태의 플레이어가 사실상 존재하지 않습니다.
         </p>
         <p style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif", color: "#475569", lineHeight: "1.9" }}>
-          우리는 흔해 빠진 &ldquo;비즈니스 뉴스레터&rdquo;나 &ldquo;창업 커뮤니티&rdquo;의 틀을 부수고, <strong style={{ color: "#0F172A" }}>&ldquo;1인 사업자와 중소기업을 위한 민간 싱크탱크&rdquo;</strong>라는 독보적인 카테고리를 창조합니다. &ldquo;제1의&rdquo;라는 선언은 이 새로운 카테고리를 우리가 정의하고 이끌어가겠다는 카테고리 킹(Category King)으로서의 선언입니다.
+          우리는 기존의 &ldquo;비즈니스 뉴스레터&rdquo;나 &ldquo;창업 커뮤니티&rdquo;의 틀을 부수고, <strong style={{ color: "#0F172A" }}>&ldquo;1인 사업자와 중소기업을 위한 민간 싱크탱크&rdquo;</strong>라는 독보적인 카테고리를 창조합니다. &ldquo;제1의&rdquo;라는 선언은 이 새로운 카테고리를 우리가 정의하고 이끌어가겠다는 카테고리 킹(Category King)으로서의 선언입니다.
         </p>
       </div>
 
