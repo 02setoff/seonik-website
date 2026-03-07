@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
   try {
-    const { name, email, password, occupation, howFound, joinReason } = await request.json();
+    const { name, email, password, occupation, howFound, joinReason, newsletterConsent } = await request.json();
 
     if (!name || !email || !password) {
       return NextResponse.json(
@@ -35,6 +35,18 @@ export async function POST(request: Request) {
       );
     }
 
+    // 이메일 인증 확인
+    const verification = await prisma.emailVerification.findFirst({
+      where: { email, verified: true },
+      orderBy: { createdAt: "desc" },
+    });
+    if (!verification || new Date() > verification.expiresAt) {
+      return NextResponse.json(
+        { error: "이메일 인증이 완료되지 않았습니다." },
+        { status: 400 }
+      );
+    }
+
     if (name) {
       const nameExists = await prisma.user.findFirst({ where: { name } });
       if (nameExists) {
@@ -52,6 +64,8 @@ export async function POST(request: Request) {
         occupation: occupation || null,
         howFound: howFound || null,
         joinReason: joinReason || null,
+        newsletterConsent: newsletterConsent ?? false,
+        newsletterConsentAt: newsletterConsent ? new Date() : null,
       },
     });
 

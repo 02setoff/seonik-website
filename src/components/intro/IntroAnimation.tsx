@@ -2,6 +2,17 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useState, useCallback, useRef } from "react";
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+  return isMobile;
+}
 // useCallback kept for onEnterFeed wrapper below
 import { ChevronDown } from "lucide-react";
 import { TIMING } from "@/lib/constants";
@@ -15,6 +26,7 @@ type Phase = 0 | 1 | 2 | 3;
 
 export default function IntroAnimation({ onEnterFeed }: IntroAnimationProps) {
   const [phase, setPhase] = useState<Phase>(0);
+  const isMobile = useIsMobile();
   // 피드 진입 여부 추적 (휠/키 핸들러 중복 발동 방지)
   const hasEnteredFeed = useRef(false);
 
@@ -136,8 +148,8 @@ export default function IntroAnimation({ onEnterFeed }: IntroAnimationProps) {
           {/* 슬로건 */}
           {phase >= 2 && (
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, ...(isMobile ? { y: -20 } : { x: -20 }) }}
+              animate={{ opacity: 1, ...(isMobile ? { y: 0 } : { x: 0 }) }}
               transition={{
                 delay: TIMING.sloganDelay / 1000,
                 duration: TIMING.sloganDuration / 1000,

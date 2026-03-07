@@ -153,21 +153,40 @@ export default function MyPage() {
         </div>
 
         <div style={{ marginBottom: "48px" }}>
-          <SectionTitle text="체크한 게시물" count={likedPostItems.length} />
-          {likedPostItems.length === 0 ? (
-            <div style={{ backgroundColor: "white", border: "1px solid #E2E8F0", padding: "48px", textAlign: "center" }}><p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "#CBD5E1" }}>아직 체크한 게시물이 없습니다.</p></div>
+          <SectionTitle text="저장한 브리핑" count={profile.likes.length} />
+          {profile.likes.length === 0 ? (
+            <div style={{ backgroundColor: "white", border: "1px solid #E2E8F0", padding: "48px", textAlign: "center" }}>
+              <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "#CBD5E1" }}>저장한 브리핑이 없습니다.</p>
+              <p style={{ fontSize: "12px", fontFamily: "'Pretendard', sans-serif", color: "#CBD5E1", marginTop: "6px" }}>글을 읽다가 ✓ 저장하기를 누르면 여기에 모입니다.</p>
+            </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              {likedPostItems.map(post => (
-                <button key={post.id} onClick={() => setSelectedPost(post)}
-                  style={{ backgroundColor: "white", border: "1px solid #E2E8F0", padding: "14px 20px", textAlign: "left", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "#94A3B8", marginBottom: "3px" }}>{post.category} · {formatDate(post.createdAt)}</p>
-                    <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", fontWeight: 600, color: "#0F172A", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{post.title}</p>
-                  </div>
-                  <span style={{ display: "flex", alignItems: "center", gap: "3px", marginLeft: "16px", flexShrink: 0, color: "#CBD5E1", fontSize: "12px", fontFamily: "Inter, sans-serif" }}><Check size={11} />{post.likeCount ?? 0}</span>
-                </button>
-              ))}
+              {profile.likes.map((l) => {
+                const post = toPostItem(l.post);
+                return (
+                  <button key={post.id} onClick={() => setSelectedPost(post)}
+                    style={{ backgroundColor: "white", border: "1px solid #E2E8F0", padding: "16px 20px", textAlign: "left", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", transition: "box-shadow 0.15s" }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "5px" }}>
+                        <span style={{
+                          fontSize: "10px", fontFamily: "Inter, sans-serif", fontWeight: 700,
+                          letterSpacing: "0.06em", padding: "2px 8px",
+                          backgroundColor: (CATEGORY_COLORS[l.post.category] || "#94A3B8") + "18",
+                          color: CATEGORY_COLORS[l.post.category] || "#94A3B8",
+                        }}>{l.post.category}</span>
+                        <span style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "#CBD5E1" }}>
+                          저장 {formatDate(l.createdAt)}
+                        </span>
+                      </div>
+                      <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", fontWeight: 600, color: "#0F172A", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{post.title}</p>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "3px", marginLeft: "16px", flexShrink: 0, color: "#94A3B8", fontSize: "12px", fontFamily: "Inter, sans-serif" }}>
+                      <Check size={11} />
+                      <span>{post.likeCount ?? 0}</span>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>

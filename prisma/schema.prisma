@@ -16,10 +16,12 @@ model User {
   image         String?
   password      String?
   role          String    @default("USER")
-  occupation    String?
-  howFound      String?
-  joinReason    String?
-  createdAt     DateTime  @default(now())
+  occupation        String?
+  howFound          String?
+  joinReason        String?
+  newsletterConsent   Boolean   @default(false)
+  newsletterConsentAt DateTime?
+  createdAt           DateTime  @default(now())
 
   accounts  Account[]
   sessions  Session[]
@@ -101,6 +103,17 @@ model PostView {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model EmailVerification {
+  id        String   @id @default(cuid())
+  email     String
+  code      String
+  expiresAt DateTime
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([email])
 }
 
 model Contact {

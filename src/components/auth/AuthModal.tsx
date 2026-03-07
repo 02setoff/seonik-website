@@ -17,17 +17,20 @@ const JOIN_REASON_OPTIONS = ["비즈니스 인텔리전스", "시장 분석", "�
 export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: AuthModalProps) {
   const backdropMouseDown = useRef(false);
   const [tab, setTab] = useState<"login" | "signup">(defaultTab);
-  const [signupStep, setSignupStep] = useState<1 | 2>(1);
+  const [signupStep, setSignupStep] = useState<1 | 2 | 3>(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
+  const [rememberEmail, setRememberEmail] = useState(false);
 
   const [signupName, setSignupName] = useState("");
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [signupConfirm, setSignupConfirm] = useState("");
+  const [verifyCode, setVerifyCode] = useState("");
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   const [occupation, setOccupation] = useState("");
   const [occupationOther, setOccupationOther] = useState("");
@@ -35,12 +38,30 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
   const [howFoundOther, setHowFoundOther] = useState("");
   const [joinReason, setJoinReason] = useState("");
   const [joinReasonOther, setJoinReasonOther] = useState("");
+  const [newsletterConsent, setNewsletterConsent] = useState(false);
 
   useEffect(() => {
     setTab(defaultTab);
     setSignupStep(1);
     setError("");
+    setVerifyCode("");
+    setResendCooldown(0);
   }, [defaultTab, isOpen]);
+
+  // 재발송 쿨다운 카운트다운
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const t = setTimeout(() => setResendCooldown(c => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [resendCooldown]);
+
+  // 아이디 저장: 마운트 시 localStorage에서 복원
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("seonik_saved_email");
+      if (saved) { setLoginEmail(saved); setRememberEmail(true); }
+    } catch {}
+  }, []);
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
@@ -65,18 +86,79 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
     if (result?.error) {
       setError("이메일 또는 비밀번호가 올바르지 않습니다.");
     } else {
+      try {
+        if (rememberEmail) localStorage.setItem("seonik_saved_email", loginEmail);
+        else localStorage.removeItem("seonik_saved_email");
+      } catch {}
       onClose();
       window.location.reload();
     }
   };
 
-  const handleStep1 = (e: React.FormEvent) => {
+  const handleStep1 = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     if (!signupName.trim()) { setError("이름을 입력해 주세요."); return; }
+    if (!signupEmail.trim()) { setError("이메일을 입력해 주세요."); return; }
     if (signupPassword !== signupConfirm) { setError("비밀번호가 일치하지 않습니다."); return; }
     if (signupPassword.length < 6) { setError("비밀번호는 6자 이상이어야 합니다."); return; }
-    setSignupStep(2);
+
+    setLoading(true);
+    try {
+      // 인증 코드 발송 (중복 이메일 체크 포함)
+      const res = await fetch("/api/auth/send-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: signupEmail }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error || "인증 코드 발송에 실패했습니다."); setLoading(false); return; }
+      setVerifyCode("");
+      setResendCooldown(60);
+      setSignupStep(2);
+    } catch {
+      setError("네트워크 오류가 발생했습니다.");
+    }
+    setLoading(false);
+  };
+
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    if (!verifyCode.trim()) { setError("인증 코드를 입력해 주세요."); return; }
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/verify-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: signupEmail, code: verifyCode }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error || "인증에 실패했습니다."); setLoading(false); return; }
+      setSignupStep(3);
+    } catch {
+      setError("네트워크 오류가 발생했습니다.");
+    }
+    setLoading(false);
+  };
+
+  const handleResend = async () => {
+    if (resendCooldown > 0) return;
+    setError("");
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/send-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: signupEmail }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error || "재발송에 실패했습니다."); }
+      else { setResendCooldown(60); setError(""); }
+    } catch {
+      setError("네트워크 오류가 발생했습니다.");
+    }
+    setLoading(false);
   };
 
   const getFinalValue = (value: string, other: string) =>
@@ -102,6 +184,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
         occupation: getFinalValue(occupation, occupationOther),
         howFound: getFinalValue(howFound, howFoundOther),
         joinReason: getFinalValue(joinReason, joinReasonOther),
+        newsletterConsent,
       }),
     });
     const data = await res.json();
@@ -155,7 +238,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
 
         <div style={{ display: "flex", borderBottom: "1px solid #E2E8F0", marginBottom: "28px" }}>
           {(["login", "signup"] as const).map((t) => (
-            <button key={t} onClick={() => { setTab(t); setSignupStep(1); setError(""); }}
+            <button key={t} onClick={() => { setTab(t); setSignupStep(1); setVerifyCode(""); setResendCooldown(0); setError(""); }}
               style={{
                 flex: 1, padding: "10px", background: "none", border: "none", cursor: "pointer",
                 fontSize: "14px", fontFamily: "'Pretendard', sans-serif",
@@ -180,6 +263,11 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
               onChange={(e) => setLoginEmail(e.target.value)} required style={inputStyle} />
             <input type="password" placeholder="비밀번호" value={loginPassword}
               onChange={(e) => setLoginPassword(e.target.value)} required style={inputStyle} />
+            <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
+              <input type="checkbox" checked={rememberEmail} onChange={(e) => setRememberEmail(e.target.checked)}
+                style={{ width: "14px", height: "14px", cursor: "pointer" }} />
+              <span style={{ fontSize: "12px", color: "#64748B", fontFamily: "'Pretendard', sans-serif" }}>아이디 저장</span>
+            </label>
             <button type="submit" disabled={loading} style={{ ...btnPrimary, marginTop: "4px" }}>
               {loading ? "로그인 중..." : "로그인"}
             </button>
@@ -200,17 +288,51 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
               onChange={(e) => setSignupPassword(e.target.value)} required style={inputStyle} />
             <input type="password" placeholder="비밀번호 확인" value={signupConfirm}
               onChange={(e) => setSignupConfirm(e.target.value)} required style={inputStyle} />
-            <button type="submit" style={{ ...btnPrimary, marginTop: "4px" }}>
-              다음 →
+            <button type="submit" disabled={loading} style={{ ...btnPrimary, marginTop: "4px" }}>
+              {loading ? "확인 중..." : "다음 →"}
             </button>
           </form>
         )}
 
-        {/* 회원가입 Step 2 */}
+        {/* 회원가입 Step 2: 이메일 인증 */}
         {tab === "signup" && signupStep === 2 && (
+          <form onSubmit={handleVerify} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+            <p style={{ fontSize: "11px", color: "#94A3B8", fontFamily: "Inter, sans-serif", textAlign: "center", letterSpacing: "0.05em" }}>
+              2 / 3 · 이메일 인증
+            </p>
+            <div style={{ background: "#F8F9FA", border: "1px solid #E2E8F0", padding: "14px 16px" }}>
+              <p style={{ fontSize: "13px", fontFamily: "'Pretendard', sans-serif", color: "#475569", lineHeight: 1.6 }}>
+                <strong style={{ color: "#0F172A" }}>{signupEmail}</strong>으로<br/>인증 코드를 발송했습니다. 10분 이내에 입력해 주세요.
+              </p>
+            </div>
+            <input
+              type="text" placeholder="인증 코드 6자리" value={verifyCode}
+              onChange={(e) => setVerifyCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+              required maxLength={6} style={{ ...inputStyle, textAlign: "center", fontSize: "22px", letterSpacing: "0.3em", fontFamily: "monospace" }}
+            />
+            <button type="submit" disabled={loading} style={{ ...btnPrimary, marginTop: "4px" }}>
+              {loading ? "확인 중..." : "인증 확인"}
+            </button>
+            <div style={{ textAlign: "center" }}>
+              <button type="button" onClick={handleResend} disabled={resendCooldown > 0 || loading}
+                style={{ background: "none", border: "none", cursor: resendCooldown > 0 ? "not-allowed" : "pointer",
+                  fontSize: "12px", color: resendCooldown > 0 ? "#CBD5E1" : "#64748B", fontFamily: "'Pretendard', sans-serif" }}>
+                {resendCooldown > 0 ? `재발송 (${resendCooldown}초 후)` : "코드 재발송"}
+              </button>
+            </div>
+            <button type="button" onClick={() => { setSignupStep(1); setError(""); }}
+              style={{ background: "none", border: "none", cursor: "pointer", fontSize: "12px", color: "#94A3B8",
+                fontFamily: "'Pretendard', sans-serif", textAlign: "center" }}>
+              ← 이전으로
+            </button>
+          </form>
+        )}
+
+        {/* 회원가입 Step 3 */}
+        {tab === "signup" && signupStep === 3 && (
           <form onSubmit={handleSignup} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
             <p style={{ fontSize: "11px", color: "#94A3B8", fontFamily: "Inter, sans-serif", textAlign: "center", letterSpacing: "0.05em" }}>
-              2 / 2 · 추가 정보 (필수)
+              3 / 3 · 추가 정보 (필수)
             </p>
 
             {[
@@ -232,8 +354,16 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
               </div>
             ))}
 
+            <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", cursor: "pointer" }}>
+              <input type="checkbox" checked={newsletterConsent} onChange={(e) => setNewsletterConsent(e.target.checked)}
+                style={{ width: "14px", height: "14px", cursor: "pointer", marginTop: "1px", flexShrink: 0 }} />
+              <span style={{ fontSize: "12px", color: "#64748B", fontFamily: "'Pretendard', sans-serif", lineHeight: "1.5" }}>
+                새 브리핑 발행 시 이메일로 알림 받기 <span style={{ color: "#CBD5E1" }}>(선택)</span>
+              </span>
+            </label>
+
             <div style={{ display: "flex", gap: "8px", marginTop: "4px" }}>
-              <button type="button" onClick={() => { setSignupStep(1); setError(""); }}
+              <button type="button" onClick={() => { setSignupStep(2); setError(""); }}
                 style={{
                   flex: 1, padding: "12px", backgroundColor: "white", color: "#0F172A",
                   border: "1px solid #E2E8F0", cursor: "pointer", fontSize: "14px",

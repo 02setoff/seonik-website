@@ -49,15 +49,65 @@ body {
   color: #F8F9FA;
 }
 
-/* 포스트 본문 HTML 렌더링 스타일 */
-.post-content h2 { font-size: 20px; font-weight: 700; margin: 20px 0 10px; color: #0F172A; }
-.post-content h3 { font-size: 17px; font-weight: 600; margin: 16px 0 8px; color: #0F172A; }
-.post-content p { margin: 0 0 10px; }
-.post-content ul { padding-left: 22px; list-style: disc; margin: 10px 0; }
-.post-content ol { padding-left: 22px; list-style: decimal; margin: 10px 0; }
-.post-content li { margin-bottom: 4px; }
-.post-content strong { font-weight: 700; }
-.post-content em { font-style: italic; }
-.post-content u { text-decoration: underline; }
-.post-content s { text-decoration: line-through; }
-.post-content img { max-width: 100%; height: auto; display: block; margin: 16px 0; }
+/* 포스트 본문 HTML 렌더링 스타일 — 인텔리전스 브리핑 */
+.post-content h2 {
+  font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  color: #0F172A; margin: 28px 0 12px; padding-bottom: 8px;
+  border-bottom: 2px solid #0F172A; font-family: 'Inter', sans-serif;
+}
+.post-content h3 {
+  font-size: 15px; font-weight: 700; color: #0F172A;
+  margin: 20px 0 8px; padding-left: 12px;
+  border-left: 3px solid #94A3B8;
+}
+.post-content p { margin: 0 0 14px; }
+.post-content ul {
+  padding-left: 0; list-style: none; margin: 12px 0;
+}
+.post-content ul li {
+  position: relative; padding-left: 20px; margin-bottom: 8px; color: #374151;
+}
+.post-content ul li::before {
+  content: "—"; position: absolute; left: 0;
+  color: #94A3B8; font-weight: 700;
+}
+.post-content ol {
+  padding-left: 0; list-style: none; margin: 12px 0; counter-reset: briefing-counter;
+}
+.post-content ol li {
+  position: relative; padding-left: 28px; margin-bottom: 10px;
+  counter-increment: briefing-counter;
+}
+.post-content ol li::before {
+  content: counter(briefing-counter, decimal-leading-zero);
+  position: absolute; left: 0; top: 0;
+  font-size: 11px; font-weight: 700; font-family: 'Inter', monospace;
+  color: #94A3B8; letter-spacing: 0.05em; line-height: 1.9;
+}
+.post-content blockquote {
+  background: #F8F9FA; border-left: 3px solid #E2E8F0;
+  padding: 14px 18px; margin: 16px 0;
+  font-style: normal; color: #475569;
+}
+.post-content blockquote::before {
+  content: "NOTE"; display: block;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+  color: #94A3B8; margin-bottom: 6px; font-family: 'Inter', sans-serif;
+}
+.post-content strong {
+  font-weight: 700; color: #0F172A;
+  background: linear-gradient(transparent 60%, rgba(15,23,42,0.08) 60%);
+}
+.post-content em { font-style: italic; color: #475569; }
+.post-content u { text-decoration: underline; text-underline-offset: 3px; }
+.post-content s { text-decoration: line-through; color: #94A3B8; }
+.post-content img {
+  max-width: 100%; height: auto; display: block; margin: 20px 0;
+  border: 1px solid #E2E8F0;
+}
+.post-content a {
+  color: #3B82F6; text-decoration: underline; text-underline-offset: 3px;
+}
+.post-content hr {
+  border: none; border-top: 1px solid #E2E8F0; margin: 24px 0;
+}

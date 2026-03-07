@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Check } from "lucide-react";
 import { SECTIONS } from "@/lib/constants";
 import PostModal, { PostItem } from "./PostModal";
+import PersonalizedSection from "./PersonalizedSection";
 
 interface Post {
   id: string;
@@ -77,7 +78,22 @@ export default function FeedSection() {
   const [selectedPost, setSelectedPost] = useState<PostItem | null>(null);
 
   useEffect(() => {
-    fetch("/api/posts").then(r => r.json()).then(setPosts).catch(() => {});
+    fetch("/api/posts").then(r => r.json()).then((data: Post[]) => {
+      setPosts(data);
+      // URL ?p=postId 파라미터로 특정 글 바로 열기 (링크 공유)
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const postId = params.get("p");
+        if (postId) {
+          const found = data.find((p) => p.id === postId);
+          if (found) setSelectedPost({
+            id: found.id, title: found.title, summary: found.summary, content: found.content,
+            category: found.category, createdAt: found.createdAt,
+            viewCount: found.viewCount, likeCount: found._count.likes,
+          });
+        }
+      } catch {}
+    }).catch(() => {});
   }, []);
 
   const toPostItem = (p: Post): PostItem => ({
@@ -128,6 +144,8 @@ export default function FeedSection() {
           })}
         </div>
       </div>
+
+      <PersonalizedSection onSelectPost={(post) => setSelectedPost(post)} />
 
       <PostModal post={selectedPost} onClose={() => setSelectedPost(null)} />
     </>
