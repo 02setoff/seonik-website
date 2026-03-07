@@ -22,9 +22,9 @@ export default async function CorePage() {
   }));
 
   return (
-    <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "48px 40px" }}>
+    <div className="mx-auto px-5 md:px-10 py-10 md:py-12" style={{ maxWidth: "1280px" }}>
       <h1 className="font-bold text-[#0F172A]"
-        style={{ fontSize: "32px", fontFamily: "Inter, sans-serif", marginBottom: "6px" }}>
+        style={{ fontSize: "clamp(24px,6vw,32px)", fontFamily: "Inter, sans-serif", marginBottom: "6px" }}>
         CORE
       </h1>
       <p className="text-[#64748B]"

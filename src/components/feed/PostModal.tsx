@@ -102,7 +102,7 @@ export default function PostModal({ post, onClose }: PostModalProps) {
       <div style={{
         borderBottom: "1px solid #E2E8F0", flexShrink: 0,
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "0 32px", height: "56px",
+        padding: "0 clamp(16px, 4vw, 32px)", height: "56px",
         backgroundColor: "white",
       }}>
         {/* 카테고리 배지 */}
@@ -135,15 +135,16 @@ export default function PostModal({ post, onClose }: PostModalProps) {
 
       {/* ── 본문 영역 (스크롤) ── */}
       <div ref={scrollRef} style={{ flex: 1, overflowY: "auto" }}>
-        <div style={{ maxWidth: "760px", margin: "0 auto", padding: "48px 32px 80px" }}>
+        <div style={{ maxWidth: "760px", margin: "0 auto", padding: "clamp(28px,5vw,48px) clamp(16px,4vw,32px) 80px" }}>
 
           {/* 제목 */}
           <h1 style={{
-            fontSize: "clamp(22px, 4vw, 32px)",
+            fontSize: "clamp(20px, 4vw, 32px)",
             fontFamily: "'Pretendard', sans-serif",
             fontWeight: 800, color: "#0F172A",
             lineHeight: "1.35", letterSpacing: "-0.02em",
             marginBottom: "32px",
+            wordBreak: "break-word", overflowWrap: "break-word",
           }}>
             {post.title}
           </h1>
@@ -190,8 +191,9 @@ export default function PostModal({ post, onClose }: PostModalProps) {
             <div
               className="post-content"
               style={{
-                fontSize: "15px", fontFamily: "'Pretendard', sans-serif",
+                fontSize: "clamp(14px, 3.5vw, 15px)", fontFamily: "'Pretendard', sans-serif",
                 lineHeight: "1.95", color: "#374151",
+                wordBreak: "break-word", overflowWrap: "break-word",
               }}
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
@@ -207,7 +209,7 @@ export default function PostModal({ post, onClose }: PostModalProps) {
       <div style={{
         borderTop: "1px solid #E2E8F0", flexShrink: 0,
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "12px 32px", backgroundColor: "#FAFAFA",
+        padding: "12px clamp(16px, 4vw, 32px)", backgroundColor: "#FAFAFA",
       }}>
         {/* 링크 복사 */}
         <button onClick={handleCopy}

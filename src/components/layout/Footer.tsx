@@ -13,8 +13,8 @@ export default function FeedFooter() {
       <footer>
         {/* ── Instagram CTA 섹션 ── */}
         <div
-          className="bg-[#0F172A] flex flex-col items-center justify-center text-center"
-          style={{ padding: "64px 40px" }}
+          className="bg-[#0F172A] flex flex-col items-center justify-center text-center px-5 md:px-10"
+          style={{ paddingTop: "clamp(40px,8vw,64px)", paddingBottom: "clamp(40px,8vw,64px)" }}
         >
           <p
             className="text-white font-medium"
@@ -56,8 +56,8 @@ export default function FeedFooter() {
 
         {/* ── 하단 심플 바 ── */}
         <div
-          className="bg-[#060E1C] flex flex-col items-center gap-4"
-          style={{ padding: "36px 40px", textAlign: "center" }}
+          className="bg-[#060E1C] flex flex-col items-center gap-4 px-5 md:px-10"
+          style={{ padding: "36px 0", textAlign: "center" }}
         >
           {/* 브랜드 */}
           <div className="flex flex-col items-center">

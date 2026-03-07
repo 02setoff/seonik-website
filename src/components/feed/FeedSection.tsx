@@ -106,24 +106,24 @@ export default function FeedSection() {
   return (
     <>
       <div className="bg-[#F8F9FA] pb-16">
-        <div className="mx-auto" style={{ maxWidth: "1280px", padding: "0 40px" }}>
+        <div className="mx-auto px-5 md:px-10" style={{ maxWidth: "1280px" }}>
           {SECTIONS.map((section, idx) => {
             const sectionPosts = posts.filter(p => p.category === section.id);
             const empties = Math.max(0, 4 - sectionPosts.length);
 
             return (
               <div key={section.id} style={{ marginTop: idx === 0 ? "32px" : "48px" }}>
-                <div className="flex items-center mb-6">
+                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 mb-6">
                   <Link
                     href={`/${section.id.toLowerCase()}`}
                     className="font-bold text-[#0F172A] tracking-[0.05em] hover:text-[#475569] transition-colors duration-150"
-                    style={{ fontSize: "20px", fontFamily: "Inter, sans-serif" }}
+                    style={{ fontSize: "clamp(16px,4vw,20px)", fontFamily: "Inter, sans-serif" }}
                   >
                     {section.title}
                   </Link>
-                  <span className="text-[#94A3B8] mx-3" style={{ fontSize: "20px" }}>—</span>
+                  <span className="text-[#94A3B8]" style={{ fontSize: "clamp(16px,4vw,20px)" }}>—</span>
                   <span className="font-normal text-[#64748B]"
-                    style={{ fontSize: "16px", fontFamily: "'Pretendard', sans-serif" }}>
+                    style={{ fontSize: "clamp(13px,3.5vw,16px)", fontFamily: "'Pretendard', sans-serif" }}>
                     {section.subtitle}
                   </span>
                 </div>

@@ -84,15 +84,15 @@ function SectionRow({ title, subtitle, posts, onSelectPost, toPostItem }: Sectio
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center flex-wrap gap-y-1">
+      <div className="flex items-start justify-between mb-6 gap-3">
+        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 min-w-0">
           <span className="font-bold text-[#0F172A] tracking-[0.04em]"
-            style={{ fontSize: "18px", fontFamily: "Inter, sans-serif" }}>
+            style={{ fontSize: "clamp(15px,4vw,18px)", fontFamily: "Inter, sans-serif" }}>
             {title}
           </span>
-          <span className="text-[#94A3B8] mx-3" style={{ fontSize: "18px" }}>—</span>
+          <span className="text-[#94A3B8]" style={{ fontSize: "clamp(15px,4vw,18px)" }}>—</span>
           <span className="text-[#64748B]"
-            style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif" }}>
+            style={{ fontSize: "clamp(12px,3vw,15px)", fontFamily: "'Pretendard', sans-serif" }}>
             {subtitle}
           </span>
         </div>
@@ -163,7 +163,7 @@ export default function PersonalizedSection({ onSelectPost }: { onSelectPost: (p
   if (sections.length === 0) return null;
 
   return (
-    <div className="mx-auto" style={{ maxWidth: "1280px", padding: "0 40px 48px" }}>
+    <div className="mx-auto px-5 md:px-10 pb-12" style={{ maxWidth: "1280px" }}>
       <div style={{ borderTop: "1px solid #E2E8F0", paddingTop: "48px" }}>
         <p style={{
           fontSize: "11px", fontFamily: "Inter, sans-serif", color: "#94A3B8",

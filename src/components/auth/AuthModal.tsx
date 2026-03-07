@@ -223,6 +223,19 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
 
     setLoading(true);
     try {
+      // 이름 중복 확인
+      const nameRes = await fetch("/api/auth/check-name", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: signupName }),
+      });
+      const nameData = await nameRes.json();
+      if (nameData.taken) {
+        setError("기존 회원과 중복된 이름입니다. 다른 이름을 입력해주세요.");
+        setLoading(false);
+        return;
+      }
+
       const res = await fetch("/api/auth/send-verification", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
