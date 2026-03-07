@@ -77,14 +77,9 @@ export default function IntroAnimation({ onEnterFeed }: IntroAnimationProps) {
       <div className="flex flex-col items-center">
 
         {/* ── 데스크톱: 가로 배치 / 모바일: 세로 배치 ── */}
-        <motion.div
-          layout
-          transition={{ layout: { duration: 0.6, ease: "easeOut" } }}
-          className="flex md:flex-row flex-col items-center"
-        >
+        <div className="flex md:flex-row flex-col items-center">
           {/* 로고 블록 */}
           <motion.div
-            layout
             initial={{ opacity: 0 }}
             animate={{ opacity: phase >= 1 ? 1 : 0 }}
             transition={{
@@ -92,7 +87,6 @@ export default function IntroAnimation({ onEnterFeed }: IntroAnimationProps) {
                 duration: TIMING.logoFadeDuration / 1000,
                 ease: "easeOut",
               },
-              layout: { duration: TIMING.logoMoveDuration / 1000, ease: "easeOut" },
             }}
             className="flex flex-col items-center"
           >
@@ -148,8 +142,8 @@ export default function IntroAnimation({ onEnterFeed }: IntroAnimationProps) {
           {/* 슬로건 */}
           {phase >= 2 && (
             <motion.div
-              initial={{ opacity: 0, ...(isMobile ? { y: -20 } : { x: -20 }) }}
-              animate={{ opacity: 1, ...(isMobile ? { y: 0 } : { x: 0 }) }}
+              initial={{ opacity: 0, y: isMobile ? 16 : 0, x: isMobile ? 0 : -20 }}
+              animate={{ opacity: 1, y: 0, x: 0 }}
               transition={{
                 delay: TIMING.sloganDelay / 1000,
                 duration: TIMING.sloganDuration / 1000,
@@ -171,7 +165,7 @@ export default function IntroAnimation({ onEnterFeed }: IntroAnimationProps) {
               </p>
             </motion.div>
           )}
-        </motion.div>
+        </div>
 
         {/* CTA 버튼 (Step 2.5) */}
         {phase >= 3 && (

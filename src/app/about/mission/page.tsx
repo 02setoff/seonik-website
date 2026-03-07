@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "미션 | 선익 SEONIK",
-  description: "정보 비대칭 장벽을 파괴하여 모든 사업가가 공정하게 경쟁할 수 있는 세상을 만듭니다.",
+  description: "정보 비대칭의 장벽을 파괴하여, 대한민국의 저성장을 돌파할 실행가들을 무장시킨다.",
 };
 
 const NAV = [
@@ -18,7 +18,7 @@ export default function MissionPage() {
   return (
     <div style={{ maxWidth: "800px", margin: "0 auto", padding: "64px 40px 96px" }}>
       {/* About 서브 네비 */}
-      <div style={{ display: "flex", gap: "24px", marginBottom: "48px", borderBottom: "1px solid #E2E8F0", paddingBottom: "16px" }}>
+      <div style={{ display: "flex", gap: "24px", flexWrap: "wrap", marginBottom: "48px", borderBottom: "1px solid #E2E8F0", paddingBottom: "16px" }}>
         {NAV.map((item) => (
           <Link key={item.href} href={item.href}
             style={{
@@ -39,7 +39,7 @@ export default function MissionPage() {
         <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "#94A3B8", letterSpacing: "0.15em", marginBottom: "12px" }}>
           OUR MISSION
         </p>
-        <h1 style={{ fontSize: "32px", fontFamily: "'Pretendard', sans-serif", fontWeight: 800, color: "#0F172A", marginBottom: "0" }}>
+        <h1 style={{ fontSize: "32px", fontFamily: "'Pretendard', sans-serif", fontWeight: 800, color: "#0F172A" }}>
           미션
         </h1>
       </div>
@@ -49,58 +49,71 @@ export default function MissionPage() {
         <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "#64748B", letterSpacing: "0.15em", marginBottom: "20px" }}>
           MISSION STATEMENT
         </p>
-        <blockquote style={{ fontSize: "22px", fontFamily: "'Pretendard', sans-serif", fontWeight: 700, color: "white", lineHeight: "1.6", margin: 0 }}>
-          &ldquo;정보 비대칭 장벽을 파괴하여<br />
-          모든 사업가가 공정하게 경쟁할 수 있는<br />
-          세상을 만듭니다.&rdquo;
+        <blockquote style={{ fontSize: "20px", fontFamily: "'Pretendard', sans-serif", fontWeight: 700, color: "white", lineHeight: "1.7", margin: 0 }}>
+          &ldquo;정보 비대칭의 장벽을 파괴하여,<br />
+          대한민국의 저성장을 돌파할<br />
+          실행가들을 무장시킨다.&rdquo;
         </blockquote>
       </div>
 
-      {/* 배경 설명 */}
+      {/* 정보 비대칭의 장벽 */}
       <div style={{ marginBottom: "48px" }}>
         <h2 style={{ fontSize: "13px", fontFamily: "Inter, sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#0F172A", borderBottom: "2px solid #0F172A", paddingBottom: "8px", marginBottom: "24px" }}>
-          배경
+          정보 비대칭의 잔혹한 현실
         </h2>
-        <p style={{ fontSize: "16px", fontFamily: "'Pretendard', sans-serif", color: "#475569", lineHeight: "1.9", marginBottom: "20px" }}>
-          지금 이 순간에도, 대기업은 수십억 원의 컨설팅 비용을 들여 시장 정보와 경쟁사 분석을 받고 있습니다.
-          맥킨지, BCG, 골드만삭스의 리서치는 오직 그들만이 볼 수 있습니다.
+        <p style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif", color: "#475569", lineHeight: "1.9", marginBottom: "20px" }}>
+          현대 비즈니스는 총성 없는 전쟁터입니다. 대기업은 맥킨지·BCG 같은 컨설팅 펌에 수억~수십억 원을 지불하고 글로벌 시장의 미세한 진동조차 감지하여 데이터 기반의 의사결정을 내립니다.
         </p>
         <div style={{ padding: "24px 28px", borderLeft: "3px solid #0F172A", backgroundColor: "#F8F9FA", marginBottom: "20px" }}>
-          <p style={{ fontSize: "16px", fontFamily: "'Pretendard', sans-serif", fontWeight: 700, color: "#0F172A", marginBottom: "8px" }}>
-            1인 사업자와 소규모 창업자는?
+          <p style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif", fontWeight: 700, color: "#0F172A", marginBottom: "8px" }}>
+            1인 사업자·소규모 창업가는?
           </p>
-          <p style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif", color: "#475569", lineHeight: "1.7", margin: 0 }}>
-            혼자서 구글링하고, 감으로 결정하고, 실패하고 있습니다. 이것이 <strong style={{ color: "#0F172A" }}>정보 비대칭</strong>입니다.
+          <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "#475569", lineHeight: "1.7", margin: 0 }}>
+            구조적으로 이와 같은 수준의 전략 컨설팅에 접근하지 못합니다. 결국 검증되지 않은 유튜브, 파편화된 블로그, 그리고 &ldquo;감&rdquo;에 의존하여 회사의 명운이 걸린 결정을 내립니다.
           </p>
         </div>
-        <p style={{ fontSize: "16px", fontFamily: "'Pretendard', sans-serif", color: "#475569", lineHeight: "1.9" }}>
-          선익은 이 불공정한 게임의 규칙을 바꿉니다. 기관급 인텔리전스를 모든 실행가에게. 알면 이기는 세상을 만듭니다.
+        <p style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif", color: "#475569", lineHeight: "1.9" }}>
+          이것은 정보의 양 문제가 아닙니다. 정보는 존재하지만 <strong style={{ color: "#0F172A" }}>4가지 거대한 장벽</strong>에 가로막혀 있습니다.
         </p>
       </div>
 
-      {/* 핵심 가치 */}
+      {/* 4가지 장벽 */}
       <div style={{ marginBottom: "48px" }}>
         <h2 style={{ fontSize: "13px", fontFamily: "Inter, sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#0F172A", borderBottom: "2px solid #0F172A", paddingBottom: "8px", marginBottom: "24px" }}>
-          우리가 추구하는 것
+          4가지 정보 비대칭 장벽
         </h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "16px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "16px" }}>
           {[
-            { no: "01", title: "정보 민주화", desc: "기관급 인텔리전스를 모든 규모의 사업가에게 동등하게 제공합니다." },
-            { no: "02", title: "실행 가능한 인사이트", desc: "단순한 뉴스가 아닌, 즉시 비즈니스에 적용할 수 있는 분석을 제공합니다." },
-            { no: "03", title: "공정한 경쟁", desc: "정보 접근성의 차이로 인한 구조적 불평등을 해소합니다." },
+            { no: "01", title: "비용의 장벽", desc: "고급 리포트에 접근하기 위한 압도적인 자본의 격차" },
+            { no: "02", title: "언어의 장벽", desc: "실리콘밸리·런던 등 영어권 중심으로 쏟아지는 원천 데이터" },
+            { no: "03", title: "시간의 장벽", desc: "당장 오늘의 생존을 위해 뛰느라 리서치에 투자할 물리적 시간 부족" },
+            { no: "04", title: "해석의 장벽", desc: "정보를 모았어도 내 사업에 어떻게 적용할지 모르는 막막함" },
           ].map((item) => (
-            <div key={item.no} style={{ border: "1px solid #E2E8F0", padding: "24px" }}>
-              <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "#CBD5E1", fontWeight: 700, marginBottom: "12px" }}>{item.no}</p>
-              <p style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif", fontWeight: 700, color: "#0F172A", marginBottom: "8px" }}>{item.title}</p>
-              <p style={{ fontSize: "13px", fontFamily: "'Pretendard', sans-serif", color: "#64748B", lineHeight: "1.7", margin: 0 }}>{item.desc}</p>
+            <div key={item.no} style={{ border: "1px solid #E2E8F0", padding: "20px" }}>
+              <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "#CBD5E1", fontWeight: 700, marginBottom: "10px" }}>{item.no}</p>
+              <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", fontWeight: 700, color: "#0F172A", marginBottom: "6px" }}>{item.title}</p>
+              <p style={{ fontSize: "12px", fontFamily: "'Pretendard', sans-serif", color: "#64748B", lineHeight: "1.7", margin: 0 }}>{item.desc}</p>
             </div>
           ))}
         </div>
       </div>
 
+      {/* 파괴·무장 */}
+      <div style={{ marginBottom: "48px" }}>
+        <h2 style={{ fontSize: "13px", fontFamily: "Inter, sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#0F172A", borderBottom: "2px solid #0F172A", paddingBottom: "8px", marginBottom: "24px" }}>
+          개선이 아닌 파괴, 그리고 무장
+        </h2>
+        <p style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif", color: "#475569", lineHeight: "1.9", marginBottom: "16px" }}>
+          선익은 이 장벽을 단순히 줄이는(Reduce) 수준에 머물지 않습니다. 장벽을 줄인다는 것은 기존의 불공정한 질서를 인정하면서 점진적인 개선을 도모하겠다는 타협에 불과합니다. 우리의 미션은 이 장벽을 철저히 <strong style={{ color: "#0F172A" }}>파괴(Destroy)</strong>하는 것입니다.
+        </p>
+        <p style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif", color: "#475569", lineHeight: "1.9" }}>
+          선익은 고객을 &ldquo;돕거나(Help)&rdquo; &ldquo;지원(Support)&rdquo;하지 않습니다. 우리는 실행가들을 철저히 <strong style={{ color: "#0F172A" }}>무장(Arming)</strong>시킵니다. 정보는 곧 무기이며, 분석은 전략이 되고, 실행 가이드는 전술이 됩니다.
+        </p>
+      </div>
+
       <div style={{ borderTop: "1px solid #F1F5F9", paddingTop: "32px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <p style={{ fontSize: "12px", color: "#94A3B8", fontFamily: "Inter, sans-serif" }}>
-          先益 — Know First, Win First.
+          先益 — 앞서나가는 정보로 실행가들을 이롭게
         </p>
         <Link href="/about/vision" style={{ fontSize: "13px", color: "#0F172A", fontFamily: "'Pretendard', sans-serif", textDecoration: "none", fontWeight: 600 }}>
           비전 →
