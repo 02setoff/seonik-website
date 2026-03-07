@@ -5,6 +5,9 @@ import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
+const MAX_ATTEMPTS = 10;
+const LOCKOUT_MINUTES = 5;
+
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
@@ -33,11 +36,32 @@ export const authOptions: NextAuthOptions = {
 
         if (!user || !user.password) return null;
 
-        const isValid = await bcrypt.compare(
-          credentials.password,
-          user.password
-        );
-        if (!isValid) return null;
+        // 잠금 상태 확인 (보안: 잠금된 계정은 무조건 실패)
+        if (user.loginLockedUntil && new Date() < user.loginLockedUntil) {
+          return null;
+        }
+
+        const isValid = await bcrypt.compare(credentials.password, user.password);
+
+        if (!isValid) {
+          // 실패 횟수 누적
+          const newAttempts = (user.loginAttempts ?? 0) + 1;
+          const updateData: Record<string, unknown> = { loginAttempts: newAttempts };
+
+          // MAX_ATTEMPTS 이상 실패 시 잠금
+          if (newAttempts >= MAX_ATTEMPTS) {
+            updateData.loginLockedUntil = new Date(Date.now() + LOCKOUT_MINUTES * 60 * 1000);
+          }
+
+          await prisma.user.update({ where: { id: user.id }, data: updateData });
+          return null;
+        }
+
+        // 로그인 성공: 카운터 초기화
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { loginAttempts: 0, loginLockedUntil: null },
+        });
 
         return {
           id: user.id,

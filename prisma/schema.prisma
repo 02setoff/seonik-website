@@ -19,11 +19,13 @@ model User {
   occupation        String?
   howFound          String?
   joinReason        String?
-  newsletterConsent      Boolean   @default(false)
-  newsletterConsentAt    DateTime?
-  newsletterUnsubscribedAt DateTime?  // 수신거부 일시 (정보통신망법 제50조의5: 6개월 보관)
-  privacyConsentAt       DateTime?  // 개인정보처리방침 동의 일시 (개인정보보호법 제15조)
-  createdAt              DateTime  @default(now())
+  newsletterConsent        Boolean   @default(false)
+  newsletterConsentAt      DateTime?
+  newsletterUnsubscribedAt DateTime?
+  privacyConsentAt         DateTime?
+  loginAttempts            Int       @default(0)
+  loginLockedUntil         DateTime?
+  createdAt                DateTime  @default(now())
 
   accounts  Account[]
   sessions  Session[]
@@ -113,6 +115,17 @@ model EmailVerification {
   code      String
   expiresAt DateTime
   verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
+
+model PasswordReset {
+  id        String   @id @default(cuid())
+  email     String
+  code      String
+  expiresAt DateTime
+  used      Boolean  @default(false)
   createdAt DateTime @default(now())
 
   @@index([email])

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Instagram } from "lucide-react";
+import Link from "next/link";
 import ContactModal from "./ContactModal";
 
 export default function FeedFooter() {
@@ -82,6 +83,21 @@ export default function FeedFooter() {
             <p className="text-[#475569]" style={{ fontSize: "12px", fontFamily: "Inter, sans-serif" }}>
               先益 — Know First, Win First.
             </p>
+          </div>
+
+          {/* 법적 링크 */}
+          <div className="flex items-center gap-4">
+            <Link href="/terms"
+              className="text-[#475569] hover:text-white transition-colors duration-200"
+              style={{ fontSize: "12px", fontFamily: "Inter, sans-serif" }}>
+              이용약관
+            </Link>
+            <span style={{ color: "#2D3748", fontSize: "12px" }}>|</span>
+            <Link href="/privacy"
+              className="text-[#475569] hover:text-white transition-colors duration-200"
+              style={{ fontSize: "12px", fontFamily: "Inter, sans-serif" }}>
+              개인정보처리방침
+            </Link>
           </div>
 
           {/* 연락처 */}

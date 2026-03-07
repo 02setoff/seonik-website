@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: "선익(SEONIK)의 개인정보처리방침입니다.",
 };
 
-const EFFECTIVE_DATE = "2025년 1월 1일";
+const EFFECTIVE_DATE = "2026년 3월 7일";
 const COMPANY = "선익(SEONIK)";
 const EMAIL = "seonik.official@gmail.com";
 
