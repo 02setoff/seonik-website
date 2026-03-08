@@ -31,17 +31,17 @@ const MILESTONES = [
 
 export default function HistoryPage() {
   return (
-    <div style={{ maxWidth: "800px", margin: "0 auto", padding: "64px 40px 96px" }}>
+    <div style={{ maxWidth: "800px", margin: "0 auto", padding: "clamp(40px,8vw,64px) clamp(20px,5vw,40px) 96px" }}>
       {/* About 서브 네비 */}
-      <div style={{ display: "flex", gap: "24px", flexWrap: "wrap", marginBottom: "48px", borderBottom: "1px solid #E2E8F0", paddingBottom: "16px" }}>
+      <div style={{ display: "flex", gap: "24px", flexWrap: "wrap", marginBottom: "48px", borderBottom: "1px solid var(--border)", paddingBottom: "16px" }}>
         {NAV.map((item) => (
           <Link key={item.href} href={item.href}
             style={{
               fontSize: "13px", fontFamily: "'Pretendard', sans-serif",
-              color: item.href === "/about/history" ? "#0F172A" : "#94A3B8",
+              color: item.href === "/about/history" ? "var(--text-primary)" : "var(--text-placeholder)",
               fontWeight: item.href === "/about/history" ? 700 : 400,
               textDecoration: "none",
-              borderBottom: item.href === "/about/history" ? "2px solid #0F172A" : "2px solid transparent",
+              borderBottom: item.href === "/about/history" ? "2px solid var(--text-primary)" : "2px solid transparent",
               paddingBottom: "16px", marginBottom: "-17px",
             }}>
             {item.label}
@@ -51,17 +51,17 @@ export default function HistoryPage() {
 
       {/* 헤더 */}
       <div style={{ marginBottom: "56px" }}>
-        <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "#94A3B8", letterSpacing: "0.15em", marginBottom: "12px" }}>
+        <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "var(--text-placeholder)", letterSpacing: "0.15em", marginBottom: "12px" }}>
           MILESTONES
         </p>
-        <h1 style={{ fontSize: "32px", fontFamily: "'Pretendard', sans-serif", fontWeight: 800, color: "#0F172A" }}>
+        <h1 style={{ fontSize: "32px", fontFamily: "'Pretendard', sans-serif", fontWeight: 800, color: "var(--text-primary)" }}>
           연혁
         </h1>
       </div>
 
       {/* 타임라인 */}
       <div style={{ marginBottom: "56px" }}>
-        <h2 style={{ fontSize: "13px", fontFamily: "Inter, sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#0F172A", borderBottom: "2px solid #0F172A", paddingBottom: "8px", marginBottom: "32px" }}>
+        <h2 style={{ fontSize: "13px", fontFamily: "Inter, sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-primary)", borderBottom: "2px solid var(--text-primary)", paddingBottom: "8px", marginBottom: "32px" }}>
           주요 마일스톤
         </h2>
 
@@ -70,27 +70,33 @@ export default function HistoryPage() {
             <div key={i} style={{ display: "flex", gap: "24px" }}>
               {/* 타임라인 선 */}
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "12px" }}>
-                <div style={{ width: "12px", height: "12px", borderRadius: "50%", backgroundColor: "#0F172A", border: "2px solid white", boxShadow: "0 0 0 2px #0F172A", flexShrink: 0, marginTop: "20px" }} />
+                <div style={{
+                  width: "12px", height: "12px", borderRadius: "50%",
+                  backgroundColor: "var(--text-primary)",
+                  border: "2px solid var(--bg-primary)",
+                  boxShadow: "0 0 0 2px var(--text-primary)",
+                  flexShrink: 0, marginTop: "20px",
+                }} />
                 {i < MILESTONES.length - 1 && (
-                  <div style={{ width: "2px", flex: 1, backgroundColor: "#E2E8F0", minHeight: "40px" }} />
+                  <div style={{ width: "2px", flex: 1, backgroundColor: "var(--border)", minHeight: "40px" }} />
                 )}
               </div>
 
               {/* 내용 */}
               <div style={{ paddingBottom: i < MILESTONES.length - 1 ? "32px" : "0", flex: 1, paddingLeft: "12px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
-                  <span style={{ fontSize: "13px", fontFamily: "Inter, sans-serif", fontWeight: 700, color: "#0F172A" }}>{item.date}</span>
-                  <span style={{ fontSize: "10px", fontFamily: "Inter, sans-serif", fontWeight: 700, color: "#94A3B8", letterSpacing: "0.08em", backgroundColor: "#F1F5F9", padding: "2px 8px" }}>{item.tag}</span>
+                  <span style={{ fontSize: "13px", fontFamily: "Inter, sans-serif", fontWeight: 700, color: "var(--text-primary)" }}>{item.date}</span>
+                  <span style={{ fontSize: "10px", fontFamily: "Inter, sans-serif", fontWeight: 700, color: "var(--text-placeholder)", letterSpacing: "0.08em", backgroundColor: "var(--bg-subtle)", padding: "2px 8px" }}>{item.tag}</span>
                 </div>
-                <p style={{ fontSize: "17px", fontFamily: "'Pretendard', sans-serif", fontWeight: 700, color: "#0F172A", marginBottom: "8px" }}>{item.title}</p>
-                <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "#64748B", lineHeight: "1.7", margin: 0 }}>{item.desc}</p>
+                <p style={{ fontSize: "17px", fontFamily: "'Pretendard', sans-serif", fontWeight: 700, color: "var(--text-primary)", marginBottom: "8px" }}>{item.title}</p>
+                <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-muted)", lineHeight: "1.7", margin: 0 }}>{item.desc}</p>
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* 현재 상태 */}
+      {/* 현재 상태 — 브랜드 블록 (다크 고정) */}
       <div style={{ padding: "32px", backgroundColor: "#0F172A", marginBottom: "48px" }}>
         <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "#64748B", letterSpacing: "0.15em", marginBottom: "16px" }}>
           CURRENT STATUS
@@ -104,10 +110,10 @@ export default function HistoryPage() {
         </p>
       </div>
 
-      <div style={{ borderTop: "1px solid #F1F5F9", paddingTop: "32px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <Link href="/about/slogan" style={{ fontSize: "13px", color: "#64748B", fontFamily: "'Pretendard', sans-serif", textDecoration: "none" }}>← 슬로건</Link>
-        <p style={{ fontSize: "12px", color: "#94A3B8", fontFamily: "Inter, sans-serif" }}>先益 — 앞서나가는 정보로 실행가들을 이롭게</p>
-        <Link href="/about/mission" style={{ fontSize: "13px", color: "#0F172A", fontFamily: "'Pretendard', sans-serif", textDecoration: "none", fontWeight: 600 }}>미션 ↑</Link>
+      <div style={{ borderTop: "1px solid var(--border-light)", paddingTop: "32px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Link href="/about/slogan" style={{ fontSize: "13px", color: "var(--text-muted)", fontFamily: "'Pretendard', sans-serif", textDecoration: "none" }}>← 슬로건</Link>
+        <p style={{ fontSize: "12px", color: "var(--text-placeholder)", fontFamily: "Inter, sans-serif" }}>先益 — 앞서나가는 정보로 실행가들을 이롭게</p>
+        <Link href="/about/mission" style={{ fontSize: "13px", color: "var(--text-primary)", fontFamily: "'Pretendard', sans-serif", textDecoration: "none", fontWeight: 600 }}>미션 ↑</Link>
       </div>
     </div>
   );

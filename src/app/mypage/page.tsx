@@ -55,74 +55,77 @@ export default function MyPage() {
   };
 
   if (status === "loading" || (status === "authenticated" && !profileLoaded))
-    return <div style={{ maxWidth: "800px", margin: "0 auto", padding: "80px 40px", textAlign: "center" }}><p style={{ color: "#94A3B8", fontFamily: "'Pretendard', sans-serif" }}>로딩 중...</p></div>;
+    return <div style={{ maxWidth: "800px", margin: "0 auto", padding: "80px 40px", textAlign: "center" }}><p style={{ color: "var(--text-placeholder)", fontFamily: "'Pretendard', sans-serif" }}>로딩 중...</p></div>;
   if (!profile)
-    return <div style={{ maxWidth: "800px", margin: "0 auto", padding: "80px 40px", textAlign: "center" }}><p style={{ color: "#94A3B8", fontFamily: "'Pretendard', sans-serif" }}>회원 정보를 불러올 수 없습니다. 다시 로그인해 주세요.</p></div>;
+    return <div style={{ maxWidth: "800px", margin: "0 auto", padding: "80px 40px", textAlign: "center" }}><p style={{ color: "var(--text-placeholder)", fontFamily: "'Pretendard', sans-serif" }}>회원 정보를 불러올 수 없습니다. 다시 로그인해 주세요.</p></div>;
 
   const toPostItem = (p2: RecentView["post"] | LikedPost["post"]): PostItem => ({ id: p2.id, title: p2.title, summary: p2.summary, content: p2.content, category: p2.category, createdAt: p2.createdAt, viewCount: p2.viewCount, likeCount: p2._count.likes });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const likedPostItems = profile.likes.map(l => toPostItem(l.post));
   const maxCatCount = profile.categoryStats[0]?.count || 1;
 
   const SectionTitle = ({ text, count }: { text: string; count?: number }) => (
-    <h2 style={{ fontSize: "16px", fontFamily: "Inter, sans-serif", fontWeight: 700, color: "#0F172A", marginBottom: "16px", letterSpacing: "0.05em" }}>
-      {text}{count !== undefined && <span style={{ color: "#94A3B8", fontWeight: 400 }}> ({count})</span>}
+    <h2 style={{ fontSize: "16px", fontFamily: "Inter, sans-serif", fontWeight: 700, color: "var(--text-primary)", marginBottom: "16px", letterSpacing: "0.05em" }}>
+      {text}{count !== undefined && <span style={{ color: "var(--text-placeholder)", fontWeight: 400 }}> ({count})</span>}
     </h2>
   );
 
   return (
     <>
-      <div style={{ maxWidth: "800px", margin: "0 auto", padding: "64px 40px" }}>
+      <div style={{ maxWidth: "800px", margin: "0 auto", padding: "clamp(40px,8vw,64px) clamp(20px,5vw,40px)" }}>
         <div style={{ marginBottom: "48px" }}>
-          <h1 style={{ fontSize: "28px", fontFamily: "'Pretendard', sans-serif", fontWeight: 700, color: "#0F172A", marginBottom: "4px" }}>마이페이지</h1>
-          <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "#94A3B8" }}>회원 정보 및 활동 내역</p>
+          <h1 style={{ fontSize: "28px", fontFamily: "'Pretendard', sans-serif", fontWeight: 700, color: "var(--text-primary)", marginBottom: "4px" }}>마이페이지</h1>
+          <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-placeholder)" }}>회원 정보 및 활동 내역</p>
         </div>
 
-        <div style={{ backgroundColor: "white", border: "1px solid #E2E8F0", padding: "32px", marginBottom: "32px" }}>
+        {/* 프로필 카드 */}
+        <div style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border)", padding: "32px", marginBottom: "32px" }}>
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "24px" }}>
             <div>
-              <p style={{ fontSize: "20px", fontFamily: "'Pretendard', sans-serif", fontWeight: 700, color: "#0F172A" }}>{profile.name || "이름 없음"}</p>
-              <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "#64748B", marginTop: "4px" }}>{profile.email}</p>
+              <p style={{ fontSize: "20px", fontFamily: "'Pretendard', sans-serif", fontWeight: 700, color: "var(--text-primary)" }}>{profile.name || "이름 없음"}</p>
+              <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-muted)", marginTop: "4px" }}>{profile.email}</p>
             </div>
-            <Link href="/mypage/edit" style={{ padding: "8px 18px", backgroundColor: "white", color: "#0F172A", border: "1px solid #E2E8F0", fontSize: "13px", fontFamily: "'Pretendard', sans-serif", fontWeight: 500, textDecoration: "none" }}>프로필 수정</Link>
+            <Link href="/mypage/edit" style={{ padding: "8px 18px", backgroundColor: "var(--bg-card)", color: "var(--text-primary)", border: "1px solid var(--border)", fontSize: "13px", fontFamily: "'Pretendard', sans-serif", fontWeight: 500, textDecoration: "none" }}>프로필 수정</Link>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", borderTop: "1px solid #F1F5F9", paddingTop: "24px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", borderTop: "1px solid var(--border-light)", paddingTop: "24px" }}>
             {(["occupation", "howFound", "joinReason"] as const).map(key => (
               <div key={key}>
-                <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "#94A3B8", letterSpacing: "0.05em", marginBottom: "4px" }}>{LABEL[key].toUpperCase()}</p>
-                <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: profile[key] ? "#0F172A" : "#CBD5E1" }}>{profile[key] || "—"}</p>
+                <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "var(--text-placeholder)", letterSpacing: "0.05em", marginBottom: "4px" }}>{LABEL[key].toUpperCase()}</p>
+                <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: profile[key] ? "var(--text-primary)" : "var(--text-disabled)" }}>{profile[key] || "—"}</p>
               </div>
             ))}
             <div>
-              <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "#94A3B8", letterSpacing: "0.05em", marginBottom: "4px" }}>JOINED</p>
-              <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "#0F172A" }}>{formatDate(profile.createdAt)}</p>
+              <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "var(--text-placeholder)", letterSpacing: "0.05em", marginBottom: "4px" }}>JOINED</p>
+              <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-primary)" }}>{formatDate(profile.createdAt)}</p>
             </div>
           </div>
         </div>
 
+        {/* 읽기 통계 */}
         <div style={{ marginBottom: "32px" }}>
           <SectionTitle text="나의 읽기 통계" />
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "12px" }}>
-            <div style={{ backgroundColor: "white", border: "1px solid #E2E8F0", padding: "20px 24px" }}>
-              <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "#94A3B8", letterSpacing: "0.05em", marginBottom: "6px" }}>TOTAL READ</p>
-              <p style={{ fontSize: "28px", fontFamily: "Inter, sans-serif", fontWeight: 700, color: "#0F172A" }}>{profile.totalRead}<span style={{ fontSize: "13px", color: "#94A3B8", fontWeight: 400, marginLeft: "4px" }}>편</span></p>
+            <div style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border)", padding: "20px 24px" }}>
+              <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "var(--text-placeholder)", letterSpacing: "0.05em", marginBottom: "6px" }}>TOTAL READ</p>
+              <p style={{ fontSize: "28px", fontFamily: "Inter, sans-serif", fontWeight: 700, color: "var(--text-primary)" }}>{profile.totalRead}<span style={{ fontSize: "13px", color: "var(--text-placeholder)", fontWeight: 400, marginLeft: "4px" }}>편</span></p>
             </div>
-            <div style={{ backgroundColor: "white", border: "1px solid #E2E8F0", padding: "20px 24px" }}>
-              <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "#94A3B8", letterSpacing: "0.05em", marginBottom: "6px" }}>MOST READ</p>
-              <p style={{ fontSize: "20px", fontFamily: "Inter, sans-serif", fontWeight: 700, color: profile.categoryStats[0] ? (CATEGORY_COLORS[profile.categoryStats[0].category] || "#0F172A") : "#CBD5E1" }}>{profile.categoryStats[0]?.category || "—"}</p>
+            <div style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border)", padding: "20px 24px" }}>
+              <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "var(--text-placeholder)", letterSpacing: "0.05em", marginBottom: "6px" }}>MOST READ</p>
+              <p style={{ fontSize: "20px", fontFamily: "Inter, sans-serif", fontWeight: 700, color: profile.categoryStats[0] ? (CATEGORY_COLORS[profile.categoryStats[0].category] || "var(--text-primary)") : "var(--text-disabled)" }}>{profile.categoryStats[0]?.category || "—"}</p>
             </div>
           </div>
           {profile.categoryStats.length > 0 && (
-            <div style={{ backgroundColor: "white", border: "1px solid #E2E8F0", padding: "20px 24px" }}>
-              <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "#94A3B8", letterSpacing: "0.05em", marginBottom: "16px" }}>CATEGORY BREAKDOWN</p>
+            <div style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border)", padding: "20px 24px" }}>
+              <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "var(--text-placeholder)", letterSpacing: "0.05em", marginBottom: "16px" }}>CATEGORY BREAKDOWN</p>
               <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                 {profile.categoryStats.map(({ category, count }) => (
                   <div key={category}>
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
-                      <span style={{ fontSize: "13px", fontFamily: "Inter, sans-serif", color: "#0F172A", fontWeight: 600 }}>{category}</span>
-                      <span style={{ fontSize: "12px", fontFamily: "Inter, sans-serif", color: "#94A3B8" }}>{count}회</span>
+                      <span style={{ fontSize: "13px", fontFamily: "Inter, sans-serif", color: "var(--text-primary)", fontWeight: 600 }}>{category}</span>
+                      <span style={{ fontSize: "12px", fontFamily: "Inter, sans-serif", color: "var(--text-placeholder)" }}>{count}회</span>
                     </div>
-                    <div style={{ height: "6px", backgroundColor: "#F1F5F9", borderRadius: "3px", overflow: "hidden" }}>
-                      <div style={{ height: "100%", width: `${Math.round((count / maxCatCount) * 100)}%`, backgroundColor: CATEGORY_COLORS[category] || "#0F172A", borderRadius: "3px" }} />
+                    <div style={{ height: "6px", backgroundColor: "var(--bg-subtle)", borderRadius: "3px", overflow: "hidden" }}>
+                      <div style={{ height: "100%", width: `${Math.round((count / maxCatCount) * 100)}%`, backgroundColor: CATEGORY_COLORS[category] || "var(--text-primary)", borderRadius: "3px" }} />
                     </div>
                   </div>
                 ))}
@@ -131,20 +134,21 @@ export default function MyPage() {
           )}
         </div>
 
+        {/* 최근 읽은 게시물 */}
         <div style={{ marginBottom: "32px" }}>
           <SectionTitle text="최근 읽은 게시물" count={profile.recentViews.length} />
           {profile.recentViews.length === 0 ? (
-            <div style={{ backgroundColor: "white", border: "1px solid #E2E8F0", padding: "48px", textAlign: "center" }}><p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "#CBD5E1" }}>아직 읽은 게시물이 없습니다.</p></div>
+            <div style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border)", padding: "48px", textAlign: "center" }}><p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-disabled)" }}>아직 읽은 게시물이 없습니다.</p></div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
               {profile.recentViews.map((v, i) => (
                 <button key={v.post.id + i} onClick={() => setSelectedPost(toPostItem(v.post))}
-                  style={{ backgroundColor: "white", border: "1px solid #E2E8F0", padding: "14px 20px", textAlign: "left", cursor: "pointer", display: "flex", alignItems: "center" }}>
+                  style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border)", padding: "14px 20px", textAlign: "left", cursor: "pointer", display: "flex", alignItems: "center" }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "#94A3B8", marginBottom: "3px" }}>
-                      <span style={{ color: CATEGORY_COLORS[v.post.category] || "#94A3B8", fontWeight: 600 }}>{v.post.category}</span>{" · "}{formatDateTime(v.viewedAt)}
+                    <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "var(--text-placeholder)", marginBottom: "3px" }}>
+                      <span style={{ color: CATEGORY_COLORS[v.post.category] || "var(--text-placeholder)", fontWeight: 600 }}>{v.post.category}</span>{" · "}{formatDateTime(v.viewedAt)}
                     </p>
-                    <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", fontWeight: 600, color: "#0F172A", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{v.post.title}</p>
+                    <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", fontWeight: 600, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{v.post.title}</p>
                   </div>
                 </button>
               ))}
@@ -152,12 +156,13 @@ export default function MyPage() {
           )}
         </div>
 
+        {/* 저장한 브리핑 */}
         <div style={{ marginBottom: "48px" }}>
           <SectionTitle text="저장한 브리핑" count={profile.likes.length} />
           {profile.likes.length === 0 ? (
-            <div style={{ backgroundColor: "white", border: "1px solid #E2E8F0", padding: "48px", textAlign: "center" }}>
-              <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "#CBD5E1" }}>저장한 브리핑이 없습니다.</p>
-              <p style={{ fontSize: "12px", fontFamily: "'Pretendard', sans-serif", color: "#CBD5E1", marginTop: "6px" }}>글을 읽다가 ✓ 저장하기를 누르면 여기에 모입니다.</p>
+            <div style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border)", padding: "48px", textAlign: "center" }}>
+              <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-disabled)" }}>저장한 브리핑이 없습니다.</p>
+              <p style={{ fontSize: "12px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-disabled)", marginTop: "6px" }}>글을 읽다가 ✓ 저장하기를 누르면 여기에 모입니다.</p>
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
@@ -165,22 +170,22 @@ export default function MyPage() {
                 const post = toPostItem(l.post);
                 return (
                   <button key={post.id} onClick={() => setSelectedPost(post)}
-                    style={{ backgroundColor: "white", border: "1px solid #E2E8F0", padding: "16px 20px", textAlign: "left", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", transition: "box-shadow 0.15s" }}>
+                    style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border)", padding: "16px 20px", textAlign: "left", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", transition: "box-shadow 0.15s" }}>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "5px" }}>
                         <span style={{
                           fontSize: "10px", fontFamily: "Inter, sans-serif", fontWeight: 700,
                           letterSpacing: "0.06em", padding: "2px 8px",
                           backgroundColor: (CATEGORY_COLORS[l.post.category] || "#94A3B8") + "18",
-                          color: CATEGORY_COLORS[l.post.category] || "#94A3B8",
+                          color: CATEGORY_COLORS[l.post.category] || "var(--text-placeholder)",
                         }}>{l.post.category}</span>
-                        <span style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "#CBD5E1" }}>
+                        <span style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "var(--text-disabled)" }}>
                           저장 {formatDate(l.createdAt)}
                         </span>
                       </div>
-                      <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", fontWeight: 600, color: "#0F172A", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{post.title}</p>
+                      <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", fontWeight: 600, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{post.title}</p>
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "3px", marginLeft: "16px", flexShrink: 0, color: "#94A3B8", fontSize: "12px", fontFamily: "Inter, sans-serif" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "3px", marginLeft: "16px", flexShrink: 0, color: "var(--text-placeholder)", fontSize: "12px", fontFamily: "Inter, sans-serif" }}>
                       <Check size={11} />
                       <span>{post.likeCount ?? 0}</span>
                     </div>
@@ -191,16 +196,17 @@ export default function MyPage() {
           )}
         </div>
 
-        <div style={{ borderTop: "1px solid #F1F5F9", paddingTop: "32px" }}>
+        {/* 회원 탈퇴 */}
+        <div style={{ borderTop: "1px solid var(--border-light)", paddingTop: "32px" }}>
           <h2 style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", fontWeight: 600, color: "#EF4444", marginBottom: "12px" }}>회원 탈퇴</h2>
-          <p style={{ fontSize: "13px", fontFamily: "'Pretendard', sans-serif", color: "#94A3B8", marginBottom: "16px" }}>탈퇴 시 모든 데이터가 삭제되며 복구할 수 없습니다.</p>
+          <p style={{ fontSize: "13px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-placeholder)", marginBottom: "16px" }}>탈퇴 시 모든 데이터가 삭제되며 복구할 수 없습니다.</p>
           {!deleteConfirm ? (
-            <button onClick={() => setDeleteConfirm(true)} style={{ padding: "8px 18px", backgroundColor: "white", color: "#EF4444", border: "1px solid #FCA5A5", cursor: "pointer", fontSize: "13px", fontFamily: "'Pretendard', sans-serif" }}>회원 탈퇴</button>
+            <button onClick={() => setDeleteConfirm(true)} style={{ padding: "8px 18px", backgroundColor: "var(--bg-card)", color: "#EF4444", border: "1px solid #FCA5A5", cursor: "pointer", fontSize: "13px", fontFamily: "'Pretendard', sans-serif" }}>회원 탈퇴</button>
           ) : (
-            <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+            <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
               <p style={{ fontSize: "13px", fontFamily: "'Pretendard', sans-serif", color: "#EF4444" }}>정말 탈퇴하시겠습니까?</p>
               <button onClick={handleDelete} disabled={deleting} style={{ padding: "8px 18px", backgroundColor: "#EF4444", color: "white", border: "none", cursor: deleting ? "not-allowed" : "pointer", fontSize: "13px", fontFamily: "'Pretendard', sans-serif", opacity: deleting ? 0.6 : 1 }}>{deleting ? "처리 중..." : "확인"}</button>
-              <button onClick={() => setDeleteConfirm(false)} style={{ padding: "8px 18px", backgroundColor: "white", color: "#64748B", border: "1px solid #E2E8F0", cursor: "pointer", fontSize: "13px", fontFamily: "'Pretendard', sans-serif" }}>취소</button>
+              <button onClick={() => setDeleteConfirm(false)} style={{ padding: "8px 18px", backgroundColor: "var(--bg-card)", color: "var(--text-muted)", border: "1px solid var(--border)", cursor: "pointer", fontSize: "13px", fontFamily: "'Pretendard', sans-serif" }}>취소</button>
             </div>
           )}
         </div>

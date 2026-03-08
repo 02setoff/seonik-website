@@ -142,3 +142,14 @@ model Contact {
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
 }
+
+model Notice {
+  id        String   @id @default(cuid())
+  type      String
+  title     String
+  content   String
+  important Boolean  @default(false)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
