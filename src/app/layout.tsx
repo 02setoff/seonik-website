@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import LayoutWrapper from "@/components/LayoutWrapper";
 import SessionProvider from "@/components/SessionProvider";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 export const metadata: Metadata = {
   title: "선익 SEONIK",
@@ -51,10 +52,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko">
+    <html lang="ko" suppressHydrationWarning>
       <body className="antialiased">
         <SessionProvider>
-          <LayoutWrapper>{children}</LayoutWrapper>
+          <ThemeProvider>
+            <LayoutWrapper>{children}</LayoutWrapper>
+          </ThemeProvider>
         </SessionProvider>
       </body>
     </html>

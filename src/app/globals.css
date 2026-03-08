@@ -8,6 +8,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── 라이트 모드 (기본) ── */
 :root {
   --midnight-slate: #0F172A;
   --paper-white: #F8F9FA;
@@ -16,6 +17,43 @@
   --slate-400: #94A3B8;
   --slate-200: #E2E8F0;
   --slate-100: #F1F5F9;
+
+  --bg-primary: #F8F9FA;
+  --bg-card: #FFFFFF;
+  --bg-subtle: #F1F5F9;
+  --bg-hover: #F8F9FA;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
+  --text-placeholder: #94A3B8;
+  --text-disabled: #CBD5E1;
+  --border: #E2E8F0;
+  --border-light: #F1F5F9;
+  --header-bg: #FFFFFF;
+  --header-border: #E2E8F0;
+  --modal-bg: #FFFFFF;
+  --input-bg: #F8FAFC;
+  --input-border: #E2E8F0;
+}
+
+/* ── 다크 모드 ── */
+[data-theme="dark"] {
+  --bg-primary: #080F1E;
+  --bg-card: #111C30;
+  --bg-subtle: #0F172A;
+  --bg-hover: #162032;
+  --text-primary: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --text-placeholder: #475569;
+  --text-disabled: #2D3748;
+  --border: #1E293B;
+  --border-light: #243248;
+  --header-bg: #080F1E;
+  --header-border: #1A2744;
+  --modal-bg: #111C30;
+  --input-bg: #0F172A;
+  --input-border: #1E293B;
 }
 
 * {
@@ -32,8 +70,8 @@ body {
   font-family: 'Pretendard', 'Inter', -apple-system, BlinkMacSystemFont,
     system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo',
     'Noto Sans KR', 'Malgun Gothic', sans-serif;
-  color: var(--midnight-slate);
-  background-color: var(--paper-white);
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -49,7 +87,7 @@ body {
   color: #F8F9FA;
 }
 
-/* 포스트 본문 HTML 렌더링 스타일 — 인텔리전스 브리핑 */
+/* ── 포스트 본문 HTML 렌더링 스타일 — 인텔리전스 브리핑 ── */
 .post-content h2 {
   font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
   color: #0F172A; margin: 28px 0 12px; padding-bottom: 8px;
@@ -111,3 +149,27 @@ body {
 .post-content hr {
   border: none; border-top: 1px solid #E2E8F0; margin: 24px 0;
 }
+
+/* ── 다크 모드 — 포스트 본문 ── */
+[data-theme="dark"] .post-content h2 {
+  color: #F1F5F9; border-bottom-color: #334155;
+}
+[data-theme="dark"] .post-content h3 {
+  color: #F1F5F9; border-left-color: #475569;
+}
+[data-theme="dark"] .post-content p { color: #CBD5E1; }
+[data-theme="dark"] .post-content ul li { color: #CBD5E1; }
+[data-theme="dark"] .post-content ol li { color: #CBD5E1; }
+[data-theme="dark"] .post-content ul li::before { color: #475569; }
+[data-theme="dark"] .post-content blockquote {
+  background: #0F172A; border-left-color: #1E293B; color: #94A3B8;
+}
+[data-theme="dark"] .post-content blockquote::before { color: #475569; }
+[data-theme="dark"] .post-content strong {
+  color: #F1F5F9;
+  background: linear-gradient(transparent 60%, rgba(241,245,249,0.08) 60%);
+}
+[data-theme="dark"] .post-content em { color: #94A3B8; }
+[data-theme="dark"] .post-content s { color: #475569; }
+[data-theme="dark"] .post-content img { border-color: #1E293B; }
+[data-theme="dark"] .post-content hr { border-top-color: #1E293B; }

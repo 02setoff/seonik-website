@@ -15,11 +15,11 @@ export interface PostItem {
   likeCount?: number;
 }
 
-// 선익 메인 컬러 팔레트만 사용
-const CATEGORY_META: Record<string, { accent: string; label: string; bg: string; border: string }> = {
-  RADAR: { accent: "#0F172A",  label: "RADAR INTEL",  bg: "#F1F5F9", border: "#CBD5E1" },
-  CORE:  { accent: "#334155",  label: "CORE BRIEF",   bg: "#F8F9FA", border: "#E2E8F0" },
-  FLASH: { accent: "#64748B",  label: "FLASH ALERT",  bg: "#F8F9FA", border: "#E2E8F0" },
+// accent: 좌측 border 포인트 컬러로만 사용 (장식용)
+const CATEGORY_META: Record<string, { accent: string; label: string }> = {
+  RADAR: { accent: "#0F172A", label: "RADAR INTEL" },
+  CORE:  { accent: "#334155", label: "CORE BRIEF"  },
+  FLASH: { accent: "#64748B", label: "FLASH ALERT" },
 };
 
 function formatDate(iso: string) {
@@ -93,41 +93,46 @@ export default function PostModal({ post, onClose }: PostModalProps) {
     /* 전체 화면 오버레이 */
     <div style={{
       position: "fixed", inset: 0, zIndex: 400,
-      backgroundColor: "white",
+      backgroundColor: "var(--modal-bg)",
       display: "flex", flexDirection: "column",
       overflowY: "hidden",
     }}>
 
       {/* ── 상단 바 ── */}
       <div style={{
-        borderBottom: "1px solid #E2E8F0", flexShrink: 0,
+        borderBottom: "1px solid var(--border)", flexShrink: 0,
         display: "flex", alignItems: "center", justifyContent: "space-between",
         padding: "0 clamp(16px, 4vw, 32px)", height: "56px",
-        backgroundColor: "white",
+        backgroundColor: "var(--modal-bg)",
       }}>
         {/* 카테고리 배지 */}
         <span style={{
           fontSize: "10px", fontFamily: "Inter, sans-serif",
           fontWeight: 700, letterSpacing: "0.12em",
           padding: "4px 12px",
-          backgroundColor: meta.bg, color: meta.accent,
-          border: `1px solid ${meta.border}`,
+          backgroundColor: "var(--bg-subtle)",
+          color: "var(--text-primary)",
+          border: "1px solid var(--border)",
         }}>
           {meta.label}
         </span>
 
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <span style={{ fontSize: "12px", fontFamily: "Inter, sans-serif", color: "#94A3B8" }}>
+          <span style={{ fontSize: "12px", fontFamily: "Inter, sans-serif", color: "var(--text-placeholder)" }}>
             {formatDate(post.createdAt)}
           </span>
           {/* 닫기 */}
-          <button onClick={onClose}
-            className="hover:bg-[#F8F9FA] transition-colors"
+          <button
+            onClick={onClose}
             style={{
               background: "none", border: "none", cursor: "pointer",
-              color: "#94A3B8", padding: "6px", display: "flex", alignItems: "center",
-              borderRadius: "4px",
-            }}>
+              color: "var(--text-placeholder)", padding: "6px",
+              display: "flex", alignItems: "center", borderRadius: "4px",
+              transition: "background-color 0.15s",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "var(--bg-hover)")}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+          >
             <X size={18} />
           </button>
         </div>
@@ -141,7 +146,7 @@ export default function PostModal({ post, onClose }: PostModalProps) {
           <h1 style={{
             fontSize: "clamp(20px, 4vw, 32px)",
             fontFamily: "'Pretendard', sans-serif",
-            fontWeight: 800, color: "#0F172A",
+            fontWeight: 800, color: "var(--text-primary)",
             lineHeight: "1.35", letterSpacing: "-0.02em",
             marginBottom: "32px",
             wordBreak: "break-word", overflowWrap: "break-word",
@@ -154,18 +159,18 @@ export default function PostModal({ post, onClose }: PostModalProps) {
             <div style={{ marginBottom: "36px" }}>
               <p style={{
                 fontSize: "10px", fontFamily: "Inter, sans-serif", fontWeight: 700,
-                letterSpacing: "0.15em", color: "#94A3B8", marginBottom: "12px",
+                letterSpacing: "0.15em", color: "var(--text-placeholder)", marginBottom: "12px",
               }}>
                 EXECUTIVE SUMMARY
               </p>
               <div style={{
                 borderLeft: `3px solid ${meta.accent}`,
                 padding: "16px 20px",
-                backgroundColor: meta.bg,
+                backgroundColor: "var(--bg-subtle)",
               }}>
                 <p style={{
                   fontSize: "15px", fontFamily: "'Pretendard', sans-serif",
-                  color: "#334155", lineHeight: "1.8", fontWeight: 500, margin: 0,
+                  color: "var(--text-secondary)", lineHeight: "1.8", fontWeight: 500, margin: 0,
                 }}>
                   {post.summary}
                 </p>
@@ -178,11 +183,11 @@ export default function PostModal({ post, onClose }: PostModalProps) {
             <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "28px" }}>
               <p style={{
                 fontSize: "10px", fontFamily: "Inter, sans-serif", fontWeight: 700,
-                letterSpacing: "0.15em", color: "#CBD5E1", flexShrink: 0, margin: 0,
+                letterSpacing: "0.15em", color: "var(--text-disabled)", flexShrink: 0, margin: 0,
               }}>
                 BRIEFING DETAILS
               </p>
-              <div style={{ flex: 1, height: "1px", backgroundColor: "#F1F5F9" }} />
+              <div style={{ flex: 1, height: "1px", backgroundColor: "var(--bg-subtle)" }} />
             </div>
           )}
 
@@ -192,13 +197,13 @@ export default function PostModal({ post, onClose }: PostModalProps) {
               className="post-content"
               style={{
                 fontSize: "clamp(14px, 3.5vw, 15px)", fontFamily: "'Pretendard', sans-serif",
-                lineHeight: "1.95", color: "#374151",
+                lineHeight: "1.95", color: "var(--text-secondary)",
                 wordBreak: "break-word", overflowWrap: "break-word",
               }}
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
           ) : (
-            <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "#CBD5E1" }}>
+            <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-disabled)" }}>
               내용이 없습니다.
             </p>
           )}
@@ -207,19 +212,20 @@ export default function PostModal({ post, onClose }: PostModalProps) {
 
       {/* ── 하단 고정 바 ── */}
       <div style={{
-        borderTop: "1px solid #E2E8F0", flexShrink: 0,
+        borderTop: "1px solid var(--border)", flexShrink: 0,
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "12px clamp(16px, 4vw, 32px)", backgroundColor: "#FAFAFA",
+        padding: "12px clamp(16px, 4vw, 32px)", backgroundColor: "var(--bg-primary)",
       }}>
         {/* 링크 복사 */}
-        <button onClick={handleCopy}
+        <button
+          onClick={handleCopy}
           className="transition-all"
           style={{
             display: "flex", alignItems: "center", gap: "6px",
             padding: "7px 14px",
-            backgroundColor: copied ? "#0F172A" : "white",
-            color: copied ? "white" : "#64748B",
-            border: `1px solid ${copied ? "#0F172A" : "#E2E8F0"}`,
+            backgroundColor: copied ? "#0F172A" : "var(--bg-card)",
+            color: copied ? "white" : "var(--text-muted)",
+            border: `1px solid ${copied ? "#0F172A" : "var(--border)"}`,
             cursor: "pointer",
             fontSize: "12px", fontFamily: "Inter, sans-serif",
           }}>
@@ -229,13 +235,15 @@ export default function PostModal({ post, onClose }: PostModalProps) {
 
         {/* 저장하기 */}
         {session ? (
-          <button onClick={handleLike} disabled={likeLoading}
+          <button
+            onClick={handleLike}
+            disabled={likeLoading}
             style={{
               display: "flex", alignItems: "center", gap: "7px",
               padding: "8px 20px",
-              backgroundColor: liked ? "#0F172A" : "white",
-              color: liked ? "white" : "#475569",
-              border: `1px solid ${liked ? "#0F172A" : "#E2E8F0"}`,
+              backgroundColor: liked ? "#0F172A" : "var(--bg-card)",
+              color: liked ? "white" : "var(--text-secondary)",
+              border: `1px solid ${liked ? "#0F172A" : "var(--border)"}`,
               cursor: likeLoading ? "not-allowed" : "pointer",
               fontSize: "13px", fontFamily: "'Pretendard', sans-serif", fontWeight: 600,
               opacity: likeLoading ? 0.6 : 1,
@@ -244,7 +252,7 @@ export default function PostModal({ post, onClose }: PostModalProps) {
             <Check size={14} strokeWidth={2.5} />
             <span>{liked ? "저장됨" : "저장하기"}</span>
             <span style={{
-              color: liked ? "rgba(255,255,255,0.5)" : "#0F172A",
+              color: liked ? "rgba(255,255,255,0.5)" : "var(--text-primary)",
               fontSize: "12px", fontWeight: 700, marginLeft: "2px",
             }}>
               {likeCount}
@@ -254,8 +262,8 @@ export default function PostModal({ post, onClose }: PostModalProps) {
           <div style={{
             display: "flex", alignItems: "center", gap: "6px",
             padding: "8px 16px",
-            backgroundColor: "white", color: "#94A3B8",
-            border: "1px solid #E2E8F0",
+            backgroundColor: "var(--bg-card)", color: "var(--text-placeholder)",
+            border: "1px solid var(--border)",
             fontSize: "13px", fontFamily: "'Pretendard', sans-serif",
           }}>
             <Lock size={13} />

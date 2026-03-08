@@ -26,6 +26,7 @@ model User {
   loginAttempts            Int       @default(0)
   loginLockedUntil         DateTime?
   mustResetPassword        Boolean   @default(false)
+  theme                    String    @default("light")
   createdAt                DateTime  @default(now())
 
   accounts  Account[]

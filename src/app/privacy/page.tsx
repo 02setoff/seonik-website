@@ -91,6 +91,11 @@ export default function PrivacyPage() {
               <td style={tdStyle}>서비스 이용 기록, 콘텐츠 열람 이력</td>
               <td style={tdStyle}>서비스 개선 및 통계 분석</td>
             </tr>
+            <tr>
+              <td style={tdStyle}>자동</td>
+              <td style={tdStyle}>접속 IP 주소, 브라우저 유형, 접속 일시</td>
+              <td style={tdStyle}>서비스 보안 및 품질 관리</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -220,7 +225,9 @@ export default function PrivacyPage() {
         <p style={pStyle}>개인정보 관련 문의사항은 아래로 연락주시기 바랍니다.</p>
         <div style={{ padding: "20px 24px", backgroundColor: "#F8F9FA", border: "1px solid #E2E8F0" }}>
           <p style={{ ...pStyle, margin: 0 }}>
-            <strong style={{ color: "#0F172A" }}>개인정보 보호책임자:</strong> 선익 운영팀<br />
+            <strong style={{ color: "#0F172A" }}>개인정보 보호책임자:</strong> 대표<br />
+            <strong style={{ color: "#0F172A" }}>담당 부서:</strong> 서비스 운영팀<br />
+            <strong style={{ color: "#0F172A" }}>서비스명:</strong> 선익 (SEONIK)<br />
             <strong style={{ color: "#0F172A" }}>이메일:</strong>{" "}
             <a href={`mailto:${EMAIL}`} style={{ color: "#0F172A" }}>{EMAIL}</a>
           </p>

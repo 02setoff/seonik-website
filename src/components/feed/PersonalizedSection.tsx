@@ -33,34 +33,35 @@ function formatDate(iso: string) {
   }).replace(/\. /g, ".").replace(/\.$/, "");
 }
 
-// 선익 메인 컬러 팔레트만 사용
+// CSS 변수 사용 — 라이트/다크 모드 자동 대응
 const CATEGORY_COLORS: Record<string, string> = {
-  RADAR: "#0F172A", CORE: "#334155", FLASH: "#64748B",
+  RADAR: "var(--text-primary)", CORE: "var(--text-secondary)", FLASH: "var(--text-muted)",
 };
 
 function PostCard({ post, onClick }: { post: Post; onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="group bg-white border border-[#E2E8F0] overflow-hidden text-left hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-200 ease-out w-full"
+      className="group overflow-hidden text-left hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-200 ease-out w-full"
+      style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 0 }}
     >
       <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-        <div className="absolute inset-0 bg-white flex items-center justify-center p-6">
-          <p className="text-[#0F172A] font-semibold text-center leading-snug line-clamp-3"
-            style={{ fontSize: "17px", fontFamily: "'Pretendard', sans-serif" }}>
+        <div className="absolute inset-0 flex items-center justify-center p-6" style={{ backgroundColor: "var(--bg-card)" }}>
+          <p className="font-semibold text-center leading-snug line-clamp-3"
+            style={{ fontSize: "17px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-primary)" }}>
             {post.title}
           </p>
         </div>
       </div>
-      <div className="flex items-center justify-between border-t border-[#E2E8F0]" style={{ padding: "12px 16px" }}>
+      <div className="flex items-center justify-between" style={{ padding: "12px 16px", borderTop: "1px solid var(--border)" }}>
         <span className="font-bold uppercase tracking-wide"
-          style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: CATEGORY_COLORS[post.category] || "#94A3B8" }}>
+          style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: CATEGORY_COLORS[post.category] || "var(--text-placeholder)" }}>
           {post.category}
         </span>
-        <div className="flex items-center gap-3 text-[#CBD5E1]" style={{ fontSize: "12px", fontFamily: "Inter, sans-serif" }}>
+        <div className="flex items-center gap-3" style={{ fontSize: "12px", fontFamily: "Inter, sans-serif", color: "var(--text-disabled)" }}>
           <span className="flex items-center gap-1">
             <Check size={11} strokeWidth={2.5} />
-            <span className="font-bold text-[#0F172A]">{post._count.likes}</span>
+            <span className="font-bold" style={{ color: "var(--text-primary)" }}>{post._count.likes}</span>
           </span>
           <span style={{ fontFamily: "'Pretendard', sans-serif" }}>{formatDate(post.createdAt)}</span>
         </div>
@@ -86,13 +87,12 @@ function SectionRow({ title, subtitle, posts, onSelectPost, toPostItem }: Sectio
     <div>
       <div className="flex items-start justify-between mb-6 gap-3">
         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 min-w-0">
-          <span className="font-bold text-[#0F172A] tracking-[0.04em]"
-            style={{ fontSize: "clamp(15px,4vw,18px)", fontFamily: "Inter, sans-serif" }}>
+          <span className="font-bold tracking-[0.04em]"
+            style={{ fontSize: "clamp(15px,4vw,18px)", fontFamily: "Inter, sans-serif", color: "var(--text-primary)" }}>
             {title}
           </span>
-          <span className="text-[#94A3B8]" style={{ fontSize: "clamp(15px,4vw,18px)" }}>—</span>
-          <span className="text-[#64748B]"
-            style={{ fontSize: "clamp(12px,3vw,15px)", fontFamily: "'Pretendard', sans-serif" }}>
+          <span style={{ fontSize: "clamp(15px,4vw,18px)", color: "var(--text-placeholder)" }}>—</span>
+          <span style={{ fontSize: "clamp(12px,3vw,15px)", fontFamily: "'Pretendard', sans-serif", color: "var(--text-muted)" }}>
             {subtitle}
           </span>
         </div>
@@ -100,7 +100,7 @@ function SectionRow({ title, subtitle, posts, onSelectPost, toPostItem }: Sectio
           <button
             onClick={() => setExpanded((v) => !v)}
             style={{
-              fontSize: "12px", fontFamily: "Inter, sans-serif", color: "#64748B",
+              fontSize: "12px", fontFamily: "Inter, sans-serif", color: "var(--text-muted)",
               background: "none", border: "none", cursor: "pointer",
               letterSpacing: "0.05em", padding: "4px 0", flexShrink: 0, marginLeft: "16px",
             }}
@@ -164,9 +164,9 @@ export default function PersonalizedSection({ onSelectPost }: { onSelectPost: (p
 
   return (
     <div className="mx-auto px-5 md:px-10 pb-12" style={{ maxWidth: "1280px" }}>
-      <div style={{ borderTop: "1px solid #E2E8F0", paddingTop: "48px" }}>
+      <div style={{ borderTop: "1px solid var(--border)", paddingTop: "48px" }}>
         <p style={{
-          fontSize: "11px", fontFamily: "Inter, sans-serif", color: "#94A3B8",
+          fontSize: "11px", fontFamily: "Inter, sans-serif", color: "var(--text-placeholder)",
           letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "36px",
         }}>
           나의 맞춤 브리핑

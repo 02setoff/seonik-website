@@ -17,7 +17,7 @@ export default function LayoutWrapper({
   return (
     <>
       {showLayout && <FeedHeader />}
-      <main className={showLayout ? "min-h-screen bg-[#F8F9FA]" : ""}>{children}</main>
+      <main className={showLayout ? "min-h-screen" : ""} style={showLayout ? { backgroundColor: "var(--bg-primary)" } : {}}>{children}</main>
       {showLayout && <FeedFooter />}
     </>
   );
