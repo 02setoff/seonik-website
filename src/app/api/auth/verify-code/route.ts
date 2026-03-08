@@ -1,8 +1,19 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
   try {
+    // Rate limit: 10회 / 10분 per IP (6자리 코드 브루트포스 방지)
+    const ip = getClientIp(request);
+    const limited = rateLimit(`verify-code:${ip}`, 10, 10 * 60 * 1000);
+    if (limited) {
+      return NextResponse.json(
+        { error: "요청이 너무 많습니다. 잠시 후 다시 시도해 주세요." },
+        { status: 429 }
+      );
+    }
+
     const { email, code } = await request.json();
     if (!email || !code) return NextResponse.json({ error: "이메일과 코드가 필요합니다." }, { status: 400 });
 

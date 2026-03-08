@@ -3,11 +3,22 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 // POST /api/auth/change-password
 // 로그인된 사용자의 비밀번호 변경 (임시 비밀번호 후 강제 재설정 포함)
 export async function POST(request: Request) {
   try {
+    // Rate limit: 10회 / 10분 per IP
+    const ip = getClientIp(request);
+    const limited = rateLimit(`change-password:${ip}`, 10, 10 * 60 * 1000);
+    if (limited) {
+      return NextResponse.json(
+        { error: "요청이 너무 많습니다. 잠시 후 다시 시도해 주세요." },
+        { status: 429 }
+      );
+    }
+
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
       return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
