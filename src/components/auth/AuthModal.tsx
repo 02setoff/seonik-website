@@ -54,6 +54,8 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
   const [newsletterConsent, setNewsletterConsent] = useState(false);
   const [privacyConsent, setPrivacyConsent] = useState(false);
   const [privacyScrolled, setPrivacyScrolled] = useState(false);
+  const [disclaimerConsent, setDisclaimerConsent] = useState(false);
+  const [disclaimerScrolled, setDisclaimerScrolled] = useState(false);
   const [ageConsent, setAgeConsent] = useState(false);
 
   // 잠금 카운트다운
@@ -90,6 +92,8 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
     setLockedSeconds(0);
     setPrivacyScrolled(false);
     setPrivacyConsent(false);
+    setDisclaimerScrolled(false);
+    setDisclaimerConsent(false);
     setAgeConsent(false);
     setFindEmailName("");
     setForgotPwName("");
@@ -115,6 +119,14 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
     const el = e.currentTarget;
     if (el.scrollHeight - el.scrollTop <= el.clientHeight + 8) {
       setPrivacyScrolled(true);
+    }
+  };
+
+  // 면책 조항 스크롤 감지
+  const handleDisclaimerScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    if (el.scrollHeight - el.scrollTop <= el.clientHeight + 8) {
+      setDisclaimerScrolled(true);
     }
   };
 
@@ -220,6 +232,8 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
     if (!ageConsent) { setError("만 14세 이상인 경우에만 가입하실 수 있습니다."); return; }
     if (!privacyScrolled) { setError("개인정보처리방침을 끝까지 읽어주세요."); return; }
     if (!privacyConsent) { setError("개인정보처리방침에 동의해 주세요."); return; }
+    if (!disclaimerScrolled) { setError("면책 조항을 끝까지 읽어주세요."); return; }
+    if (!disclaimerConsent) { setError("면책 조항에 동의해 주세요."); return; }
 
     setLoading(true);
     try {
@@ -383,7 +397,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
           <div style={{ display: "flex", borderBottom: "1px solid #E2E8F0", marginBottom: "28px" }}>
             {(["login", "signup"] as const).map((t) => (
               <button key={t}
-                onClick={() => { setTab(t); setSignupStep(1); setVerifyCode(""); setResendCooldown(0); setError(""); setLoginView("form"); setShowRecovery(false); setLockedSeconds(0); setPrivacyScrolled(false); setPrivacyConsent(false); setAgeConsent(false); }}
+                onClick={() => { setTab(t); setSignupStep(1); setVerifyCode(""); setResendCooldown(0); setError(""); setLoginView("form"); setShowRecovery(false); setLockedSeconds(0); setPrivacyScrolled(false); setPrivacyConsent(false); setDisclaimerScrolled(false); setDisclaimerConsent(false); setAgeConsent(false); }}
                 style={{
                   flex: 1, padding: "10px", background: "none", border: "none", cursor: "pointer",
                   fontSize: "14px", fontFamily: "'Pretendard', sans-serif",
@@ -615,6 +629,58 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
                   </span>
                 </label>
                 <a href="/privacy" target="_blank" rel="noopener noreferrer"
+                  style={{ fontSize: "11px", color: "#94A3B8", fontFamily: "'Pretendard', sans-serif", textDecoration: "none", flexShrink: 0 }}>
+                  전체 보기 →
+                </a>
+              </div>
+            </div>
+
+            {/* 면책 조항 필독 영역 */}
+            <div>
+              <label style={{ fontSize: "12px", color: "#64748B", fontFamily: "'Pretendard', sans-serif", display: "block", marginBottom: "6px", fontWeight: 600 }}>
+                면책 조항 <span style={{ color: "#EF4444" }}>(필수 — 끝까지 읽어주세요)</span>
+              </label>
+              <div
+                onScroll={handleDisclaimerScroll}
+                style={{
+                  height: "130px", overflowY: "auto", border: `1px solid ${disclaimerScrolled ? "#10B981" : "#E2E8F0"}`,
+                  padding: "12px 14px", backgroundColor: "#F8FAFC", fontSize: "11px",
+                  fontFamily: "'Pretendard', sans-serif", color: "#64748B", lineHeight: "1.85",
+                  transition: "border-color 0.2s",
+                }}
+              >
+                <p style={{ fontWeight: 700, color: "#0F172A", marginBottom: "6px", fontSize: "12px" }}>면책 조항 요약</p>
+                <p><strong>콘텐츠 성격:</strong> 선익(SEONIK)의 모든 브리핑 콘텐츠는 정보 제공 목적으로만 제공됩니다. 투자 권유, 법률 자문, 세무 조언, 경영 컨설팅이 아닙니다.</p>
+                <br />
+                <p><strong>투자·재무:</strong> 어떠한 경우에도 투자 권유나 금융 상품 추천으로 해석되어서는 안 됩니다. 모든 투자 결정은 이용자 본인의 판단과 책임 하에 이루어져야 합니다.</p>
+                <br />
+                <p><strong>법률·세무:</strong> 콘텐츠 내 법률·세무 정보는 일반적인 참고 정보로, 전문가의 법적 자문을 대체하지 않습니다.</p>
+                <br />
+                <p><strong>정확성 보증 불가:</strong> 회사는 콘텐츠의 정확성·완전성·최신성에 대해 보증하지 않습니다. AI 분석 특성상 사실과 다른 내용이 포함될 수 있습니다.</p>
+                <br />
+                <p><strong>수익 보증 불가:</strong> 서비스 이용이 특정 사업 성과나 투자 수익을 보장하지 않습니다.</p>
+                <br />
+                <p><strong>준거법:</strong> 본 면책 조항은 대한민국 법률을 준거법으로 합니다.</p>
+                <br />
+                <p style={{ color: disclaimerScrolled ? "#10B981" : "#94A3B8", fontWeight: 600 }}>
+                  {disclaimerScrolled ? "✓ 읽기 완료 — 아래에서 동의해 주세요." : "↓ 끝까지 스크롤하면 동의가 활성화됩니다."}
+                </p>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "8px" }}>
+                <label style={{
+                  display: "flex", alignItems: "center", gap: "8px",
+                  cursor: disclaimerScrolled ? "pointer" : "not-allowed",
+                  opacity: disclaimerScrolled ? 1 : 0.45,
+                }}>
+                  <input type="checkbox" checked={disclaimerConsent}
+                    onChange={(e) => { if (disclaimerScrolled) setDisclaimerConsent(e.target.checked); }}
+                    disabled={!disclaimerScrolled}
+                    style={{ width: "14px", height: "14px", cursor: disclaimerScrolled ? "pointer" : "not-allowed" }} />
+                  <span style={{ fontSize: "12px", color: "#64748B", fontFamily: "'Pretendard', sans-serif", lineHeight: "1.5" }}>
+                    위 내용을 읽었으며 동의합니다
+                  </span>
+                </label>
+                <a href="/disclaimer" target="_blank" rel="noopener noreferrer"
                   style={{ fontSize: "11px", color: "#94A3B8", fontFamily: "'Pretendard', sans-serif", textDecoration: "none", flexShrink: 0 }}>
                   전체 보기 →
                 </a>

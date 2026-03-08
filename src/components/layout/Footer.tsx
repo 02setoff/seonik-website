@@ -98,6 +98,12 @@ export default function FeedFooter() {
               style={{ fontSize: "12px", fontFamily: "Inter, sans-serif" }}>
               개인정보처리방침
             </Link>
+            <span style={{ color: "#2D3748", fontSize: "12px" }}>|</span>
+            <Link href="/disclaimer"
+              className="text-[#475569] hover:text-white transition-colors duration-200"
+              style={{ fontSize: "12px", fontFamily: "Inter, sans-serif" }}>
+              면책 조항
+            </Link>
           </div>
 
           {/* 연락처 */}
