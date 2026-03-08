@@ -10,25 +10,16 @@ export default function Home() {
   const introRef = useRef<HTMLDivElement>(null);
   const feedRef = useRef<HTMLDivElement>(null);
   const [showUnsubscribed, setShowUnsubscribed] = useState(false);
-  const [feedActive, setFeedActive] = useState(false);
 
+  // 인트로 → 피드: 부드럽게 스크롤
   const scrollToFeed = useCallback(() => {
     feedRef.current?.scrollIntoView({ behavior: "smooth" });
-    // 부드러운 스크롤 완료 후 인트로 숨김 + 피드를 최상단으로 고정
-    setTimeout(() => {
-      setFeedActive(true);
-      window.scrollTo({ top: 0 });
-    }, 650);
   }, []);
 
-  // 로고 클릭: 피드 진입 전이면 인트로로 스크롤, 진입 후면 새로고침으로 인트로 재표시
+  // 로고 클릭 → 인트로로 스크롤 (언제나 가능)
   const scrollToIntro = useCallback(() => {
-    if (feedActive) {
-      window.location.reload();
-    } else {
-      introRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [feedActive]);
+    introRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
 
   // ?unsubscribed=1 파라미터 처리 - 수신거부 완료 알림
   useEffect(() => {
@@ -36,9 +27,7 @@ export default function Home() {
       const params = new URLSearchParams(window.location.search);
       if (params.get("unsubscribed") === "1") {
         setShowUnsubscribed(true);
-        // URL에서 파라미터 제거 (히스토리 오염 방지)
         window.history.replaceState({}, "", "/");
-        // 5초 후 자동 닫기
         setTimeout(() => setShowUnsubscribed(false), 5000);
       }
     } catch {}
@@ -67,13 +56,12 @@ export default function Home() {
         </div>
       )}
 
-      {/* 인트로 영역 — 피드 진입 후 숨김 (DOM에서 제거해 스크롤 역방향 차단) */}
-      {!feedActive && (
-        <div ref={introRef}>
-          <IntroAnimation onEnterFeed={scrollToFeed} />
-        </div>
-      )}
+      {/* 인트로 영역 — 항상 DOM에 유지, 언제든 위아래 스크롤 가능 */}
+      <div ref={introRef}>
+        <IntroAnimation onEnterFeed={scrollToFeed} />
+      </div>
 
+      {/* 피드 영역 */}
       <div ref={feedRef}>
         <FeedHeader onLogoClick={scrollToIntro} />
         <FeedSection />
