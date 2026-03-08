@@ -260,11 +260,14 @@ export default function PrivacyPage() {
           先益 — 앞서나가는 정보로 실행가들을 이롭게
         </p>
         <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
+          <Link href="/terms" style={{ fontSize: "13px", color: "var(--text-muted)", fontFamily: "'Pretendard', sans-serif", textDecoration: "none" }}>
+            이용약관
+          </Link>
+          <Link href="/disclaimer" style={{ fontSize: "13px", color: "var(--text-muted)", fontFamily: "'Pretendard', sans-serif", textDecoration: "none" }}>
+            면책 조항
+          </Link>
           <Link href="/" style={{ fontSize: "13px", color: "var(--text-muted)", fontFamily: "'Pretendard', sans-serif", textDecoration: "none" }}>
             ← 홈으로
-          </Link>
-          <Link href="/terms" style={{ fontSize: "13px", color: "var(--text-primary)", fontFamily: "'Pretendard', sans-serif", textDecoration: "none", fontWeight: 600 }}>
-            이용약관 →
           </Link>
         </div>
       </div>

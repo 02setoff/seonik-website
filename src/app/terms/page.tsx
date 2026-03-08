@@ -312,6 +312,9 @@ export default function TermsPage() {
           <Link href="/privacy" style={{ fontSize: "13px", color: "var(--text-muted)", fontFamily: "'Pretendard', sans-serif", textDecoration: "none" }}>
             개인정보처리방침
           </Link>
+          <Link href="/disclaimer" style={{ fontSize: "13px", color: "var(--text-muted)", fontFamily: "'Pretendard', sans-serif", textDecoration: "none" }}>
+            면책 조항
+          </Link>
           <Link href="/" style={{ fontSize: "13px", color: "var(--text-muted)", fontFamily: "'Pretendard', sans-serif", textDecoration: "none" }}>
             ← 홈으로
           </Link>
