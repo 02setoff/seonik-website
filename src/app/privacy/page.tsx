@@ -16,15 +16,15 @@ export default function PrivacyPage() {
   };
   const h2Style: React.CSSProperties = {
     fontSize: "13px", fontFamily: "Inter, sans-serif", fontWeight: 700,
-    letterSpacing: "0.1em", textTransform: "uppercase", color: "#0F172A",
-    borderBottom: "2px solid #0F172A", paddingBottom: "8px", marginBottom: "16px",
+    letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-primary)",
+    borderBottom: "2px solid var(--text-primary)", paddingBottom: "8px", marginBottom: "16px",
   };
   const h3Style: React.CSSProperties = {
     fontSize: "14px", fontFamily: "'Pretendard', sans-serif", fontWeight: 700,
-    color: "#0F172A", marginBottom: "8px", marginTop: "20px",
+    color: "var(--text-primary)", marginBottom: "8px", marginTop: "20px",
   };
   const pStyle: React.CSSProperties = {
-    fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "#475569",
+    fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-secondary)",
     lineHeight: "1.85", marginBottom: "10px",
   };
   const tableStyle: React.CSSProperties = {
@@ -32,29 +32,29 @@ export default function PrivacyPage() {
     fontFamily: "'Pretendard', sans-serif",
   };
   const thStyle: React.CSSProperties = {
-    padding: "10px 14px", backgroundColor: "#F8F9FA", fontWeight: 700,
-    color: "#0F172A", textAlign: "left", border: "1px solid #E2E8F0",
+    padding: "10px 14px", backgroundColor: "var(--bg-subtle)", fontWeight: 700,
+    color: "var(--text-primary)", textAlign: "left", border: "1px solid var(--border)",
   };
   const tdStyle: React.CSSProperties = {
-    padding: "10px 14px", color: "#475569", border: "1px solid #E2E8F0", verticalAlign: "top",
+    padding: "10px 14px", color: "var(--text-secondary)", border: "1px solid var(--border)", verticalAlign: "top",
   };
 
   return (
     <div style={{ maxWidth: "800px", margin: "0 auto", padding: "64px 40px 96px" }}>
       {/* 헤더 */}
       <div style={{ marginBottom: "48px" }}>
-        <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "#94A3B8", letterSpacing: "0.12em", marginBottom: "12px" }}>
+        <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "var(--text-placeholder)", letterSpacing: "0.12em", marginBottom: "12px" }}>
           PRIVACY POLICY
         </p>
-        <h1 style={{ fontSize: "28px", fontFamily: "'Pretendard', sans-serif", fontWeight: 800, color: "#0F172A", marginBottom: "8px" }}>
+        <h1 style={{ fontSize: "28px", fontFamily: "'Pretendard', sans-serif", fontWeight: 800, color: "var(--text-primary)", marginBottom: "8px" }}>
           개인정보처리방침
         </h1>
-        <p style={{ fontSize: "13px", fontFamily: "'Pretendard', sans-serif", color: "#94A3B8" }}>
+        <p style={{ fontSize: "13px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-placeholder)" }}>
           시행일: {EFFECTIVE_DATE}
         </p>
       </div>
 
-      <div style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "#475569", lineHeight: "1.85", marginBottom: "48px", padding: "20px 24px", backgroundColor: "#F8F9FA", borderLeft: "3px solid #0F172A" }}>
+      <div style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-secondary)", lineHeight: "1.85", marginBottom: "48px", padding: "20px 24px", backgroundColor: "var(--bg-subtle)", borderLeft: "3px solid var(--text-primary)" }}>
         {COMPANY}(이하 "회사")는 이용자의 개인정보를 소중히 여기며, 「개인정보 보호법」 및 「정보통신망 이용촉진 및 정보보호 등에 관한 법률」에 따라 이용자의 개인정보를 보호하고 이와 관련한 고충을 신속하게 처리합니다.
       </div>
 
@@ -163,7 +163,7 @@ export default function PrivacyPage() {
             <li key={item} style={{ ...pStyle, marginBottom: "6px" }}>{item}</li>
           ))}
         </ul>
-        <p style={{ ...pStyle, marginTop: "12px", color: "#94A3B8", fontSize: "12px" }}>
+        <p style={{ ...pStyle, marginTop: "12px", color: "var(--text-placeholder)", fontSize: "12px" }}>
           * 수신 동의 일시는 법적 근거로 보관됩니다 (정보통신망법 제50조의5).
         </p>
       </div>
@@ -223,13 +223,13 @@ export default function PrivacyPage() {
       <div style={sectionStyle}>
         <h2 style={h2Style}>제8조. 개인정보 보호책임자</h2>
         <p style={pStyle}>개인정보 관련 문의사항은 아래로 연락주시기 바랍니다.</p>
-        <div style={{ padding: "20px 24px", backgroundColor: "#F8F9FA", border: "1px solid #E2E8F0" }}>
+        <div style={{ padding: "20px 24px", backgroundColor: "var(--bg-subtle)", border: "1px solid var(--border)" }}>
           <p style={{ ...pStyle, margin: 0 }}>
-            <strong style={{ color: "#0F172A" }}>개인정보 보호책임자:</strong> 대표<br />
-            <strong style={{ color: "#0F172A" }}>담당 부서:</strong> 서비스 운영팀<br />
-            <strong style={{ color: "#0F172A" }}>서비스명:</strong> 선익 (SEONIK)<br />
-            <strong style={{ color: "#0F172A" }}>이메일:</strong>{" "}
-            <a href={`mailto:${EMAIL}`} style={{ color: "#0F172A" }}>{EMAIL}</a>
+            <strong style={{ color: "var(--text-primary)" }}>개인정보 보호책임자:</strong> 대표<br />
+            <strong style={{ color: "var(--text-primary)" }}>담당 부서:</strong> 서비스 운영팀<br />
+            <strong style={{ color: "var(--text-primary)" }}>서비스명:</strong> 선익 (SEONIK)<br />
+            <strong style={{ color: "var(--text-primary)" }}>이메일:</strong>{" "}
+            <a href={`mailto:${EMAIL}`} style={{ color: "var(--text-primary)" }}>{EMAIL}</a>
           </p>
         </div>
       </div>
@@ -255,15 +255,15 @@ export default function PrivacyPage() {
         </table>
       </div>
 
-      <div style={{ borderTop: "1px solid #F1F5F9", paddingTop: "32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
-        <p style={{ fontSize: "12px", color: "#94A3B8", fontFamily: "Inter, sans-serif" }}>
+      <div style={{ borderTop: "1px solid var(--border-light)", paddingTop: "32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
+        <p style={{ fontSize: "12px", color: "var(--text-placeholder)", fontFamily: "Inter, sans-serif" }}>
           先益 — 앞서나가는 정보로 실행가들을 이롭게
         </p>
         <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
-          <Link href="/" style={{ fontSize: "13px", color: "#64748B", fontFamily: "'Pretendard', sans-serif", textDecoration: "none" }}>
+          <Link href="/" style={{ fontSize: "13px", color: "var(--text-muted)", fontFamily: "'Pretendard', sans-serif", textDecoration: "none" }}>
             ← 홈으로
           </Link>
-          <Link href="/terms" style={{ fontSize: "13px", color: "#0F172A", fontFamily: "'Pretendard', sans-serif", textDecoration: "none", fontWeight: 600 }}>
+          <Link href="/terms" style={{ fontSize: "13px", color: "var(--text-primary)", fontFamily: "'Pretendard', sans-serif", textDecoration: "none", fontWeight: 600 }}>
             이용약관 →
           </Link>
         </div>

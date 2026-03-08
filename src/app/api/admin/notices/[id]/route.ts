@@ -25,11 +25,18 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const body = await request.json();
-  const { type, title, content, important, published } = body;
+  const { type, title, content, important, published, scheduledAt } = body;
 
   const notice = await prisma.notice.update({
     where: { id: params.id },
-    data: { type, title, content, important, published },
+    data: {
+      type,
+      title,
+      content,
+      important,
+      published,
+      scheduledAt: scheduledAt ? new Date(scheduledAt) : null,
+    },
   });
   return NextResponse.json(notice);
 }

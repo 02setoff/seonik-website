@@ -200,17 +200,43 @@ export default function MyPage() {
         <div style={{ borderTop: "1px solid var(--border-light)", paddingTop: "32px" }}>
           <h2 style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", fontWeight: 600, color: "#EF4444", marginBottom: "12px" }}>회원 탈퇴</h2>
           <p style={{ fontSize: "13px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-placeholder)", marginBottom: "16px" }}>탈퇴 시 모든 데이터가 삭제되며 복구할 수 없습니다.</p>
-          {!deleteConfirm ? (
-            <button onClick={() => setDeleteConfirm(true)} style={{ padding: "8px 18px", backgroundColor: "var(--bg-card)", color: "#EF4444", border: "1px solid #FCA5A5", cursor: "pointer", fontSize: "13px", fontFamily: "'Pretendard', sans-serif" }}>회원 탈퇴</button>
-          ) : (
-            <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
-              <p style={{ fontSize: "13px", fontFamily: "'Pretendard', sans-serif", color: "#EF4444" }}>정말 탈퇴하시겠습니까?</p>
-              <button onClick={handleDelete} disabled={deleting} style={{ padding: "8px 18px", backgroundColor: "#EF4444", color: "white", border: "none", cursor: deleting ? "not-allowed" : "pointer", fontSize: "13px", fontFamily: "'Pretendard', sans-serif", opacity: deleting ? 0.6 : 1 }}>{deleting ? "처리 중..." : "확인"}</button>
-              <button onClick={() => setDeleteConfirm(false)} style={{ padding: "8px 18px", backgroundColor: "var(--bg-card)", color: "var(--text-muted)", border: "1px solid var(--border)", cursor: "pointer", fontSize: "13px", fontFamily: "'Pretendard', sans-serif" }}>취소</button>
-            </div>
-          )}
+          <button onClick={() => setDeleteConfirm(true)} style={{ padding: "8px 18px", backgroundColor: "var(--bg-card)", color: "#EF4444", border: "1px solid #FCA5A5", cursor: "pointer", fontSize: "13px", fontFamily: "'Pretendard', sans-serif" }}>회원 탈퇴</button>
         </div>
       </div>
+      {/* 회원 탈퇴 확인 오버레이 */}
+      {deleteConfirm && (
+        <div
+          style={{ position: "fixed", inset: 0, zIndex: 500, backgroundColor: "rgba(15,23,42,0.75)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}
+          onClick={() => setDeleteConfirm(false)}
+        >
+          <div
+            style={{ backgroundColor: "var(--modal-bg)", padding: "clamp(28px,6vw,44px)", maxWidth: "400px", width: "100%", boxShadow: "0 24px 48px rgba(0,0,0,0.3)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p style={{ fontSize: "10px", fontFamily: "Inter, sans-serif", color: "#EF4444", letterSpacing: "0.15em", marginBottom: "16px" }}>WITHDRAWAL</p>
+            <h3 style={{ fontSize: "20px", fontFamily: "'Pretendard', sans-serif", fontWeight: 700, color: "var(--text-primary)", marginBottom: "12px" }}>회원 탈퇴</h3>
+            <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-secondary)", lineHeight: "1.75", marginBottom: "32px" }}>
+              탈퇴 시 <strong style={{ color: "#EF4444" }}>모든 데이터(읽기 이력, 저장한 브리핑)가 즉시 삭제</strong>되며 복구할 수 없습니다.<br />
+              정말 탈퇴하시겠습니까?
+            </p>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                style={{ flex: 1, padding: "12px", backgroundColor: "#EF4444", color: "white", border: "none", cursor: deleting ? "not-allowed" : "pointer", fontSize: "14px", fontFamily: "'Pretendard', sans-serif", fontWeight: 600, opacity: deleting ? 0.6 : 1 }}
+              >
+                {deleting ? "처리 중..." : "탈퇴 확인"}
+              </button>
+              <button
+                onClick={() => setDeleteConfirm(false)}
+                style={{ flex: 1, padding: "12px", backgroundColor: "transparent", color: "var(--text-muted)", border: "1px solid var(--border)", cursor: "pointer", fontSize: "14px", fontFamily: "'Pretendard', sans-serif" }}
+              >
+                취소
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <PostModal post={selectedPost} onClose={() => setSelectedPost(null)} />
     </>
   );

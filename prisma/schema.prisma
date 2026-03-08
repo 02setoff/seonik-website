@@ -144,12 +144,13 @@ model Contact {
 }
 
 model Notice {
-  id        String   @id @default(cuid())
-  type      String
-  title     String
-  content   String
-  important Boolean  @default(false)
-  published Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String    @id @default(cuid())
+  type        String
+  title       String
+  content     String
+  important   Boolean   @default(false)
+  published   Boolean   @default(true)
+  scheduledAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }

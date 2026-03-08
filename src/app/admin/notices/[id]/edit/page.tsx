@@ -16,6 +16,7 @@ export default async function EditNoticePage({ params }: { params: { id: string 
       content: notice.content,
       important: notice.important,
       published: notice.published,
+      scheduledAt: notice.scheduledAt ? notice.scheduledAt.toISOString() : null,
     }} />
   );
 }

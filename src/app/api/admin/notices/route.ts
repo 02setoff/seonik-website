@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const body = await request.json();
-  const { type, title, content, important, published } = body;
+  const { type, title, content, important, published, scheduledAt } = body;
 
   if (!type || !title || !content) {
     return NextResponse.json({ error: "type, title, content는 필수입니다." }, { status: 400 });
@@ -39,6 +39,7 @@ export async function POST(request: Request) {
       content,
       important: important ?? false,
       published: published ?? true,
+      scheduledAt: scheduledAt ? new Date(scheduledAt) : null,
     },
   });
   return NextResponse.json(notice, { status: 201 });

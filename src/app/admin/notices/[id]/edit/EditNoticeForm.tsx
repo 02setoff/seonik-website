@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 const TYPE_OPTIONS = ["서비스", "약관", "업데이트", "긴급"];
+type PublishMode = "instant" | "scheduled" | "draft";
 
 const inputStyle: React.CSSProperties = {
   width: "100%", padding: "10px 14px", border: "1px solid #E2E8F0",
@@ -19,6 +20,13 @@ interface NoticeData {
   content: string;
   important: boolean;
   published: boolean;
+  scheduledAt: string | null;
+}
+
+function getInitialPublishMode(notice: NoticeData): PublishMode {
+  if (!notice.published) return "draft";
+  if (notice.scheduledAt && new Date(notice.scheduledAt) > new Date()) return "scheduled";
+  return "instant";
 }
 
 export default function EditNoticeForm({ notice }: { notice: NoticeData }) {
@@ -28,8 +36,11 @@ export default function EditNoticeForm({ notice }: { notice: NoticeData }) {
     title: notice.title,
     content: notice.content,
     important: notice.important,
-    published: notice.published,
   });
+  const [publishMode, setPublishMode] = useState<PublishMode>(getInitialPublishMode(notice));
+  const [scheduledAt, setScheduledAt] = useState(
+    notice.scheduledAt ? new Date(notice.scheduledAt).toISOString().slice(0, 16) : ""
+  );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -39,13 +50,22 @@ export default function EditNoticeForm({ notice }: { notice: NoticeData }) {
       setError("제목과 내용을 입력해주세요.");
       return;
     }
+    if (publishMode === "scheduled" && !scheduledAt) {
+      setError("예약 발행 날짜와 시간을 설정해주세요.");
+      return;
+    }
     setSaving(true);
     setError("");
     try {
+      const published = publishMode !== "draft";
+      const scheduledAtValue = publishMode === "scheduled"
+        ? new Date(scheduledAt).toISOString()
+        : null;
+
       const res = await fetch(`/api/admin/notices/${notice.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, published, scheduledAt: scheduledAtValue }),
       });
       if (res.ok) {
         router.push("/admin/notices");
@@ -60,6 +80,8 @@ export default function EditNoticeForm({ notice }: { notice: NoticeData }) {
       setSaving(false);
     }
   };
+
+  const minDateTime = new Date(Date.now() + 5 * 60000).toISOString().slice(0, 16);
 
   return (
     <div style={{ maxWidth: "720px" }}>
@@ -104,25 +126,69 @@ export default function EditNoticeForm({ notice }: { notice: NoticeData }) {
           />
         </div>
 
-        <div style={{ display: "flex", gap: "24px" }}>
-          <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "#0F172A" }}>
-            <input
-              type="checkbox"
-              checked={form.important}
-              onChange={(e) => setForm(f => ({ ...f, important: e.target.checked }))}
-              style={{ width: "16px", height: "16px", accentColor: "#EF4444" }}
-            />
-            중요 공지
-          </label>
-          <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "#0F172A" }}>
-            <input
-              type="checkbox"
-              checked={form.published}
-              onChange={(e) => setForm(f => ({ ...f, published: e.target.checked }))}
-              style={{ width: "16px", height: "16px", accentColor: "#0F172A" }}
-            />
-            공개
-          </label>
+        {/* 중요 공지 */}
+        <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "#0F172A" }}>
+          <input
+            type="checkbox"
+            checked={form.important}
+            onChange={(e) => setForm(f => ({ ...f, important: e.target.checked }))}
+            style={{ width: "16px", height: "16px", accentColor: "#EF4444" }}
+          />
+          중요 공지
+        </label>
+
+        {/* 공개 설정 */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          <label style={{ fontSize: "12px", color: "#64748B", fontFamily: "'Pretendard', sans-serif", fontWeight: 600 }}>공개 설정</label>
+          <div style={{ display: "flex", gap: "0" }}>
+            {([
+              { key: "instant", label: "즉시 공개" },
+              { key: "scheduled", label: "예약 발행" },
+              { key: "draft", label: "비공개(초안)" },
+            ] as { key: PublishMode; label: string }[]).map(({ key, label }) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => setPublishMode(key)}
+                style={{
+                  padding: "9px 16px",
+                  border: "1px solid #E2E8F0",
+                  marginLeft: key !== "instant" ? "-1px" : 0,
+                  backgroundColor: publishMode === key ? "#0F172A" : "white",
+                  color: publishMode === key ? "white" : "#64748B",
+                  fontSize: "13px", fontFamily: "'Pretendard', sans-serif",
+                  cursor: "pointer",
+                  position: "relative", zIndex: publishMode === key ? 1 : 0,
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {publishMode === "scheduled" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px", padding: "16px", backgroundColor: "#F8FAFC", border: "1px solid #E2E8F0" }}>
+              <label style={{ fontSize: "12px", color: "#64748B", fontFamily: "Inter, sans-serif" }}>발표 일시 설정</label>
+              <input
+                type="datetime-local"
+                value={scheduledAt}
+                min={minDateTime}
+                onChange={(e) => setScheduledAt(e.target.value)}
+                style={{ ...inputStyle, backgroundColor: "white" }}
+              />
+              {scheduledAt && (
+                <p style={{ fontSize: "12px", color: "#64748B", fontFamily: "'Pretendard', sans-serif", margin: 0 }}>
+                  ⏰ {new Date(scheduledAt).toLocaleString("ko-KR", { year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })} 에 자동 공개됩니다.
+                </p>
+              )}
+            </div>
+          )}
+
+          {publishMode === "draft" && (
+            <p style={{ fontSize: "12px", color: "#94A3B8", fontFamily: "'Pretendard', sans-serif", margin: 0 }}>
+              비공개 상태로 저장됩니다. 목록에서 언제든지 공개로 변경할 수 있습니다.
+            </p>
+          )}
         </div>
 
         {error && <p style={{ fontSize: "13px", color: "#EF4444", fontFamily: "'Pretendard', sans-serif" }}>{error}</p>}

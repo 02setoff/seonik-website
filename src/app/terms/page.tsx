@@ -12,38 +12,38 @@ const EMAIL = "seonik.official@gmail.com";
 export default function TermsPage() {
   const h2Style: React.CSSProperties = {
     fontSize: "13px", fontFamily: "Inter, sans-serif", fontWeight: 700,
-    letterSpacing: "0.1em", textTransform: "uppercase", color: "#0F172A",
-    borderBottom: "2px solid #0F172A", paddingBottom: "8px", marginBottom: "16px",
+    letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-primary)",
+    borderBottom: "2px solid var(--text-primary)", paddingBottom: "8px", marginBottom: "16px",
   };
   const h3Style: React.CSSProperties = {
     fontSize: "14px", fontFamily: "'Pretendard', sans-serif", fontWeight: 700,
-    color: "#0F172A", marginBottom: "8px", marginTop: "20px",
+    color: "var(--text-primary)", marginBottom: "8px", marginTop: "20px",
   };
   const pStyle: React.CSSProperties = {
-    fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "#475569",
+    fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-secondary)",
     lineHeight: "1.85", marginBottom: "10px",
   };
   const section: React.CSSProperties = { marginBottom: "48px" };
-  const tdStyle: React.CSSProperties = { padding: "10px 14px", color: "#475569", border: "1px solid #E2E8F0", verticalAlign: "top" };
-  const thStyle: React.CSSProperties = { padding: "10px 14px", backgroundColor: "#F8F9FA", fontWeight: 700, color: "#0F172A", textAlign: "left", border: "1px solid #E2E8F0" };
+  const tdStyle: React.CSSProperties = { padding: "10px 14px", color: "var(--text-secondary)", border: "1px solid var(--border)", verticalAlign: "top" };
+  const thStyle: React.CSSProperties = { padding: "10px 14px", backgroundColor: "var(--bg-subtle)", fontWeight: 700, color: "var(--text-primary)", textAlign: "left", border: "1px solid var(--border)" };
   const tableStyle: React.CSSProperties = { width: "100%", borderCollapse: "collapse", marginBottom: "16px", fontSize: "13px", fontFamily: "'Pretendard', sans-serif" };
 
   return (
     <div style={{ maxWidth: "800px", margin: "0 auto", padding: "64px 40px 96px" }}>
       {/* 헤더 */}
       <div style={{ marginBottom: "48px" }}>
-        <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "#94A3B8", letterSpacing: "0.12em", marginBottom: "12px" }}>
+        <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "var(--text-placeholder)", letterSpacing: "0.12em", marginBottom: "12px" }}>
           TERMS OF SERVICE
         </p>
-        <h1 style={{ fontSize: "28px", fontFamily: "'Pretendard', sans-serif", fontWeight: 800, color: "#0F172A", marginBottom: "8px" }}>
+        <h1 style={{ fontSize: "28px", fontFamily: "'Pretendard', sans-serif", fontWeight: 800, color: "var(--text-primary)", marginBottom: "8px" }}>
           이용약관
         </h1>
-        <p style={{ fontSize: "13px", fontFamily: "'Pretendard', sans-serif", color: "#94A3B8" }}>
+        <p style={{ fontSize: "13px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-placeholder)" }}>
           시행일: {EFFECTIVE_DATE}
         </p>
       </div>
 
-      <div style={{ ...pStyle, marginBottom: "48px", padding: "20px 24px", backgroundColor: "#F8F9FA", borderLeft: "3px solid #0F172A" }}>
+      <div style={{ ...pStyle, marginBottom: "48px", padding: "20px 24px", backgroundColor: "var(--bg-subtle)", borderLeft: "3px solid var(--text-primary)" }}>
         선익(SEONIK, 이하 &ldquo;회사&rdquo;)가 제공하는 AI 기반 비즈니스 인텔리전스 브리핑 서비스(이하 &ldquo;서비스&rdquo;)를 이용함으로써 본 약관에 동의한 것으로 간주합니다. 본 약관을 주의 깊게 읽어 주시기 바랍니다.
       </div>
 
@@ -111,7 +111,7 @@ export default function TermsPage() {
         <h3 style={h3Style}>연령 확인</h3>
         <p style={pStyle}>
           서비스는 만 14세 이상만 이용할 수 있습니다 (「정보통신망법」 제31조). 가입 시 본인이 만 14세 이상임을 확인하는 절차를 거칩니다.
-          <strong style={{ color: "#0F172A" }}> 만 14세 미만임을 허위 기재하여 가입한 경우, 회사는 해당 사실 확인 즉시 계정을 정지하거나 삭제할 수 있습니다.</strong>
+          <strong style={{ color: "var(--text-primary)" }}> 만 14세 미만임을 허위 기재하여 가입한 경우, 회사는 해당 사실 확인 즉시 계정을 정지하거나 삭제할 수 있습니다.</strong>
         </p>
         <h3 style={h3Style}>계정 보안</h3>
         <p style={pStyle}>
@@ -196,11 +196,11 @@ export default function TermsPage() {
           서비스 내 회사가 제작한 모든 브리핑 콘텐츠(RADAR·CORE·FLASH), 분석 프레임워크, 디자인, 로고, 텍스트 등에 대한 저작권 및 지식재산권은 회사에 귀속됩니다.
         </p>
         <p style={pStyle}>
-          이용자는 서비스를 통해 제공되는 콘텐츠를 <strong style={{ color: "#0F172A" }}>개인적, 비상업적 목적</strong>으로만 이용할 수 있습니다. 회사의 사전 서면 동의 없이 상업적으로 이용하거나 제3자에게 재배포하는 것을 금지합니다.
+          이용자는 서비스를 통해 제공되는 콘텐츠를 <strong style={{ color: "var(--text-primary)" }}>개인적, 비상업적 목적</strong>으로만 이용할 수 있습니다. 회사의 사전 서면 동의 없이 상업적으로 이용하거나 제3자에게 재배포하는 것을 금지합니다.
         </p>
         <h3 style={h3Style}>콘텐츠의 성격</h3>
         <p style={pStyle}>
-          선익의 브리핑 콘텐츠는 공개 출처 정보(OSINT) 및 AI 분석을 기반으로 제작되며, <strong style={{ color: "#0F172A" }}>정보 제공 목적</strong>으로만 제공됩니다. 투자 권유, 법률 자문, 세무 조언 등으로 해석될 수 없으며, 해당 콘텐츠를 기반으로 한 사업 결정의 결과에 대한 책임은 이용자 본인에게 있습니다.
+          선익의 브리핑 콘텐츠는 공개 출처 정보(OSINT) 및 AI 분석을 기반으로 제작되며, <strong style={{ color: "var(--text-primary)" }}>정보 제공 목적</strong>으로만 제공됩니다. 투자 권유, 법률 자문, 세무 조언 등으로 해석될 수 없으며, 해당 콘텐츠를 기반으로 한 사업 결정의 결과에 대한 책임은 이용자 본인에게 있습니다.
         </p>
       </div>
 
@@ -273,11 +273,11 @@ export default function TermsPage() {
       <div style={section}>
         <h2 style={h2Style}>제13조. 문의</h2>
         <p style={pStyle}>이용약관에 관한 문의는 아래 이메일로 연락주시기 바랍니다.</p>
-        <div style={{ padding: "20px 24px", backgroundColor: "#F8F9FA", border: "1px solid #E2E8F0" }}>
+        <div style={{ padding: "20px 24px", backgroundColor: "var(--bg-subtle)", border: "1px solid var(--border)" }}>
           <p style={{ ...pStyle, margin: 0 }}>
-            <strong style={{ color: "#0F172A" }}>서비스명:</strong> 선익 (SEONIK)<br />
-            <strong style={{ color: "#0F172A" }}>운영 책임:</strong> 선익 운영팀<br />
-            <strong style={{ color: "#0F172A" }}>이메일:</strong>{" "}
+            <strong style={{ color: "var(--text-primary)" }}>서비스명:</strong> 선익 (SEONIK)<br />
+            <strong style={{ color: "var(--text-primary)" }}>운영 책임:</strong> 선익 운영팀<br />
+            <strong style={{ color: "var(--text-primary)" }}>이메일:</strong>{" "}
             <a href={`mailto:${EMAIL}`} style={{ color: "#3B82F6" }}>{EMAIL}</a>
           </p>
         </div>
@@ -304,15 +304,15 @@ export default function TermsPage() {
         </table>
       </div>
 
-      <div style={{ borderTop: "1px solid #F1F5F9", paddingTop: "32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
-        <p style={{ fontSize: "12px", color: "#94A3B8", fontFamily: "Inter, sans-serif" }}>
+      <div style={{ borderTop: "1px solid var(--border-light)", paddingTop: "32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
+        <p style={{ fontSize: "12px", color: "var(--text-placeholder)", fontFamily: "Inter, sans-serif" }}>
           先益 — 앞서나가는 정보로 실행가들을 이롭게
         </p>
         <div style={{ display: "flex", gap: "16px" }}>
-          <Link href="/privacy" style={{ fontSize: "13px", color: "#64748B", fontFamily: "'Pretendard', sans-serif", textDecoration: "none" }}>
+          <Link href="/privacy" style={{ fontSize: "13px", color: "var(--text-muted)", fontFamily: "'Pretendard', sans-serif", textDecoration: "none" }}>
             개인정보처리방침
           </Link>
-          <Link href="/" style={{ fontSize: "13px", color: "#64748B", fontFamily: "'Pretendard', sans-serif", textDecoration: "none" }}>
+          <Link href="/" style={{ fontSize: "13px", color: "var(--text-muted)", fontFamily: "'Pretendard', sans-serif", textDecoration: "none" }}>
             ← 홈으로
           </Link>
         </div>

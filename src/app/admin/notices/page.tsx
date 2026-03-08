@@ -13,6 +13,18 @@ function formatDate(d: Date) {
   return d.toLocaleDateString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit" }).replace(/\. /g, ".").replace(/\.$/, "");
 }
 
+function formatDateTime(d: Date) {
+  return d.toLocaleDateString("ko-KR", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }).replace(/\. /g, ".").replace(/\.$/, "");
+}
+
+function getStatus(notice: { published: boolean; scheduledAt: Date | null }) {
+  if (!notice.published) return { label: "비공개", color: "#94A3B8" };
+  if (notice.scheduledAt && notice.scheduledAt > new Date()) {
+    return { label: `예약 ${formatDateTime(notice.scheduledAt)}`, color: "#F59E0B" };
+  }
+  return { label: "공개", color: "#16A34A" };
+}
+
 export const dynamic = "force-dynamic";
 
 export default async function AdminNoticesPage() {
@@ -41,22 +53,23 @@ export default async function AdminNoticesPage() {
       ) : (
         <div style={{ border: "1px solid #E2E8F0" }}>
           {/* 헤더 */}
-          <div style={{ display: "grid", gridTemplateColumns: "80px 1fr 100px 80px 80px 120px", gap: "0", backgroundColor: "#F8F9FA", borderBottom: "1px solid #E2E8F0", padding: "10px 16px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "80px 1fr 100px 60px 120px 120px", gap: "0", backgroundColor: "#F8F9FA", borderBottom: "1px solid #E2E8F0", padding: "10px 16px" }}>
             <span style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "#94A3B8", fontWeight: 700 }}>유형</span>
             <span style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "#94A3B8", fontWeight: 700 }}>제목</span>
             <span style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "#94A3B8", fontWeight: 700 }}>날짜</span>
             <span style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "#94A3B8", fontWeight: 700 }}>중요</span>
-            <span style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "#94A3B8", fontWeight: 700 }}>공개</span>
+            <span style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "#94A3B8", fontWeight: 700 }}>상태</span>
             <span style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "#94A3B8", fontWeight: 700 }}>관리</span>
           </div>
 
           {notices.map((notice, idx) => {
             const typeMeta = TYPE_COLORS[notice.type] || { bg: "#F1F5F9", color: "#475569" };
+            const status = getStatus(notice);
             return (
               <div
                 key={notice.id}
                 style={{
-                  display: "grid", gridTemplateColumns: "80px 1fr 100px 80px 80px 120px",
+                  display: "grid", gridTemplateColumns: "80px 1fr 100px 60px 120px 120px",
                   gap: "0", padding: "12px 16px", alignItems: "center",
                   borderBottom: idx < notices.length - 1 ? "1px solid #F1F5F9" : "none",
                   backgroundColor: "white",
@@ -80,10 +93,10 @@ export default async function AdminNoticesPage() {
                   {formatDate(notice.createdAt)}
                 </span>
                 <span style={{ fontSize: "13px", color: notice.important ? "#EF4444" : "#CBD5E1" }}>
-                  {notice.important ? "● 중요" : "—"}
+                  {notice.important ? "●" : "—"}
                 </span>
-                <span style={{ fontSize: "13px", color: notice.published ? "#16A34A" : "#94A3B8" }}>
-                  {notice.published ? "공개" : "비공개"}
+                <span style={{ fontSize: "12px", fontFamily: "Inter, sans-serif", color: status.color, fontWeight: 600 }}>
+                  {status.label}
                 </span>
                 <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
                   <Link href={`/admin/notices/${notice.id}/edit`}
