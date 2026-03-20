@@ -21,11 +21,6 @@ interface SearchModalProps {
   onSelectPost?: (post: PostItem) => void;
 }
 
-const CATEGORY_COLORS: Record<string, string> = {
-  RADAR: "#3B82F6",
-  CORE: "#8B5CF6",
-  FLASH: "#F59E0B",
-};
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("ko-KR", {
@@ -67,7 +62,6 @@ export default function SearchModal({ isOpen, onClose, onSelectPost }: SearchMod
     return () => { document.body.style.overflow = ""; };
   }, [isOpen]);
 
-  const setCategory = useCallback((cat: string) => setQuery(cat), []);
 
   const handleSelect = useCallback((result: SearchResult) => {
     if (onSelectPost) {
@@ -133,25 +127,8 @@ export default function SearchModal({ isOpen, onClose, onSelectPost }: SearchMod
           {query.trim() === "" ? (
             <div style={{ padding: "32px 20px", textAlign: "center" }}>
               <p style={{ fontFamily: "'Pretendard', sans-serif", fontSize: "14px", color: "var(--text-placeholder)" }}>
-                {posts.length === 0 ? "아직 게시된 글이 없습니다." : "RADAR · CORE · FLASH 브리핑을 검색해보세요"}
+                {posts.length === 0 ? "아직 게시된 브리핑이 없습니다." : "브리핑 제목을 검색하세요"}
               </p>
-              {posts.length > 0 && (
-                <div className="flex items-center justify-center gap-2 mt-4">
-                  {["RADAR", "CORE", "FLASH"].map(cat => (
-                    <button key={cat} onClick={() => setCategory(cat)}
-                      style={{
-                        padding: "4px 12px", fontSize: "11px", letterSpacing: "0.06em",
-                        fontFamily: "Inter, sans-serif", borderRadius: "4px", cursor: "pointer",
-                        border: "1px solid var(--border)", color: "var(--text-placeholder)",
-                        background: "none", transition: "all 0.15s",
-                      }}
-                      onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--text-primary)"; (e.currentTarget as HTMLButtonElement).style.color = "var(--text-primary)"; }}
-                      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)"; (e.currentTarget as HTMLButtonElement).style.color = "var(--text-placeholder)"; }}>
-                      {cat}
-                    </button>
-                  ))}
-                </div>
-              )}
             </div>
           ) : results.length === 0 ? (
             <div style={{ padding: "32px 20px", textAlign: "center" }}>
@@ -176,10 +153,10 @@ export default function SearchModal({ isOpen, onClose, onSelectPost }: SearchMod
                     </p>
                     <p className="text-xs mt-0.5 tracking-wide" style={{
                       fontFamily: "Inter, sans-serif",
-                      color: CATEGORY_COLORS[result.category] || "var(--text-placeholder)",
-                      fontWeight: 600,
+                      color: "var(--text-placeholder)",
+                      fontWeight: 500,
                     }}>
-                      {result.category} · {formatDate(result.createdAt)}
+                      {formatDate(result.createdAt)}
                     </p>
                   </div>
                   <span className="flex items-center gap-1 shrink-0"

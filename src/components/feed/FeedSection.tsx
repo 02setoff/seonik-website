@@ -1,15 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Check, Eye } from "lucide-react";
+import { Check, Eye, ArrowRight } from "lucide-react";
 import PostModal, { PostItem } from "./PostModal";
-
-// 카테고리별 좌측 포인트 컬러
-const CATEGORY_ACCENT: Record<string, string> = {
-  RADAR: "#0F172A",
-  CORE:  "#334155",
-  FLASH: "#64748B",
-};
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("ko-KR", {
@@ -17,60 +10,154 @@ function formatDate(iso: string) {
   }).replace(/\. /g, ".").replace(/\.$/, "");
 }
 
-// ── 피처드 카드 (최신 글 1개, 전체 폭) ──────────────────────────
-function FeaturedCard({ post, onClick }: { post: PostItem; onClick: () => void }) {
-  const accent = CATEGORY_ACCENT[post.category] ?? CATEGORY_ACCENT.RADAR;
+function formatDocId(index: number, iso: string) {
+  const d = new Date(iso);
+  const yy = String(d.getFullYear()).slice(2);
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `BRF-${yy}${mm}${dd}-${String(index + 1).padStart(3, "0")}`;
+}
+
+// ── 첫 번째: LEAD 문서 (전체폭, 강조) ────────────────────────────
+function LeadEntry({ post, index, onClick }: { post: PostItem; index: number; onClick: () => void }) {
+  const [hover, setHover] = useState(false);
   return (
     <button
       onClick={onClick}
-      className="group w-full text-left transition-all duration-200 ease-out hover:shadow-[0_6px_24px_rgba(0,0,0,0.10)] hover:-translate-y-0.5"
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      className="w-full text-left"
       style={{
-        backgroundColor: "var(--bg-card)",
-        border: "1px solid var(--border)",
-        borderLeft: `4px solid ${accent}`,
-        borderRadius: 0,
-        display: "grid",
-        gridTemplateColumns: "1fr auto",
+        display: "block",
+        borderTop: "2px solid var(--text-primary)",
+        borderBottom: "1px solid var(--border)",
+        padding: "clamp(24px,4vw,40px) 0",
+        background: hover ? "var(--bg-hover)" : "transparent",
+        transition: "background 0.15s",
+        cursor: "pointer",
       }}
     >
-      <div style={{ padding: "clamp(24px,4vw,40px)" }}>
-        {/* 배지 + 날짜 */}
-        <div className="flex items-center gap-3 mb-4">
-          <span style={{
-            fontSize: "10px", fontFamily: "Inter, sans-serif", fontWeight: 700,
-            letterSpacing: "0.12em", padding: "3px 10px",
-            backgroundColor: "var(--bg-subtle)", color: "var(--text-primary)",
-            border: "1px solid var(--border)",
-          }}>
-            {post.category}
-          </span>
-          <span style={{ fontSize: "12px", fontFamily: "Inter, sans-serif", color: "var(--text-placeholder)" }}>
-            LATEST
-          </span>
-        </div>
+      {/* 문서 메타 헤더 */}
+      <div className="flex items-center gap-3 mb-5" style={{ fontFamily: "Inter, sans-serif" }}>
+        <span style={{
+          fontSize: "10px", fontWeight: 700, letterSpacing: "0.14em",
+          backgroundColor: "var(--text-primary)",
+          padding: "3px 10px",
+          color: "var(--bg-primary)",
+        }}>
+          INTEL BRIEF
+        </span>
+        <span style={{ fontSize: "10px", letterSpacing: "0.1em", color: "var(--text-placeholder)", fontWeight: 600 }}>
+          {formatDocId(index, post.createdAt)}
+        </span>
+        <span style={{ fontSize: "10px", color: "var(--border)", letterSpacing: "0.05em" }}>·</span>
+        <span style={{ fontSize: "10px", letterSpacing: "0.08em", color: "var(--text-placeholder)" }}>
+          {formatDate(post.createdAt)}
+        </span>
+      </div>
 
-        {/* 제목 */}
-        <h2 style={{
-          fontSize: "clamp(18px,3vw,26px)",
+      {/* 제목 */}
+      <h2 style={{
+        fontSize: "clamp(20px,3.5vw,30px)",
+        fontFamily: "'Pretendard', sans-serif",
+        fontWeight: 800,
+        color: "var(--text-primary)",
+        lineHeight: 1.3,
+        letterSpacing: "-0.025em",
+        marginBottom: "16px",
+        wordBreak: "break-word",
+      }}>
+        {post.title}
+      </h2>
+
+      {/* 요약 */}
+      {post.summary && (
+        <p style={{
+          fontSize: "clamp(13px,2vw,15px)",
           fontFamily: "'Pretendard', sans-serif",
-          fontWeight: 800,
+          color: "var(--text-secondary)",
+          lineHeight: 1.8,
+          marginBottom: "24px",
+          maxWidth: "760px",
+        }}>
+          {post.summary}
+        </p>
+      )}
+
+      {/* 하단 메타 */}
+      <div className="flex items-center gap-5" style={{ fontFamily: "Inter, sans-serif", fontSize: "12px" }}>
+        <span className="flex items-center gap-1.5" style={{ color: "var(--text-muted)" }}>
+          <Check size={11} strokeWidth={2.5} />
+          {post.likeCount ?? 0}
+        </span>
+        {post.viewCount != null && (
+          <span className="flex items-center gap-1.5" style={{ color: "var(--text-placeholder)" }}>
+            <Eye size={11} strokeWidth={2} />
+            {post.viewCount}
+          </span>
+        )}
+        <span className="flex items-center gap-1.5 font-semibold" style={{
+          color: "var(--text-primary)", letterSpacing: "0.06em",
+          marginLeft: "auto",
+          fontSize: "11px",
+        }}>
+          FULL BRIEFING <ArrowRight size={12} strokeWidth={2} />
+        </span>
+      </div>
+    </button>
+  );
+}
+
+// ── 나머지: 문서 목록 엔트리 ─────────────────────────────────────
+function DocEntry({ post, index, onClick }: { post: PostItem; index: number; onClick: () => void }) {
+  const [hover, setHover] = useState(false);
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      className="w-full text-left"
+      style={{
+        display: "grid",
+        gridTemplateColumns: "120px 1fr auto",
+        gap: "clamp(16px,3vw,32px)",
+        alignItems: "start",
+        borderBottom: "1px solid var(--border)",
+        padding: "20px 0",
+        background: hover ? "var(--bg-hover)" : "transparent",
+        transition: "background 0.15s",
+        cursor: "pointer",
+      }}
+    >
+      {/* 좌측: 문서번호 + 날짜 */}
+      <div style={{ fontFamily: "Inter, sans-serif", paddingTop: "3px" }}>
+        <p style={{ fontSize: "9px", letterSpacing: "0.12em", color: "var(--text-placeholder)", marginBottom: "4px", fontWeight: 600 }}>
+          {formatDocId(index, post.createdAt)}
+        </p>
+        <p style={{ fontSize: "11px", color: "var(--text-disabled)" }}>
+          {formatDate(post.createdAt)}
+        </p>
+      </div>
+
+      {/* 중앙: 제목 + 요약 */}
+      <div>
+        <h3 style={{
+          fontSize: "clamp(14px,2vw,16px)",
+          fontFamily: "'Pretendard', sans-serif",
+          fontWeight: 700,
           color: "var(--text-primary)",
-          lineHeight: 1.35,
-          letterSpacing: "-0.02em",
-          marginBottom: post.summary ? "16px" : "24px",
+          lineHeight: 1.4,
+          marginBottom: post.summary ? "6px" : 0,
           wordBreak: "break-word",
         }}>
           {post.title}
-        </h2>
-
-        {/* 요약 */}
+        </h3>
         {post.summary && (
           <p style={{
-            fontSize: "clamp(13px,2vw,15px)",
+            fontSize: "13px",
             fontFamily: "'Pretendard', sans-serif",
             color: "var(--text-muted)",
-            lineHeight: 1.75,
-            marginBottom: "24px",
+            lineHeight: 1.65,
             display: "-webkit-box",
             WebkitLineClamp: 2,
             WebkitBoxOrient: "vertical" as React.CSSProperties["WebkitBoxOrient"],
@@ -79,91 +166,20 @@ function FeaturedCard({ post, onClick }: { post: PostItem; onClick: () => void }
             {post.summary}
           </p>
         )}
-
-        {/* 메타 */}
-        <div className="flex items-center gap-4" style={{ fontSize: "12px", fontFamily: "Inter, sans-serif" }}>
-          <span style={{ color: "var(--text-placeholder)" }}>{formatDate(post.createdAt)}</span>
-          <span className="flex items-center gap-1 font-bold" style={{ color: "var(--text-secondary)" }}>
-            <Check size={11} strokeWidth={2.5} />
-            {post.likeCount ?? 0}
-          </span>
-          {post.viewCount != null && (
-            <span className="flex items-center gap-1" style={{ color: "var(--text-placeholder)" }}>
-              <Eye size={11} strokeWidth={2} />
-              {post.viewCount}
-            </span>
-          )}
-          <span style={{
-            fontSize: "11px", fontFamily: "Inter, sans-serif", fontWeight: 600,
-            color: "var(--text-primary)", letterSpacing: "0.05em",
-            borderBottom: "1px solid var(--text-primary)", paddingBottom: "1px",
-            marginLeft: "auto",
-          }}>
-            READ BRIEFING →
-          </span>
-        </div>
       </div>
-    </button>
-  );
-}
 
-// ── 일반 카드 ────────────────────────────────────────────────────
-function PostCard({ post, onClick }: { post: PostItem; onClick: () => void }) {
-  const accent = CATEGORY_ACCENT[post.category] ?? CATEGORY_ACCENT.RADAR;
-  return (
-    <button
-      onClick={onClick}
-      className="group overflow-hidden text-left transition-all duration-200 ease-out hover:shadow-[0_4px_16px_rgba(0,0,0,0.10)] hover:-translate-y-1"
-      style={{
-        backgroundColor: "var(--bg-card)",
-        border: "1px solid var(--border)",
-        borderTop: `3px solid ${accent}`,
-        borderRadius: 0,
-        display: "flex", flexDirection: "column",
-      }}
-    >
-      <div style={{ padding: "20px 20px 16px", flex: 1, display: "flex", flexDirection: "column", gap: "10px" }}>
-        {/* 카테고리 배지 */}
-        <span style={{
-          fontSize: "10px", fontFamily: "Inter, sans-serif", fontWeight: 700,
-          letterSpacing: "0.12em", color: "var(--text-placeholder)", alignSelf: "flex-start",
-        }}>
-          {post.category}
+      {/* 우측: 통계 */}
+      <div className="flex flex-col items-end gap-1.5" style={{ fontFamily: "Inter, sans-serif", fontSize: "11px", paddingTop: "2px", flexShrink: 0 }}>
+        <span className="flex items-center gap-1" style={{ color: "var(--text-muted)" }}>
+          <Check size={10} strokeWidth={2.5} />
+          {post.likeCount ?? 0}
         </span>
-
-        {/* 제목 */}
-        <p className="font-bold leading-snug line-clamp-3"
-          style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-primary)", flex: 1 }}>
-          {post.title}
-        </p>
-
-        {/* 요약 (있을 때만) */}
-        {post.summary && (
-          <p className="line-clamp-2"
-            style={{ fontSize: "12px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-muted)", lineHeight: 1.65 }}>
-            {post.summary}
-          </p>
+        {post.viewCount != null && (
+          <span className="flex items-center gap-1" style={{ color: "var(--text-placeholder)" }}>
+            <Eye size={10} strokeWidth={2} />
+            {post.viewCount}
+          </span>
         )}
-      </div>
-
-      {/* 하단 메타 */}
-      <div className="flex items-center justify-between"
-        style={{ padding: "10px 20px", borderTop: "1px solid var(--border)" }}>
-        <span style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "var(--text-disabled)" }}>
-          {formatDate(post.createdAt)}
-        </span>
-        <div className="flex items-center gap-3" style={{ fontSize: "11px", fontFamily: "Inter, sans-serif" }}>
-          <span className="flex items-center gap-1 font-bold" style={{ color: "var(--text-secondary)" }}>
-            <Check size={10} strokeWidth={2.5} />
-            {post.likeCount ?? 0}
-          </span>
-          {post.viewCount != null && (
-            <span className="flex items-center gap-1" style={{ color: "var(--text-placeholder)" }}>
-              <Eye size={10} strokeWidth={2} />
-              {post.viewCount}
-            </span>
-          )}
-        </div>
       </div>
     </button>
   );
@@ -208,12 +224,16 @@ export default function FeedSection() {
     finally { setLoadingMore(false); }
   };
 
-  const [featured, ...rest] = posts;
+  const today = new Date().toLocaleDateString("ko-KR", {
+    year: "numeric", month: "long", day: "numeric",
+  });
+
+  const [lead, ...rest] = posts;
 
   return (
     <>
-      <div className="pb-20" style={{ backgroundColor: "var(--bg-primary)" }}>
-        <div className="mx-auto px-5 md:px-10" style={{ maxWidth: "1280px" }}>
+      <div className="pb-24" style={{ backgroundColor: "var(--bg-primary)" }}>
+        <div className="mx-auto px-5 md:px-10" style={{ maxWidth: "1100px" }}>
 
           {/* 로딩 */}
           {loading && (
@@ -234,67 +254,81 @@ export default function FeedSection() {
           {!loading && (
             <div style={{ marginTop: "40px" }}>
 
-              {/* 섹션 헤더 */}
-              <div className="flex flex-wrap items-baseline justify-between gap-4 mb-8">
-                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                  <span className="font-bold tracking-[0.05em]"
-                    style={{ fontSize: "clamp(15px,3.5vw,18px)", fontFamily: "Inter, sans-serif", color: "var(--text-primary)" }}>
-                    BRIEFING
+              {/* 문서 헤더 바 */}
+              <div style={{
+                borderTop: "1px solid var(--border)",
+                borderBottom: "1px solid var(--border)",
+                padding: "10px 0",
+                marginBottom: "0",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                flexWrap: "wrap",
+                gap: "8px",
+              }}>
+                <div className="flex items-center gap-4" style={{ fontFamily: "Inter, sans-serif" }}>
+                  <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.18em", color: "var(--text-primary)" }}>
+                    SEONIK INTELLIGENCE
                   </span>
-                  <span style={{ fontSize: "clamp(15px,3.5vw,18px)", color: "var(--text-placeholder)" }}>—</span>
-                  <span className="font-normal"
-                    style={{ fontSize: "clamp(13px,3vw,15px)", fontFamily: "'Pretendard', sans-serif", color: "var(--text-muted)" }}>
-                    앞서나가는 실행가를 위한 브리핑
+                  <span style={{ width: "1px", height: "12px", backgroundColor: "var(--border)", display: "inline-block" }} />
+                  <span style={{ fontSize: "10px", letterSpacing: "0.1em", color: "var(--text-placeholder)", fontWeight: 500 }}>
+                    BRIEFING INDEX
                   </span>
                 </div>
-                {posts.length > 0 && (
-                  <span style={{ fontSize: "12px", fontFamily: "Inter, sans-serif", color: "var(--text-disabled)" }}>
-                    {posts.length}{cursor ? "+" : ""}개
+                <div className="flex items-center gap-4" style={{ fontFamily: "Inter, sans-serif" }}>
+                  <span style={{ fontSize: "10px", color: "var(--text-placeholder)", letterSpacing: "0.06em" }}>
+                    {today}
                   </span>
-                )}
+                  {posts.length > 0 && (
+                    <span style={{ fontSize: "10px", color: "var(--text-disabled)", letterSpacing: "0.06em" }}>
+                      총 {posts.length}{cursor ? "+" : ""}건
+                    </span>
+                  )}
+                </div>
               </div>
 
               {posts.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-32">
-                  <p style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-disabled)" }}>
-                    아직 게시된 브리핑이 없습니다.
+                  <p style={{ fontSize: "13px", fontFamily: "Inter, sans-serif", color: "var(--text-disabled)", letterSpacing: "0.1em" }}>
+                    NO BRIEFINGS AVAILABLE
                   </p>
                 </div>
               ) : (
                 <>
-                  {/* 피처드 카드 */}
-                  {featured && (
-                    <div className="mb-5">
-                      <FeaturedCard post={featured} onClick={() => setSelectedPost(featured)} />
-                    </div>
+                  {/* 리드 문서 */}
+                  {lead && (
+                    <LeadEntry post={lead} index={0} onClick={() => setSelectedPost(lead)} />
                   )}
 
-                  {/* 나머지 그리드 */}
-                  {rest.length > 0 && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-5">
-                      {rest.map(post => (
-                        <PostCard key={post.id} post={post} onClick={() => setSelectedPost(post)} />
-                      ))}
-                    </div>
-                  )}
+                  {/* 문서 목록 */}
+                  {rest.map((post, i) => (
+                    <DocEntry
+                      key={post.id}
+                      post={post}
+                      index={i + 1}
+                      onClick={() => setSelectedPost(post)}
+                    />
+                  ))}
 
                   {/* 더 보기 */}
                   {cursor && (
-                    <div className="flex justify-center mt-12">
+                    <div className="flex justify-center pt-10" style={{ borderTop: "1px solid var(--border)", marginTop: "0" }}>
                       <button
                         onClick={loadMore}
                         disabled={loadingMore}
                         style={{
-                          border: "1px solid var(--border)",
-                          padding: "12px 48px",
-                          fontSize: "12px", fontFamily: "Inter, sans-serif",
-                          letterSpacing: "0.08em", color: "var(--text-secondary)",
-                          background: "none", cursor: loadingMore ? "not-allowed" : "pointer",
-                          opacity: loadingMore ? 0.6 : 1, transition: "all 0.2s",
+                          fontFamily: "Inter, sans-serif",
+                          fontSize: "11px", letterSpacing: "0.12em", fontWeight: 600,
+                          color: "var(--text-muted)",
+                          background: "none", border: "none",
+                          cursor: loadingMore ? "not-allowed" : "pointer",
+                          opacity: loadingMore ? 0.5 : 1,
+                          padding: "8px 0",
+                          transition: "color 0.15s",
                         }}
-                        onMouseEnter={e => { if (!loadingMore) (e.currentTarget as HTMLButtonElement).style.backgroundColor = "var(--bg-hover)"; }}
-                        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent"; }}>
-                        {loadingMore ? "불러오는 중..." : "MORE BRIEFINGS"}
+                        onMouseEnter={e => { if (!loadingMore) (e.currentTarget as HTMLButtonElement).style.color = "var(--text-primary)"; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = "var(--text-muted)"; }}>
+                        {loadingMore ? "LOADING..." : "LOAD MORE BRIEFINGS ↓"}
                       </button>
                     </div>
                   )}
