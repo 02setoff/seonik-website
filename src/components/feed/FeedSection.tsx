@@ -1,13 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Check, Eye, ArrowRight } from "lucide-react";
+import { Check, Eye, ArrowRight, ChevronRight } from "lucide-react";
 import PostModal, { PostItem } from "./PostModal";
 
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("ko-KR", {
-    year: "numeric", month: "2-digit", day: "2-digit",
-  }).replace(/\. /g, ".").replace(/\.$/, "");
+  const d = new Date(iso);
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}.${mm}.${dd}`;
 }
 
 function formatDocId(index: number, iso: string) {
@@ -119,7 +121,7 @@ function DocEntry({ post, index, onClick }: { post: PostItem; index: number; onC
       className="w-full text-left"
       style={{
         display: "grid",
-        gridTemplateColumns: "120px 1fr auto",
+        gridTemplateColumns: "clamp(80px,18vw,120px) 1fr auto",
         gap: "clamp(16px,3vw,32px)",
         alignItems: "start",
         borderBottom: "1px solid var(--border)",
@@ -168,7 +170,7 @@ function DocEntry({ post, index, onClick }: { post: PostItem; index: number; onC
         )}
       </div>
 
-      {/* 우측: 통계 */}
+      {/* 우측: 통계 + 화살표 */}
       <div className="flex flex-col items-end gap-1.5" style={{ fontFamily: "Inter, sans-serif", fontSize: "11px", paddingTop: "2px", flexShrink: 0 }}>
         <span className="flex items-center gap-1" style={{ color: "var(--text-muted)" }}>
           <Check size={10} strokeWidth={2.5} />
@@ -180,6 +182,10 @@ function DocEntry({ post, index, onClick }: { post: PostItem; index: number; onC
             {post.viewCount}
           </span>
         )}
+        <ChevronRight
+          size={12} strokeWidth={2}
+          style={{ color: hover ? "var(--text-primary)" : "var(--text-disabled)", transition: "color 0.15s", marginTop: "4px" }}
+        />
       </div>
     </button>
   );
@@ -224,15 +230,16 @@ export default function FeedSection() {
     finally { setLoadingMore(false); }
   };
 
-  const today = new Date().toLocaleDateString("ko-KR", {
-    year: "numeric", month: "long", day: "numeric",
-  });
+  const today = (() => {
+    const d = new Date();
+    return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
+  })();
 
   const [lead, ...rest] = posts;
 
   return (
     <>
-      <div className="pb-24" style={{ backgroundColor: "var(--bg-primary)" }}>
+      <div className="pb-24" style={{ backgroundColor: "var(--bg-primary)", minHeight: "70vh" }}>
         <div className="mx-auto px-5 md:px-10" style={{ maxWidth: "1100px" }}>
 
           {/* 로딩 */}
