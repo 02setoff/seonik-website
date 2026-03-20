@@ -89,7 +89,7 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
             {/* About 드롭다운 */}
             <div ref={aboutRef} style={{ position: "relative" }}>
               <button
-                onClick={() => { setAboutOpen(o => !o); setBriefingOpen(false); }}
+                onClick={() => { setAboutOpen(o => !o); }}
                 style={{
                   display: "flex", alignItems: "center", gap: "2px",
                   padding: "5px 6px", background: "none", border: "none", cursor: "pointer",
