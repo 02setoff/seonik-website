@@ -1,15 +1,27 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Check, Eye, ArrowRight, ChevronRight } from "lucide-react";
+import { Check, Eye, ArrowRight } from "lucide-react";
 import PostModal, { PostItem } from "./PostModal";
 
 function formatDate(iso: string) {
   const d = new Date(iso);
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  return `${yyyy}.${mm}.${dd}`;
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function formatRelativeTime(iso: string) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const min = Math.floor(diff / 60000);
+  const hrs = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+  if (min < 1) return "방금";
+  if (hrs < 1) return `${min}분 전`;
+  if (days < 1) return `${hrs}시간 전`;
+  if (days === 1) return "어제";
+  if (days < 7) return `${days}일 전`;
+  if (days < 30) return `${Math.floor(days / 7)}주 전`;
+  if (days < 365) return `${Math.floor(days / 30)}개월 전`;
+  return `${Math.floor(days / 365)}년 전`;
 }
 
 function formatDocId(index: number, iso: string) {
@@ -20,174 +32,253 @@ function formatDocId(index: number, iso: string) {
   return `BRF-${yy}${mm}${dd}-${String(index + 1).padStart(3, "0")}`;
 }
 
-// ── 첫 번째: LEAD 문서 (전체폭, 강조) ────────────────────────────
-function LeadEntry({ post, index, onClick }: { post: PostItem; index: number; onClick: () => void }) {
+// ── 브리핑 카드 ──────────────────────────────────────────────────
+function BriefCard({
+  post,
+  index,
+  onClick,
+  featured = false,
+}: {
+  post: PostItem;
+  index: number;
+  onClick: () => void;
+  featured?: boolean;
+}) {
   const [hover, setHover] = useState(false);
+
   return (
-    <button
+    <article
       onClick={onClick}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      className="w-full text-left"
       style={{
-        display: "block",
-        borderTop: "2px solid var(--text-primary)",
-        borderBottom: "1px solid var(--border)",
-        padding: "clamp(24px,4vw,40px) 0",
-        background: hover ? "var(--bg-hover)" : "transparent",
-        transition: "background 0.15s",
+        backgroundColor: "var(--bg-card)",
+        border: "1px solid var(--border)",
+        borderLeft: "3px solid var(--text-primary)",
+        padding: featured ? "28px 26px 22px" : "20px 22px 16px",
         cursor: "pointer",
+        transition: "box-shadow 0.2s, transform 0.18s",
+        boxShadow: hover
+          ? "0 8px 32px rgba(0,0,0,0.09)"
+          : "0 1px 4px rgba(0,0,0,0.03)",
+        transform: hover ? "translateY(-2px)" : "none",
       }}
     >
-      {/* 문서 메타 헤더 */}
-      <div className="flex items-center gap-3 mb-5" style={{ fontFamily: "Inter, sans-serif" }}>
-        <span style={{
-          fontSize: "10px", fontWeight: 700, letterSpacing: "0.14em",
-          backgroundColor: "var(--text-primary)",
-          padding: "3px 10px",
-          color: "var(--bg-primary)",
-        }}>
-          INTEL BRIEF
-        </span>
-        <span style={{ fontSize: "10px", letterSpacing: "0.1em", color: "var(--text-placeholder)", fontWeight: 600 }}>
-          {formatDocId(index, post.createdAt)}
-        </span>
-        <span style={{ fontSize: "10px", color: "var(--border)", letterSpacing: "0.05em" }}>·</span>
-        <span style={{ fontSize: "10px", letterSpacing: "0.08em", color: "var(--text-placeholder)" }}>
+      {/* ── 발행자 헤더 ── */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: "12px",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
+          {/* 선익 avatar */}
+          <div
+            style={{
+              width: "22px",
+              height: "22px",
+              backgroundColor: "var(--text-primary)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <span
+              style={{
+                color: "var(--bg-primary)",
+                fontSize: "9px",
+                fontWeight: 900,
+                fontFamily: "Pretendard, sans-serif",
+                letterSpacing: "-0.02em",
+              }}
+            >
+              선
+            </span>
+          </div>
+          <span
+            style={{
+              fontSize: "11px",
+              fontWeight: 700,
+              fontFamily: "Inter, sans-serif",
+              color: "var(--text-primary)",
+              letterSpacing: "0.08em",
+            }}
+          >
+            SEONIK
+          </span>
+          <span
+            style={{
+              fontSize: "11px",
+              color: "var(--text-disabled)",
+              fontFamily: "Inter, sans-serif",
+            }}
+          >
+            ·
+          </span>
+          <span
+            style={{
+              fontSize: "11px",
+              color: "var(--text-placeholder)",
+              fontFamily: "Inter, sans-serif",
+            }}
+          >
+            {formatRelativeTime(post.createdAt)}
+          </span>
+        </div>
+        <span
+          style={{
+            fontSize: "10px",
+            fontFamily: "Inter, sans-serif",
+            color: "var(--text-disabled)",
+            letterSpacing: "0.06em",
+          }}
+        >
           {formatDate(post.createdAt)}
         </span>
       </div>
 
-      {/* 제목 */}
-      <h2 style={{
-        fontSize: "clamp(20px,3.5vw,30px)",
-        fontFamily: "'Pretendard', sans-serif",
-        fontWeight: 800,
-        color: "var(--text-primary)",
-        lineHeight: 1.3,
-        letterSpacing: "-0.025em",
-        marginBottom: "16px",
-        wordBreak: "break-word",
-      }}>
+      {/* ── 분류 스탬프 ── */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          marginBottom: "10px",
+        }}
+      >
+        <span
+          style={{
+            fontSize: "9px",
+            fontWeight: 700,
+            letterSpacing: "0.18em",
+            backgroundColor: "var(--text-primary)",
+            color: "var(--bg-primary)",
+            padding: "2px 9px",
+            fontFamily: "Inter, sans-serif",
+          }}
+        >
+          INTEL BRIEF
+        </span>
+        <span
+          style={{
+            fontSize: "9px",
+            color: "var(--text-disabled)",
+            fontFamily: "Inter, sans-serif",
+            letterSpacing: "0.1em",
+            fontWeight: 600,
+          }}
+        >
+          {formatDocId(index, post.createdAt)}
+        </span>
+        {featured && (
+          <span
+            style={{
+              fontSize: "8px",
+              fontWeight: 700,
+              letterSpacing: "0.14em",
+              border: "1px solid var(--text-primary)",
+              color: "var(--text-primary)",
+              padding: "1px 6px",
+              fontFamily: "Inter, sans-serif",
+              marginLeft: "2px",
+            }}
+          >
+            LATEST
+          </span>
+        )}
+      </div>
+
+      {/* ── 제목 ── */}
+      <h2
+        style={{
+          fontSize: featured ? "clamp(17px, 2.8vw, 22px)" : "clamp(14px, 2vw, 17px)",
+          fontFamily: "'Pretendard', sans-serif",
+          fontWeight: 800,
+          color: "var(--text-primary)",
+          lineHeight: 1.35,
+          letterSpacing: "-0.02em",
+          marginBottom: post.summary ? "8px" : "16px",
+          wordBreak: "break-word",
+        }}
+      >
         {post.title}
       </h2>
 
-      {/* 요약 */}
+      {/* ── 요약 ── */}
       {post.summary && (
-        <p style={{
-          fontSize: "clamp(13px,2vw,15px)",
-          fontFamily: "'Pretendard', sans-serif",
-          color: "var(--text-secondary)",
-          lineHeight: 1.8,
-          marginBottom: "24px",
-          maxWidth: "760px",
-        }}>
+        <p
+          style={{
+            fontSize: "13px",
+            fontFamily: "'Pretendard', sans-serif",
+            color: "var(--text-secondary)",
+            lineHeight: 1.8,
+            marginBottom: "16px",
+            display: "-webkit-box",
+            WebkitLineClamp: featured ? 3 : 2,
+            WebkitBoxOrient: "vertical" as React.CSSProperties["WebkitBoxOrient"],
+            overflow: "hidden",
+          }}
+        >
           {post.summary}
         </p>
       )}
 
-      {/* 하단 메타 */}
-      <div className="flex items-center gap-5" style={{ fontFamily: "Inter, sans-serif", fontSize: "12px" }}>
-        <span className="flex items-center gap-1.5" style={{ color: "var(--text-muted)" }}>
-          <Check size={11} strokeWidth={2.5} />
-          {post.likeCount ?? 0}
-        </span>
-        {post.viewCount != null && (
-          <span className="flex items-center gap-1.5" style={{ color: "var(--text-placeholder)" }}>
-            <Eye size={11} strokeWidth={2} />
-            {post.viewCount}
-          </span>
-        )}
-        <span className="flex items-center gap-1.5 font-semibold" style={{
-          color: "var(--text-primary)", letterSpacing: "0.06em",
-          marginLeft: "auto",
+      {/* ── 인게이지먼트 바 ── */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "14px",
+          borderTop: "1px solid var(--border-light)",
+          paddingTop: "12px",
+          fontFamily: "Inter, sans-serif",
           fontSize: "11px",
-        }}>
-          FULL BRIEFING <ArrowRight size={12} strokeWidth={2} />
-        </span>
-      </div>
-    </button>
-  );
-}
-
-// ── 나머지: 문서 목록 엔트리 ─────────────────────────────────────
-function DocEntry({ post, index, onClick }: { post: PostItem; index: number; onClick: () => void }) {
-  const [hover, setHover] = useState(false);
-  return (
-    <button
-      onClick={onClick}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      className="w-full text-left"
-      style={{
-        display: "grid",
-        gridTemplateColumns: "clamp(80px,18vw,120px) 1fr auto",
-        gap: "clamp(16px,3vw,32px)",
-        alignItems: "start",
-        borderBottom: "1px solid var(--border)",
-        padding: "20px 0",
-        background: hover ? "var(--bg-hover)" : "transparent",
-        transition: "background 0.15s",
-        cursor: "pointer",
-      }}
-    >
-      {/* 좌측: 문서번호 + 날짜 */}
-      <div style={{ fontFamily: "Inter, sans-serif", paddingTop: "3px" }}>
-        <p style={{ fontSize: "9px", letterSpacing: "0.12em", color: "var(--text-placeholder)", marginBottom: "4px", fontWeight: 600 }}>
-          {formatDocId(index, post.createdAt)}
-        </p>
-        <p style={{ fontSize: "11px", color: "var(--text-disabled)" }}>
-          {formatDate(post.createdAt)}
-        </p>
-      </div>
-
-      {/* 중앙: 제목 + 요약 */}
-      <div>
-        <h3 style={{
-          fontSize: "clamp(14px,2vw,16px)",
-          fontFamily: "'Pretendard', sans-serif",
-          fontWeight: 700,
-          color: "var(--text-primary)",
-          lineHeight: 1.4,
-          marginBottom: post.summary ? "6px" : 0,
-          wordBreak: "break-word",
-        }}>
-          {post.title}
-        </h3>
-        {post.summary && (
-          <p style={{
-            fontSize: "13px",
-            fontFamily: "'Pretendard', sans-serif",
+        }}
+      >
+        <span
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "4px",
             color: "var(--text-muted)",
-            lineHeight: 1.65,
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical" as React.CSSProperties["WebkitBoxOrient"],
-            overflow: "hidden",
-          }}>
-            {post.summary}
-          </p>
-        )}
-      </div>
-
-      {/* 우측: 통계 + 화살표 */}
-      <div className="flex flex-col items-end gap-1.5" style={{ fontFamily: "Inter, sans-serif", fontSize: "11px", paddingTop: "2px", flexShrink: 0 }}>
-        <span className="flex items-center gap-1" style={{ color: "var(--text-muted)" }}>
+          }}
+        >
           <Check size={10} strokeWidth={2.5} />
           {post.likeCount ?? 0}
         </span>
         {post.viewCount != null && (
-          <span className="flex items-center gap-1" style={{ color: "var(--text-placeholder)" }}>
+          <span
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "4px",
+              color: "var(--text-placeholder)",
+            }}
+          >
             <Eye size={10} strokeWidth={2} />
             {post.viewCount}
           </span>
         )}
-        <ChevronRight
-          size={12} strokeWidth={2}
-          style={{ color: hover ? "var(--text-primary)" : "var(--text-disabled)", transition: "color 0.15s", marginTop: "4px" }}
-        />
+        <span
+          style={{
+            marginLeft: "auto",
+            fontWeight: 700,
+            letterSpacing: "0.1em",
+            color: hover ? "var(--text-primary)" : "var(--text-muted)",
+            display: "flex",
+            alignItems: "center",
+            gap: "4px",
+            transition: "color 0.15s",
+            fontSize: "10px",
+          }}
+        >
+          READ BRIEF <ArrowRight size={10} strokeWidth={2.5} />
+        </span>
       </div>
-    </button>
+    </article>
   );
 }
 
@@ -201,7 +292,7 @@ export default function FeedSection() {
 
   useEffect(() => {
     fetch("/api/posts?take=9")
-      .then(r => r.json())
+      .then((r) => r.json())
       .then((data: { posts: PostItem[]; nextCursor: string | null }) => {
         setPosts(data.posts ?? []);
         setCursor(data.nextCursor ?? null);
@@ -210,12 +301,14 @@ export default function FeedSection() {
           const params = new URLSearchParams(window.location.search);
           const postId = params.get("p");
           if (postId) {
-            const found = (data.posts ?? []).find(p => p.id === postId);
+            const found = (data.posts ?? []).find((p) => p.id === postId);
             if (found) setSelectedPost(found);
           }
         } catch {}
       })
-      .catch(() => { setLoading(false); });
+      .catch(() => {
+        setLoading(false);
+      });
   }, []);
 
   const loadMore = async () => {
@@ -223,123 +316,236 @@ export default function FeedSection() {
     setLoadingMore(true);
     try {
       const res = await fetch(`/api/posts?take=9&cursor=${cursor}`);
-      const data: { posts: PostItem[]; nextCursor: string | null } = await res.json();
-      setPosts(prev => [...prev, ...(data.posts ?? [])]);
+      const data: { posts: PostItem[]; nextCursor: string | null } =
+        await res.json();
+      setPosts((prev) => [...prev, ...(data.posts ?? [])]);
       setCursor(data.nextCursor ?? null);
     } catch {}
-    finally { setLoadingMore(false); }
+    finally {
+      setLoadingMore(false);
+    }
   };
-
-  const today = (() => {
-    const d = new Date();
-    return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
-  })();
 
   const [lead, ...rest] = posts;
 
   return (
     <>
-      <div className="pb-24" style={{ backgroundColor: "var(--bg-primary)", minHeight: "70vh" }}>
-        <div className="mx-auto px-5 md:px-10" style={{ maxWidth: "1100px" }}>
+      {/* ── 피드 배경 ── */}
+      <div
+        style={{
+          backgroundColor: "var(--bg-subtle)",
+          minHeight: "70vh",
+          paddingBottom: "96px",
+        }}
+      >
+        {/* ── 피드 서브헤더 (sticky) ── */}
+        <div
+          style={{
+            backgroundColor: "var(--header-bg)",
+            borderBottom: "1px solid var(--border)",
+            position: "sticky",
+            top: "64px",
+            zIndex: 10,
+          }}
+        >
+          <div
+            style={{
+              maxWidth: "720px",
+              margin: "0 auto",
+              padding: "9px 20px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                fontFamily: "Inter, sans-serif",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "10px",
+                  fontWeight: 700,
+                  letterSpacing: "0.2em",
+                  color: "var(--text-primary)",
+                }}
+              >
+                INTEL FEED
+              </span>
+              <span
+                style={{
+                  width: "1px",
+                  height: "10px",
+                  backgroundColor: "var(--border)",
+                  display: "inline-block",
+                }}
+              />
+              <span
+                style={{
+                  fontSize: "10px",
+                  letterSpacing: "0.1em",
+                  color: "var(--text-placeholder)",
+                  fontWeight: 500,
+                }}
+              >
+                SEONIK INTELLIGENCE
+              </span>
+            </div>
+            {!loading && posts.length > 0 && (
+              <span
+                style={{
+                  fontSize: "10px",
+                  fontFamily: "Inter, sans-serif",
+                  color: "var(--text-disabled)",
+                  letterSpacing: "0.06em",
+                }}
+              >
+                {posts.length}
+                {cursor ? "+" : ""}건
+              </span>
+            )}
+          </div>
+        </div>
 
+        {/* ── 피드 컨텐츠 ── */}
+        <div
+          style={{ maxWidth: "720px", margin: "0 auto", padding: "20px 20px 0" }}
+        >
           {/* 로딩 */}
           {loading && (
-            <div className="flex flex-col items-center justify-center py-32 gap-1">
-              <p style={{ fontFamily: "'Pretendard', sans-serif", fontWeight: 700, fontSize: "22px", color: "var(--text-primary)", lineHeight: 1 }}>선익</p>
-              <p style={{ fontFamily: "Inter, sans-serif", fontSize: "9px", letterSpacing: "0.15em", color: "var(--text-placeholder)", marginTop: "3px" }}>SEONIK</p>
-              <div className="flex gap-1.5 mt-4">
-                {[0, 150, 300].map(delay => (
-                  <span key={delay} className="animate-bounce" style={{
-                    display: "block", width: "4px", height: "4px", borderRadius: "50%",
-                    backgroundColor: "var(--text-muted)", animationDelay: `${delay}ms`,
-                  }} />
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                paddingTop: "96px",
+                gap: "4px",
+              }}
+            >
+              <p
+                style={{
+                  fontFamily: "'Pretendard', sans-serif",
+                  fontWeight: 700,
+                  fontSize: "22px",
+                  color: "var(--text-primary)",
+                  lineHeight: 1,
+                }}
+              >
+                선익
+              </p>
+              <p
+                style={{
+                  fontFamily: "Inter, sans-serif",
+                  fontSize: "9px",
+                  letterSpacing: "0.15em",
+                  color: "var(--text-placeholder)",
+                  marginTop: "3px",
+                }}
+              >
+                SEONIK
+              </p>
+              <div style={{ display: "flex", gap: "6px", marginTop: "16px" }}>
+                {[0, 150, 300].map((delay) => (
+                  <span
+                    key={delay}
+                    className="animate-bounce"
+                    style={{
+                      display: "block",
+                      width: "4px",
+                      height: "4px",
+                      borderRadius: "50%",
+                      backgroundColor: "var(--text-muted)",
+                      animationDelay: `${delay}ms`,
+                    }}
+                  />
                 ))}
               </div>
             </div>
           )}
 
-          {!loading && (
-            <div style={{ marginTop: "40px" }}>
+          {/* 빈 상태 */}
+          {!loading && posts.length === 0 && (
+            <div style={{ textAlign: "center", paddingTop: "96px" }}>
+              <p
+                style={{
+                  fontSize: "12px",
+                  fontFamily: "Inter, sans-serif",
+                  color: "var(--text-disabled)",
+                  letterSpacing: "0.1em",
+                }}
+              >
+                NO BRIEFINGS AVAILABLE
+              </p>
+            </div>
+          )}
 
-              {/* 문서 헤더 바 */}
-              <div style={{
-                borderTop: "1px solid var(--border)",
-                borderBottom: "1px solid var(--border)",
-                padding: "10px 0",
-                marginBottom: "0",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                flexWrap: "wrap",
-                gap: "8px",
-              }}>
-                <div className="flex items-center gap-4" style={{ fontFamily: "Inter, sans-serif" }}>
-                  <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.18em", color: "var(--text-primary)" }}>
-                    SEONIK INTELLIGENCE
-                  </span>
-                  <span style={{ width: "1px", height: "12px", backgroundColor: "var(--border)", display: "inline-block" }} />
-                  <span style={{ fontSize: "10px", letterSpacing: "0.1em", color: "var(--text-placeholder)", fontWeight: 500 }}>
-                    BRIEFING INDEX
-                  </span>
-                </div>
-                <div className="flex items-center gap-4" style={{ fontFamily: "Inter, sans-serif" }}>
-                  <span style={{ fontSize: "10px", color: "var(--text-placeholder)", letterSpacing: "0.06em" }}>
-                    {today}
-                  </span>
-                  {posts.length > 0 && (
-                    <span style={{ fontSize: "10px", color: "var(--text-disabled)", letterSpacing: "0.06em" }}>
-                      총 {posts.length}{cursor ? "+" : ""}건
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {posts.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-32">
-                  <p style={{ fontSize: "13px", fontFamily: "Inter, sans-serif", color: "var(--text-disabled)", letterSpacing: "0.1em" }}>
-                    NO BRIEFINGS AVAILABLE
-                  </p>
-                </div>
-              ) : (
-                <>
-                  {/* 리드 문서 */}
-                  {lead && (
-                    <LeadEntry post={lead} index={0} onClick={() => setSelectedPost(lead)} />
-                  )}
-
-                  {/* 문서 목록 */}
-                  {rest.map((post, i) => (
-                    <DocEntry
+          {/* 카드 피드 */}
+          {!loading && posts.length > 0 && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              {[lead, ...rest].map(
+                (post, i) =>
+                  post && (
+                    <BriefCard
                       key={post.id}
                       post={post}
-                      index={i + 1}
+                      index={i}
+                      featured={i === 0}
                       onClick={() => setSelectedPost(post)}
                     />
-                  ))}
+                  )
+              )}
 
-                  {/* 더 보기 */}
-                  {cursor && (
-                    <div className="flex justify-center pt-10" style={{ borderTop: "1px solid var(--border)", marginTop: "0" }}>
-                      <button
-                        onClick={loadMore}
-                        disabled={loadingMore}
-                        style={{
-                          fontFamily: "Inter, sans-serif",
-                          fontSize: "11px", letterSpacing: "0.12em", fontWeight: 600,
-                          color: "var(--text-muted)",
-                          background: "none", border: "none",
-                          cursor: loadingMore ? "not-allowed" : "pointer",
-                          opacity: loadingMore ? 0.5 : 1,
-                          padding: "8px 0",
-                          transition: "color 0.15s",
-                        }}
-                        onMouseEnter={e => { if (!loadingMore) (e.currentTarget as HTMLButtonElement).style.color = "var(--text-primary)"; }}
-                        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = "var(--text-muted)"; }}>
-                        {loadingMore ? "LOADING..." : "LOAD MORE BRIEFINGS ↓"}
-                      </button>
-                    </div>
-                  )}
-                </>
+              {/* 더보기 */}
+              {cursor && (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    paddingTop: "20px",
+                    paddingBottom: "8px",
+                  }}
+                >
+                  <button
+                    onClick={loadMore}
+                    disabled={loadingMore}
+                    style={{
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: "10px",
+                      letterSpacing: "0.14em",
+                      fontWeight: 700,
+                      color: "var(--text-muted)",
+                      background: "none",
+                      border: "1px solid var(--border)",
+                      cursor: loadingMore ? "not-allowed" : "pointer",
+                      opacity: loadingMore ? 0.5 : 1,
+                      padding: "10px 28px",
+                      transition: "all 0.15s",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!loadingMore) {
+                        (e.currentTarget as HTMLButtonElement).style.color =
+                          "var(--text-primary)";
+                        (
+                          e.currentTarget as HTMLButtonElement
+                        ).style.borderColor = "var(--text-primary)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLButtonElement).style.color =
+                        "var(--text-muted)";
+                      (
+                        e.currentTarget as HTMLButtonElement
+                      ).style.borderColor = "var(--border)";
+                    }}
+                  >
+                    {loadingMore ? "LOADING..." : "LOAD MORE ↓"}
+                  </button>
+                </div>
               )}
             </div>
           )}
