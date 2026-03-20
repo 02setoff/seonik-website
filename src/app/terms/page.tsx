@@ -64,7 +64,7 @@ export default function TermsPage() {
         <ul style={{ paddingLeft: "20px", listStyle: "disc" }}>
           {[
             "\"서비스\"란 회사가 운영하는 선익(SEONIK) 웹사이트 및 앱을 통해 제공하는 브리핑 콘텐츠 열람, 저장, 개인화 추천 등 일체의 서비스를 말합니다.",
-            "\"브리핑\"이란 회사가 AI 및 편집 과정을 통해 제작하는 비즈니스 인텔리전스 콘텐츠로, RADAR(트렌드 브리핑)·CORE(비즈니스 모델 해부)·FLASH(긴급 인사이트) 3개 채널로 구성됩니다.",
+            "\"브리핑\"이란 회사가 AI 및 편집 과정을 통해 제작하는 비즈니스 인텔리전스 콘텐츠로, 트렌드 분석·비즈니스 모델 해부·긴급 인사이트 등을 포함하는 통합 브리핑 형식으로 제공됩니다.",
             "\"이용자\"란 본 약관에 따라 서비스를 이용하는 모든 자를 말합니다.",
             "\"회원\"이란 회원가입 절차를 완료하고 이용 자격을 부여받은 이용자를 말합니다.",
             "\"실행가\"란 예비 창업가, 1인 사업자, 솔로프리너, N잡러, 중소기업 운영진 등 서비스의 주요 타겟 이용자를 통칭합니다.",
@@ -122,30 +122,20 @@ export default function TermsPage() {
       {/* 제5조 */}
       <div style={section}>
         <h2 style={h2Style}>제5조. 서비스의 제공 및 변경</h2>
-        <h3 style={h3Style}>서비스 채널</h3>
+        <h3 style={h3Style}>서비스 브리핑</h3>
         <table style={tableStyle}>
           <thead>
             <tr>
-              <th style={thStyle}>채널</th>
+              <th style={thStyle}>형식</th>
               <th style={thStyle}>내용</th>
               <th style={thStyle}>특징</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td style={tdStyle}><strong>RADAR</strong></td>
-              <td style={tdStyle}>시장 동향 및 최신 트렌드 브리핑</td>
-              <td style={tdStyle}>글로벌 마켓 모니터링</td>
-            </tr>
-            <tr>
-              <td style={tdStyle}><strong>CORE</strong></td>
-              <td style={tdStyle}>비즈니스 모델 심층 해부</td>
-              <td style={tdStyle}>국내외 사례 분석 + 한국 적용 가이드</td>
-            </tr>
-            <tr>
-              <td style={tdStyle}><strong>FLASH</strong></td>
-              <td style={tdStyle}>긴급 이슈 및 속보 인텔리전스</td>
-              <td style={tdStyle}>신속 배포, 핵심만 압축</td>
+              <td style={tdStyle}><strong>BRIEFING</strong></td>
+              <td style={tdStyle}>트렌드 분석, 비즈니스 모델 해부, 긴급 인사이트 등을 포함하는 통합 비즈니스 인텔리전스 콘텐츠</td>
+              <td style={tdStyle}>OSINT 기반 AI 분석, 실행가 맞춤 인사이트 제공</td>
             </tr>
           </tbody>
         </table>
@@ -193,7 +183,7 @@ export default function TermsPage() {
         <h2 style={h2Style}>제7조. 지식재산권 및 콘텐츠</h2>
         <h3 style={h3Style}>회사의 지식재산권</h3>
         <p style={pStyle}>
-          서비스 내 회사가 제작한 모든 브리핑 콘텐츠(RADAR·CORE·FLASH), 분석 프레임워크, 디자인, 로고, 텍스트 등에 대한 저작권 및 지식재산권은 회사에 귀속됩니다.
+          서비스 내 회사가 제작한 모든 브리핑 콘텐츠, 분석 프레임워크, 디자인, 로고, 텍스트 등에 대한 저작권 및 지식재산권은 회사에 귀속됩니다.
         </p>
         <p style={pStyle}>
           이용자는 서비스를 통해 제공되는 콘텐츠를 <strong style={{ color: "var(--text-primary)" }}>개인적, 비상업적 목적</strong>으로만 이용할 수 있습니다. 회사의 사전 서면 동의 없이 상업적으로 이용하거나 제3자에게 재배포하는 것을 금지합니다.

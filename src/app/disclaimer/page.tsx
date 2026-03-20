@@ -46,7 +46,7 @@ export default function DisclaimerPage() {
       <div style={section}>
         <h2 style={h2Style}>제1조. 콘텐츠의 성격 및 한계</h2>
         <p style={pStyle}>
-          선익(SEONIK, 이하 &ldquo;회사&rdquo;)이 제공하는 RADAR·CORE·FLASH 브리핑 콘텐츠는 공개 출처 정보(OSINT, Open Source Intelligence) 및 인공지능(AI) 분석을 기반으로 제작됩니다. 콘텐츠는 다음과 같은 한계를 가질 수 있습니다.
+          선익(SEONIK, 이하 &ldquo;회사&rdquo;)이 제공하는 브리핑 콘텐츠는 공개 출처 정보(OSINT, Open Source Intelligence) 및 인공지능(AI) 분석을 기반으로 제작됩니다. 콘텐츠는 다음과 같은 한계를 가질 수 있습니다.
         </p>
         <ul style={{ paddingLeft: "20px", listStyle: "disc" }}>
           {[

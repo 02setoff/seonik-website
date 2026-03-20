@@ -20,11 +20,6 @@ const ABOUT_ITEMS = [
   { label: "연혁", href: "/about/history" },
 ];
 
-const BRIEFING_ITEMS = [
-  { label: "RADAR", sub: "최신 트렌드 브리핑", href: "/radar" },
-  { label: "CORE", sub: "비즈니스 모델 해부", href: "/core" },
-  { label: "FLASH", sub: "긴급 인사이트", href: "/flash" },
-];
 
 export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -32,17 +27,14 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
   const [authTab, setAuthTab] = useState<"login" | "signup">("login");
   const [selectedPost, setSelectedPost] = useState<PostItem | null>(null);
   const [aboutOpen, setAboutOpen] = useState(false);
-  const [briefingOpen, setBriefingOpen] = useState(false);
   const { data: session } = useSession();
 
   const aboutRef = useRef<HTMLDivElement>(null);
-  const briefingRef = useRef<HTMLDivElement>(null);
 
   // 드롭다운 외부 클릭/터치 닫기
   useEffect(() => {
     const handler = (e: Event) => {
       if (aboutRef.current && !aboutRef.current.contains(e.target as Node)) setAboutOpen(false);
-      if (briefingRef.current && !briefingRef.current.contains(e.target as Node)) setBriefingOpen(false);
     };
     document.addEventListener("mousedown", handler);
     document.addEventListener("touchstart", handler);
@@ -122,34 +114,6 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
               )}
             </div>
 
-            {/* Briefing 드롭다운 */}
-            <div ref={briefingRef} style={{ position: "relative" }}>
-              <button
-                onClick={() => { setBriefingOpen(o => !o); setAboutOpen(false); }}
-                style={{
-                  display: "flex", alignItems: "center", gap: "2px",
-                  padding: "5px 6px", background: "none", border: "none", cursor: "pointer",
-                  color: briefingOpen ? "var(--text-primary)" : "var(--text-muted)",
-                  fontFamily: "'Pretendard', sans-serif", fontWeight: 500,
-                  borderRadius: "4px", transition: "all 0.15s", fontSize: "13px",
-                }}>
-                Briefing
-                <ChevronDown size={11} style={{ transition: "transform 0.15s", transform: briefingOpen ? "rotate(180deg)" : "none", flexShrink: 0 }} />
-              </button>
-              {briefingOpen && (
-                <div style={{ ...dropdownStyle, minWidth: "200px" }}>
-                  {BRIEFING_ITEMS.map((item) => (
-                    <Link key={item.href} href={item.href} onClick={() => setBriefingOpen(false)}
-                      style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 18px", textDecoration: "none", transition: "background 0.1s" }}
-                      onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "var(--bg-hover)"; }}
-                      onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "transparent"; }}>
-                      <span style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", fontWeight: 700, color: "var(--text-primary)", letterSpacing: "0.06em", minWidth: "40px" }}>{item.label}</span>
-                      <span style={{ fontSize: "11px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-placeholder)" }}>{item.sub}</span>
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
 
             {/* Notice 링크 */}
             <Link href="/notice"
