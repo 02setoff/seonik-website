@@ -19,7 +19,7 @@ export async function POST(request: Request) {
   if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { title, summary, source, bmBreakdown, playbook, actionItems, content,
-          category, code, isFree, isSubscriberOnly, readingTime, published } = await request.json();
+          category, code, isFree, isSubscriberOnly, published } = await request.json();
   if (!title || !category) return NextResponse.json({ error: "제목과 카테고리는 필수입니다." }, { status: 400 });
 
   const session = await getServerSession(authOptions);
@@ -28,9 +28,8 @@ export async function POST(request: Request) {
   const post = await prisma.post.create({
     data: {
       title, summary, source, bmBreakdown, playbook, actionItems, content,
-      category, code: code || null,
+      category: category || "", code: code || null,
       isFree: isFree ?? true, isSubscriberOnly: isSubscriberOnly ?? false,
-      readingTime: readingTime ? parseInt(readingTime) : null,
       published: published ?? false, authorId: author?.id,
     },
   });

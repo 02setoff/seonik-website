@@ -77,10 +77,6 @@ export default async function BriefingDetailPage({ params }: Props) {
           ) : (
             <span style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", fontWeight: 700, color: "#D4AF37" }}>🔒 구독</span>
           )}
-          <span style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "#94A3B8" }}>{post.category}</span>
-          {post.readingTime && (
-            <span style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "#94A3B8" }}>읽는 시간 {post.readingTime}분</span>
-          )}
         </div>
       </div>
 
@@ -114,7 +110,7 @@ export default async function BriefingDetailPage({ params }: Props) {
                 </p>
               )}
               <p style={{ fontSize: "12px", fontFamily: "Inter, sans-serif", color: "#CBD5E1" }}>
-                발행일: {formatDate(post.createdAt)}{post.readingTime ? `  |  읽는 시간: ${post.readingTime}분` : ""}
+                발행일: {formatDate(post.createdAt)}
               </p>
             </div>
           </div>
@@ -123,7 +119,7 @@ export default async function BriefingDetailPage({ params }: Props) {
         {/* ── 섹션 2: 지휘관 요약 ── */}
         {post.summary && (
           <div style={{ marginBottom: "40px" }}>
-            <SectionHeader label="▶ 지휘관 요약 (EXECUTIVE SUMMARY)" />
+            <SectionHeader label="▶ 브리핑 요약" />
             <div style={{ borderLeft: "3px solid #0F172A", padding: "18px 22px", backgroundColor: "#F1F5F9" }}>
               <p style={{
                 fontSize: "15px", fontFamily: "'Pretendard', sans-serif",

@@ -17,17 +17,12 @@ export interface PostItem {
   category: string;
   isFree?: boolean;
   isSubscriberOnly?: boolean;
-  readingTime?: number | null;
   createdAt: string;
   viewCount?: number;
   likeCount?: number;
 }
 
-const CATEGORY_META: Record<string, { accent: string; label: string }> = {
-  RADAR: { accent: "#0F172A", label: "RADAR INTEL" },
-  CORE:  { accent: "#334155", label: "CORE BRIEF"  },
-  FLASH: { accent: "#64748B", label: "FLASH ALERT" },
-};
+const ACCENT = "#0F172A";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("ko-KR", {
@@ -107,7 +102,6 @@ export default function PostModal({ post, onClose }: PostModalProps) {
 
   if (!post) return null;
 
-  const meta = CATEGORY_META[post.category] || CATEGORY_META.RADAR;
   const docCode = post.code || post.id.slice(0, 8).toUpperCase();
   const showSubscriberContent = isSubscribed || post.isFree;
 
@@ -131,7 +125,7 @@ export default function PostModal({ post, onClose }: PostModalProps) {
             letterSpacing: "0.12em", padding: "4px 12px",
             backgroundColor: "var(--bg-subtle)", color: "var(--text-primary)",
             border: "1px solid var(--border)",
-          }}>{meta.label}</span>
+          }}>INTEL BRIEF</span>
           {post.isFree ? (
             <span style={{ fontSize: "10px", fontFamily: "Inter, sans-serif", fontWeight: 700, color: "#16A34A" }}>🔓 무료</span>
           ) : (
@@ -139,11 +133,6 @@ export default function PostModal({ post, onClose }: PostModalProps) {
           )}
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          {post.readingTime && (
-            <span style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "var(--text-placeholder)" }}>
-              읽는 시간 {post.readingTime}분
-            </span>
-          )}
           <span style={{ fontSize: "12px", fontFamily: "Inter, sans-serif", color: "var(--text-placeholder)" }}>
             {formatDate(post.createdAt)}
           </span>
@@ -204,8 +193,8 @@ export default function PostModal({ post, onClose }: PostModalProps) {
           {/* ── 섹션 2: 지휘관 요약 ── */}
           {post.summary && (
             <div style={{ marginBottom: "36px" }}>
-              <SectionHeader label="▶ 지휘관 요약 (EXECUTIVE SUMMARY)" />
-              <div style={{ borderLeft: `3px solid ${meta.accent}`, padding: "16px 20px", backgroundColor: "var(--bg-subtle)" }}>
+              <SectionHeader label="▶ 브리핑 요약" />
+              <div style={{ borderLeft: `3px solid ${ACCENT}`, padding: "16px 20px", backgroundColor: "var(--bg-subtle)" }}>
                 <p style={{
                   fontSize: "15px", fontFamily: "'Pretendard', sans-serif",
                   color: "var(--text-secondary)", lineHeight: "1.8", fontWeight: 500, margin: 0,

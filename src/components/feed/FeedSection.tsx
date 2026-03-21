@@ -188,11 +188,6 @@ function BriefCard({
             {post.viewCount}
           </span>
         )}
-        {post.readingTime && (
-          <span style={{ fontSize: "10px", color: "var(--text-placeholder)" }}>
-            {post.readingTime}분
-          </span>
-        )}
         {isLocked ? (
           <span style={{
             marginLeft: "auto", fontWeight: 700, letterSpacing: "0.1em",

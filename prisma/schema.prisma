@@ -82,10 +82,9 @@ model Post {
   playbook         String?           // 실행 가이드 (구독자 전용)
   actionItems      String?           // 체크리스트 (구독자 전용)
   content          String?           // 기존 HTML 본문 (하위 호환)
-  category         String
+  category         String   @default("")      // 하위 호환용 (UI에서 미사용)
   isFree           Boolean  @default(true)   // 무료 여부
   isSubscriberOnly Boolean  @default(false)  // 구독 전용 여부
-  readingTime      Int?                      // 읽는 시간 (분)
   published        Boolean  @default(false)
   viewCount        Int      @default(0)
   createdAt        DateTime @default(now())

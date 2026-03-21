@@ -5,34 +5,25 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 
-function generateCode(index: number) {
-  return `INTEL-${String(index).padStart(3, "0")}`;
-}
-
 export default function NewPostPage() {
   const router = useRouter();
   const [form, setForm] = useState({
     code: "", title: "", summary: "", source: "",
     bmBreakdown: "", playbook: "", actionItems: "",
-    content: "", category: "RADAR",
-    isFree: true, isSubscriberOnly: false, readingTime: "",
+    content: "", category: "",
+    isFree: true, isSubscriberOnly: false,
     published: false,
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     if (type === "checkbox") {
       setForm(f => ({ ...f, [name]: (e.target as HTMLInputElement).checked }));
     } else {
       setForm(f => ({ ...f, [name]: value }));
     }
-  };
-
-  const handleAutoCode = () => {
-    const num = Math.floor(Math.random() * 900) + 100;
-    setForm(f => ({ ...f, code: generateCode(num) }));
   };
 
   const save = async (publish: boolean) => {
@@ -59,10 +50,6 @@ export default function NewPostPage() {
     color: "#0F172A", backgroundColor: "white", borderRadius: 0, boxSizing: "border-box",
   };
 
-  const textareaStyle: React.CSSProperties = {
-    ...inputStyle, minHeight: "120px", resize: "vertical", lineHeight: "1.7",
-  };
-
   const labelStyle: React.CSSProperties = {
     fontSize: "11px", fontFamily: "Inter, sans-serif", fontWeight: 700,
     letterSpacing: "0.1em", color: "#64748B", marginBottom: "6px", display: "block",
@@ -85,43 +72,18 @@ export default function NewPostPage() {
 
       <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
 
-        {/* ── 기본 정보 ── */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 140px 120px", gap: "12px", alignItems: "end" }}>
-          <div>
-            <label style={labelStyle}>제목 *</label>
-            <input name="title" placeholder="브리핑 제목" required value={form.title}
-              onChange={handleInput} style={{ ...inputStyle, fontSize: "17px", fontWeight: 600 }} />
-          </div>
-          <div>
-            <label style={labelStyle}>카테고리 *</label>
-            <select name="category" value={form.category} onChange={handleInput} style={inputStyle}>
-              <option value="RADAR">RADAR</option>
-              <option value="CORE">CORE</option>
-              <option value="FLASH">FLASH</option>
-            </select>
-          </div>
-          <div>
-            <label style={labelStyle}>읽는 시간 (분)</label>
-            <input name="readingTime" type="number" placeholder="5" value={form.readingTime}
-              onChange={handleInput} style={inputStyle} min="1" max="60" />
-          </div>
+        {/* ── 제목 ── */}
+        <div>
+          <label style={labelStyle}>제목 *</label>
+          <input name="title" placeholder="브리핑 제목" required value={form.title}
+            onChange={handleInput} style={{ ...inputStyle, fontSize: "17px", fontWeight: 600 }} />
         </div>
 
         {/* ── 코드명 ── */}
         <div>
           <label style={labelStyle}>코드명 (INTEL-XXX 형식)</label>
-          <div style={{ display: "flex", gap: "8px" }}>
-            <input name="code" placeholder="예: INTEL-001" value={form.code}
-              onChange={handleInput} style={{ ...inputStyle, fontFamily: "Inter, sans-serif", letterSpacing: "0.05em" }} />
-            <button type="button" onClick={handleAutoCode}
-              style={{
-                padding: "10px 16px", backgroundColor: "#F1F5F9", color: "#475569",
-                border: "1px solid #E2E8F0", cursor: "pointer", whiteSpace: "nowrap",
-                fontSize: "12px", fontFamily: "Inter, sans-serif", fontWeight: 600,
-              }}>
-              자동 생성
-            </button>
-          </div>
+          <input name="code" placeholder="예: INTEL-001" value={form.code}
+            onChange={handleInput} style={{ ...inputStyle, fontFamily: "Inter, sans-serif", letterSpacing: "0.05em" }} />
         </div>
 
         {/* ── 첩보 소스 ── */}
@@ -131,12 +93,12 @@ export default function NewPostPage() {
             onChange={handleInput} style={inputStyle} />
         </div>
 
-        {/* ── 지휘관 요약 ── */}
+        {/* ── 요약 ── */}
         <div style={sectionStyle}>
-          <label style={labelStyle}>▶ 지휘관 요약 (EXECUTIVE SUMMARY) — 3문장 권장</label>
+          <label style={labelStyle}>▶ 요약 — 3문장 권장</label>
           <textarea name="summary" placeholder="핵심 내용을 3문장으로 요약해주세요. 피드 카드에도 표시됩니다."
             value={form.summary} onChange={handleInput}
-            style={{ ...textareaStyle, minHeight: "90px" }} />
+            style={{ ...inputStyle, minHeight: "90px", resize: "vertical" as const, lineHeight: "1.7" }} />
         </div>
 
         {/* ── BM 심층 해부 ── */}
@@ -159,7 +121,7 @@ export default function NewPostPage() {
 
         {/* ── 체크리스트 ── */}
         <div style={sectionStyle}>
-          <label style={labelStyle}>▶ 오늘의 체크리스트 — 구독자 전용</label>
+          <label style={labelStyle}>▶ 체크리스트 — 구독자 전용</label>
           <RichTextEditor
             value={form.actionItems}
             onChange={(html) => setForm(f => ({ ...f, actionItems: html }))}
@@ -172,7 +134,7 @@ export default function NewPostPage() {
             <input type="checkbox" name="isFree" checked={form.isFree} onChange={handleInput}
               style={{ width: "16px", height: "16px", cursor: "pointer" }} />
             <span style={{ fontSize: "13px", fontFamily: "'Pretendard', sans-serif", color: "#0F172A" }}>
-              🔓 무료 공개 (비구독자도 열람 가능)
+              🔓 무료 공개
             </span>
           </label>
           <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>

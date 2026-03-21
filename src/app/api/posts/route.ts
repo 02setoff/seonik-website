@@ -10,7 +10,7 @@ export async function GET(request: Request) {
   const select = {
     id: true, code: true, title: true, summary: true, source: true,
     bmBreakdown: true, playbook: true, actionItems: true, content: true,
-    category: true, isFree: true, isSubscriberOnly: true, readingTime: true,
+    category: true, isFree: true, isSubscriberOnly: true,
     createdAt: true, viewCount: true, _count: { select: { likes: true } },
   };
 
@@ -36,7 +36,7 @@ export async function GET(request: Request) {
         source: p.source, bmBreakdown: p.bmBreakdown, playbook: p.playbook,
         actionItems: p.actionItems, content: p.content,
         category: p.category, isFree: p.isFree, isSubscriberOnly: p.isSubscriberOnly,
-        readingTime: p.readingTime, createdAt: p.createdAt.toISOString(),
+        createdAt: p.createdAt.toISOString(),
         viewCount: p.viewCount, likeCount: p._count.likes,
       })),
       nextCursor: hasMore ? items[items.length - 1].id : null,
