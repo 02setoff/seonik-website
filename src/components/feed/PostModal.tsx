@@ -6,16 +6,23 @@ import { useSession } from "next-auth/react";
 
 export interface PostItem {
   id: string;
+  code?: string | null;
   title: string;
   summary: string | null;
+  source?: string | null;
+  bmBreakdown?: string | null;
+  playbook?: string | null;
+  actionItems?: string | null;
   content: string | null;
   category: string;
+  isFree?: boolean;
+  isSubscriberOnly?: boolean;
+  readingTime?: number | null;
   createdAt: string;
   viewCount?: number;
   likeCount?: number;
 }
 
-// accent: 좌측 border 포인트 컬러로만 사용 (장식용)
 const CATEGORY_META: Record<string, { accent: string; label: string }> = {
   RADAR: { accent: "#0F172A", label: "RADAR INTEL" },
   CORE:  { accent: "#334155", label: "CORE BRIEF"  },
@@ -26,6 +33,21 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("ko-KR", {
     year: "numeric", month: "2-digit", day: "2-digit",
   }).replace(/\. /g, ".").replace(/\.$/, "");
+}
+
+// 섹션 헤더 컴포넌트
+function SectionHeader({ label }: { label: string }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
+      <p style={{
+        fontSize: "10px", fontFamily: "Inter, sans-serif", fontWeight: 700,
+        letterSpacing: "0.15em", color: "var(--text-disabled)", flexShrink: 0, margin: 0,
+      }}>
+        {label}
+      </p>
+      <div style={{ flex: 1, height: "1px", backgroundColor: "var(--border)" }} />
+    </div>
+  );
 }
 
 interface PostModalProps {
@@ -41,20 +63,20 @@ export default function PostModal({ post, onClose }: PostModalProps) {
   const [copied, setCopied] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // ESC 키 닫기
+  // TODO: 유료 전환 시 실제 구독 DB 체크로 교체 (현재는 모든 로그인 회원에게 전체 공개)
+  const isSubscribed = true;
+
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     if (post) window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
   }, [post, onClose]);
 
-  // 바디 스크롤 잠금
   useEffect(() => {
     document.body.style.overflow = post ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [post]);
 
-  // 조회/저장 상태 로드
   useEffect(() => {
     if (!post) return;
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
@@ -80,24 +102,22 @@ export default function PostModal({ post, onClose }: PostModalProps) {
       const res = await fetch(`/api/posts/${post.id}/like`, { method: "POST" });
       const data = await res.json();
       if (res.ok) { setLiked(data.liked); setLikeCount(data.count); }
-    } finally {
-      setLikeLoading(false);
-    }
+    } finally { setLikeLoading(false); }
   };
 
   if (!post) return null;
 
   const meta = CATEGORY_META[post.category] || CATEGORY_META.RADAR;
+  const docCode = post.code || post.id.slice(0, 8).toUpperCase();
+  const showSubscriberContent = isSubscribed || post.isFree;
 
   return (
-    /* 전체 화면 오버레이 */
     <div style={{
       position: "fixed", inset: 0, zIndex: 400,
       backgroundColor: "var(--modal-bg)",
       display: "flex", flexDirection: "column",
       overflowY: "hidden",
     }}>
-
       {/* ── 상단 바 ── */}
       <div style={{
         borderBottom: "1px solid var(--border)", flexShrink: 0,
@@ -105,23 +125,28 @@ export default function PostModal({ post, onClose }: PostModalProps) {
         padding: "0 clamp(16px, 4vw, 32px)", height: "56px",
         backgroundColor: "var(--modal-bg)",
       }}>
-        {/* 카테고리 배지 */}
-        <span style={{
-          fontSize: "10px", fontFamily: "Inter, sans-serif",
-          fontWeight: 700, letterSpacing: "0.12em",
-          padding: "4px 12px",
-          backgroundColor: "var(--bg-subtle)",
-          color: "var(--text-primary)",
-          border: "1px solid var(--border)",
-        }}>
-          {meta.label}
-        </span>
-
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <span style={{
+            fontSize: "10px", fontFamily: "Inter, sans-serif", fontWeight: 700,
+            letterSpacing: "0.12em", padding: "4px 12px",
+            backgroundColor: "var(--bg-subtle)", color: "var(--text-primary)",
+            border: "1px solid var(--border)",
+          }}>{meta.label}</span>
+          {post.isFree ? (
+            <span style={{ fontSize: "10px", fontFamily: "Inter, sans-serif", fontWeight: 700, color: "#16A34A" }}>🔓 무료</span>
+          ) : (
+            <span style={{ fontSize: "10px", fontFamily: "Inter, sans-serif", fontWeight: 700, color: "#D4AF37" }}>🔒 구독</span>
+          )}
+        </div>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          {post.readingTime && (
+            <span style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "var(--text-placeholder)" }}>
+              읽는 시간 {post.readingTime}분
+            </span>
+          )}
           <span style={{ fontSize: "12px", fontFamily: "Inter, sans-serif", color: "var(--text-placeholder)" }}>
             {formatDate(post.createdAt)}
           </span>
-          {/* 닫기 */}
           <button
             onClick={onClose}
             style={{
@@ -142,32 +167,45 @@ export default function PostModal({ post, onClose }: PostModalProps) {
       <div ref={scrollRef} style={{ flex: 1, overflowY: "auto" }}>
         <div style={{ maxWidth: "760px", margin: "0 auto", padding: "clamp(28px,5vw,48px) clamp(16px,4vw,32px) 80px" }}>
 
-          {/* 제목 */}
-          <h1 style={{
-            fontSize: "clamp(20px, 4vw, 32px)",
-            fontFamily: "'Pretendard', sans-serif",
-            fontWeight: 800, color: "var(--text-primary)",
-            lineHeight: "1.35", letterSpacing: "-0.02em",
-            marginBottom: "32px",
-            wordBreak: "break-word", overflowWrap: "break-word",
-          }}>
-            {post.title}
-          </h1>
+          {/* ── 섹션 1: 코드명 + 헤드라인 ── */}
+          <div style={{ marginBottom: "36px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
+              <span style={{
+                fontSize: "10px", fontFamily: "Inter, sans-serif", fontWeight: 700,
+                letterSpacing: "0.18em", backgroundColor: "var(--text-primary)",
+                color: "var(--bg-primary)", padding: "2px 10px",
+              }}>INTEL BRIEF</span>
+              <span style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "var(--text-disabled)", letterSpacing: "0.12em", fontWeight: 600 }}>
+                {docCode}
+              </span>
+            </div>
+            <div style={{ borderTop: "2px solid var(--text-primary)", paddingTop: "18px" }}>
+              <h1 style={{
+                fontSize: "clamp(20px, 4vw, 32px)", fontFamily: "'Pretendard', sans-serif",
+                fontWeight: 800, color: "var(--text-primary)", lineHeight: "1.35",
+                letterSpacing: "-0.02em", marginBottom: "16px",
+                wordBreak: "break-word", overflowWrap: "break-word",
+              }}>
+                {post.title}
+              </h1>
+              <div style={{ borderTop: "1px solid var(--border)", paddingTop: "12px" }}>
+                {post.source && (
+                  <p style={{ fontSize: "12px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-placeholder)", marginBottom: "4px" }}>
+                    📡 첩보 소스: {post.source}
+                  </p>
+                )}
+                <p style={{ fontSize: "12px", fontFamily: "Inter, sans-serif", color: "var(--text-disabled)" }}>
+                  발행일: {formatDate(post.createdAt)}{post.readingTime ? `  |  읽는 시간: ${post.readingTime}분` : ""}
+                </p>
+              </div>
+            </div>
+          </div>
 
-          {/* EXECUTIVE SUMMARY */}
+          {/* ── 섹션 2: 지휘관 요약 ── */}
           {post.summary && (
             <div style={{ marginBottom: "36px" }}>
-              <p style={{
-                fontSize: "10px", fontFamily: "Inter, sans-serif", fontWeight: 700,
-                letterSpacing: "0.15em", color: "var(--text-placeholder)", marginBottom: "12px",
-              }}>
-                EXECUTIVE SUMMARY
-              </p>
-              <div style={{
-                borderLeft: `3px solid ${meta.accent}`,
-                padding: "16px 20px",
-                backgroundColor: "var(--bg-subtle)",
-              }}>
+              <SectionHeader label="▶ 지휘관 요약 (EXECUTIVE SUMMARY)" />
+              <div style={{ borderLeft: `3px solid ${meta.accent}`, padding: "16px 20px", backgroundColor: "var(--bg-subtle)" }}>
                 <p style={{
                   fontSize: "15px", fontFamily: "'Pretendard', sans-serif",
                   color: "var(--text-secondary)", lineHeight: "1.8", fontWeight: 500, margin: 0,
@@ -178,34 +216,83 @@ export default function PostModal({ post, onClose }: PostModalProps) {
             </div>
           )}
 
-          {/* 구분선 */}
-          {post.content && (
-            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "28px" }}>
-              <p style={{
-                fontSize: "10px", fontFamily: "Inter, sans-serif", fontWeight: 700,
-                letterSpacing: "0.15em", color: "var(--text-disabled)", flexShrink: 0, margin: 0,
-              }}>
-                BRIEFING DETAILS
-              </p>
-              <div style={{ flex: 1, height: "1px", backgroundColor: "var(--bg-subtle)" }} />
-            </div>
-          )}
-
-          {/* 본문 */}
-          {post.content ? (
-            <div
-              className="post-content"
-              style={{
+          {/* ── 섹션 3: BM 심층 해부 ── */}
+          {post.bmBreakdown && (
+            <div style={{ marginBottom: "36px" }}>
+              <SectionHeader label="▶ 비즈니스 모델 심층 해부" />
+              <div className="post-content" style={{
                 fontSize: "clamp(14px, 3.5vw, 15px)", fontFamily: "'Pretendard', sans-serif",
                 lineHeight: "1.95", color: "var(--text-secondary)",
                 wordBreak: "break-word", overflowWrap: "break-word",
               }}
-              dangerouslySetInnerHTML={{ __html: post.content }}
-            />
-          ) : (
-            <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-disabled)" }}>
-              내용이 없습니다.
-            </p>
+                dangerouslySetInnerHTML={{ __html: post.bmBreakdown }}
+              />
+            </div>
+          )}
+
+          {/* ── 섹션 4: 실행 가이드 (구독자 전용) ── */}
+          {/* TODO: 유료 전환 시 비구독자에게 블러 처리 + 잠금 오버레이로 교체 */}
+          {showSubscriberContent && post.playbook && (
+            <div style={{ marginBottom: "36px" }}>
+              <SectionHeader label="▶ 실행 가이드 (Playbook)" />
+              <div className="post-content" style={{
+                fontSize: "clamp(14px, 3.5vw, 15px)", fontFamily: "'Pretendard', sans-serif",
+                lineHeight: "1.95", color: "var(--text-secondary)",
+                wordBreak: "break-word", overflowWrap: "break-word",
+              }}
+                dangerouslySetInnerHTML={{ __html: post.playbook }}
+              />
+            </div>
+          )}
+          {!showSubscriberContent && post.isSubscriberOnly && (
+            <div style={{ marginBottom: "36px", position: "relative" }}>
+              <SectionHeader label="▶ 실행 가이드 (Playbook)" />
+              <div style={{
+                padding: "32px", textAlign: "center",
+                border: "1px solid #D4AF37", backgroundColor: "var(--bg-subtle)",
+              }}>
+                <Lock size={24} style={{ color: "#D4AF37", marginBottom: "12px" }} />
+                <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-muted)", margin: "0 0 16px" }}>
+                  실행 가이드는 구독 회원 전용입니다.
+                </p>
+                <button style={{
+                  padding: "10px 24px", backgroundColor: "#D4AF37", color: "#0F172A",
+                  border: "none", fontFamily: "'Pretendard', sans-serif", fontWeight: 700,
+                  fontSize: "13px", cursor: "pointer",
+                }}>
+                  구독하고 전략 받기 →
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ── 섹션 5: 체크리스트 (구독자 전용) ── */}
+          {/* TODO: 유료 전환 시 비구독자에게 블러 처리 + 잠금 오버레이로 교체 */}
+          {showSubscriberContent && post.actionItems && (
+            <div style={{ marginBottom: "36px" }}>
+              <SectionHeader label="▶ 오늘의 체크리스트" />
+              <div className="post-content" style={{
+                fontSize: "clamp(14px, 3.5vw, 15px)", fontFamily: "'Pretendard', sans-serif",
+                lineHeight: "1.95", color: "var(--text-secondary)",
+                wordBreak: "break-word", overflowWrap: "break-word",
+              }}
+                dangerouslySetInnerHTML={{ __html: post.actionItems }}
+              />
+            </div>
+          )}
+
+          {/* ── 기존 content 필드 (하위 호환) ── */}
+          {post.content && !post.bmBreakdown && !post.playbook && (
+            <div style={{ marginBottom: "36px" }}>
+              <SectionHeader label="BRIEFING DETAILS" />
+              <div className="post-content" style={{
+                fontSize: "clamp(14px, 3.5vw, 15px)", fontFamily: "'Pretendard', sans-serif",
+                lineHeight: "1.95", color: "var(--text-secondary)",
+                wordBreak: "break-word", overflowWrap: "break-word",
+              }}
+                dangerouslySetInnerHTML={{ __html: post.content }}
+              />
+            </div>
           )}
         </div>
       </div>
@@ -216,55 +303,44 @@ export default function PostModal({ post, onClose }: PostModalProps) {
         display: "flex", alignItems: "center", justifyContent: "space-between",
         padding: "12px clamp(16px, 4vw, 32px)", backgroundColor: "var(--bg-primary)",
       }}>
-        {/* 링크 복사 */}
         <button
           onClick={handleCopy}
-          className="transition-all"
           style={{
-            display: "flex", alignItems: "center", gap: "6px",
-            padding: "7px 14px",
+            display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px",
             backgroundColor: copied ? "#0F172A" : "var(--bg-card)",
             color: copied ? "white" : "var(--text-muted)",
             border: `1px solid ${copied ? "#0F172A" : "var(--border)"}`,
-            cursor: "pointer",
-            fontSize: "12px", fontFamily: "Inter, sans-serif",
+            cursor: "pointer", fontSize: "12px", fontFamily: "Inter, sans-serif",
           }}>
           <Link2 size={12} />
           <span>{copied ? "복사됨!" : "링크 복사"}</span>
         </button>
 
-        {/* 저장하기 */}
         {session ? (
           <button
             onClick={handleLike}
             disabled={likeLoading}
             style={{
-              display: "flex", alignItems: "center", gap: "7px",
-              padding: "8px 20px",
+              display: "flex", alignItems: "center", gap: "7px", padding: "8px 20px",
               backgroundColor: liked ? "#0F172A" : "var(--bg-card)",
               color: liked ? "white" : "var(--text-secondary)",
               border: `1px solid ${liked ? "#0F172A" : "var(--border)"}`,
               cursor: likeLoading ? "not-allowed" : "pointer",
               fontSize: "13px", fontFamily: "'Pretendard', sans-serif", fontWeight: 600,
-              opacity: likeLoading ? 0.6 : 1,
-              transition: "all 0.15s",
+              opacity: likeLoading ? 0.6 : 1, transition: "all 0.15s",
             }}>
             <Check size={14} strokeWidth={2.5} />
             <span>{liked ? "저장됨" : "저장하기"}</span>
             <span style={{
               color: liked ? "rgba(255,255,255,0.5)" : "var(--text-primary)",
               fontSize: "12px", fontWeight: 700, marginLeft: "2px",
-            }}>
-              {likeCount}
-            </span>
+            }}>{likeCount}</span>
           </button>
         ) : (
           <div style={{
-            display: "flex", alignItems: "center", gap: "6px",
-            padding: "8px 16px",
+            display: "flex", alignItems: "center", gap: "6px", padding: "8px 16px",
             backgroundColor: "var(--bg-card)", color: "var(--text-placeholder)",
-            border: "1px solid var(--border)",
-            fontSize: "13px", fontFamily: "'Pretendard', sans-serif",
+            border: "1px solid var(--border)", fontSize: "13px", fontFamily: "'Pretendard', sans-serif",
           }}>
             <Lock size={13} />
             <span>회원 전용</span>

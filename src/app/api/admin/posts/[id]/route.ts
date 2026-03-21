@@ -12,7 +12,8 @@ async function isAdmin() {
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
   if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { title, summary, content, category, published } = await request.json();
+  const { title, summary, source, bmBreakdown, playbook, actionItems, content,
+          category, code, isFree, isSubscriberOnly, readingTime, published } = await request.json();
 
   // 발행 상태 변경 감지 (초안 → 발행 전환 시 뉴스레터)
   const prevPost = await prisma.post.findUnique({ where: { id: params.id }, select: { published: true } });
@@ -20,7 +21,13 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 
   const post = await prisma.post.update({
     where: { id: params.id },
-    data: { title, summary, content, category, published },
+    data: {
+      title, summary, source, bmBreakdown, playbook, actionItems, content,
+      category, code: code || null,
+      isFree: isFree ?? true, isSubscriberOnly: isSubscriberOnly ?? false,
+      readingTime: readingTime ? parseInt(readingTime) : null,
+      published,
+    },
   });
 
   if (isNewlyPublished && process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {

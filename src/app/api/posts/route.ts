@@ -7,6 +7,13 @@ export async function GET(request: Request) {
   const take = parseInt(searchParams.get("take") ?? "0");
   const cursor = searchParams.get("cursor");
 
+  const select = {
+    id: true, code: true, title: true, summary: true, source: true,
+    bmBreakdown: true, playbook: true, actionItems: true, content: true,
+    category: true, isFree: true, isSubscriberOnly: true, readingTime: true,
+    createdAt: true, viewCount: true, _count: { select: { likes: true } },
+  };
+
   // 페이지네이션 모드: take > 0
   if (take > 0) {
     const posts = await prisma.post.findMany({
@@ -15,12 +22,9 @@ export async function GET(request: Request) {
         ...(category ? { category } : {}),
       },
       orderBy: { createdAt: "desc" },
-      take: take + 1, // 다음 페이지 여부 확인용 (+1)
+      take: take + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-      select: {
-        id: true, title: true, summary: true, content: true, category: true, createdAt: true,
-        viewCount: true, _count: { select: { likes: true } },
-      },
+      select,
     });
 
     const hasMore = posts.length > take;
@@ -28,25 +32,25 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       posts: items.map(p => ({
-        id: p.id, title: p.title, summary: p.summary, content: p.content,
-        category: p.category, createdAt: p.createdAt.toISOString(),
+        id: p.id, code: p.code, title: p.title, summary: p.summary,
+        source: p.source, bmBreakdown: p.bmBreakdown, playbook: p.playbook,
+        actionItems: p.actionItems, content: p.content,
+        category: p.category, isFree: p.isFree, isSubscriberOnly: p.isSubscriberOnly,
+        readingTime: p.readingTime, createdAt: p.createdAt.toISOString(),
         viewCount: p.viewCount, likeCount: p._count.likes,
       })),
       nextCursor: hasMore ? items[items.length - 1].id : null,
     });
   }
 
-  // 기존 모드: 전체 반환 (FeedSection 호환성 유지)
+  // 기존 모드: 전체 반환
   const posts = await prisma.post.findMany({
     where: {
       published: true,
       ...(category ? { category } : {}),
     },
     orderBy: { createdAt: "desc" },
-    select: {
-      id: true, title: true, summary: true, content: true, category: true, createdAt: true,
-      viewCount: true, _count: { select: { likes: true } },
-    },
+    select,
   });
 
   return NextResponse.json(posts);

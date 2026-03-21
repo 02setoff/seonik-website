@@ -73,16 +73,24 @@ model VerificationToken {
 }
 
 model Post {
-  id        String   @id @default(cuid())
-  title     String
-  summary   String?
-  content   String?
-  category  String
-  published Boolean  @default(false)
-  viewCount Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  authorId  String?
+  id               String   @id @default(cuid())
+  code             String?  @unique  // 코드명: INTEL-001 형식
+  title            String
+  summary          String?           // 지휘관 요약 (3문장)
+  source           String?           // 첩보 소스 (데이터 출처)
+  bmBreakdown      String?           // BM 심층 해부
+  playbook         String?           // 실행 가이드 (구독자 전용)
+  actionItems      String?           // 체크리스트 (구독자 전용)
+  content          String?           // 기존 HTML 본문 (하위 호환)
+  category         String
+  isFree           Boolean  @default(true)   // 무료 여부
+  isSubscriberOnly Boolean  @default(false)  // 구독 전용 여부
+  readingTime      Int?                      // 읽는 시간 (분)
+  published        Boolean  @default(false)
+  viewCount        Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  authorId         String?
 
   author    User?      @relation(fields: [authorId], references: [id])
   likes     Like[]
