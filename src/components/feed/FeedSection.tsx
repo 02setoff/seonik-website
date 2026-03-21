@@ -24,23 +24,13 @@ function formatRelativeTime(iso: string) {
   return `${Math.floor(days / 365)}년 전`;
 }
 
-function formatDocId(index: number, iso: string) {
-  const d = new Date(iso);
-  const yy = String(d.getFullYear()).slice(2);
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  return `BRF-${yy}${mm}${dd}-${String(index + 1).padStart(3, "0")}`;
-}
-
 // ── 브리핑 카드 ──────────────────────────────────────────────────
 function BriefCard({
   post,
-  index,
   onClick,
   featured = false,
 }: {
   post: PostItem;
-  index: number;
   onClick: () => void;
   featured?: boolean;
 }) {
@@ -56,78 +46,72 @@ function BriefCard({
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       style={{
-        backgroundColor: "var(--bg-card)",
-        border: "1px solid var(--border)",
-        borderLeft: `3px solid ${isLocked ? "#D4AF37" : "var(--text-primary)"}`,
-        padding: featured ? "28px 26px 22px" : "20px 22px 16px",
+        padding: featured ? "28px 0 32px" : "24px 0 28px",
+        borderBottom: "1px solid var(--border)",
         cursor: "pointer",
-        transition: "box-shadow 0.2s, transform 0.18s",
-        boxShadow: hover
-          ? "0 8px 32px rgba(0,0,0,0.09)"
-          : "0 1px 4px rgba(0,0,0,0.03)",
-        transform: hover ? "translateY(-2px)" : "none",
+        backgroundColor: hover ? "var(--bg-hover)" : "transparent",
+        transition: "background-color 0.15s",
+        paddingLeft: "clamp(16px, 4vw, 0px)",
+        paddingRight: "clamp(16px, 4vw, 0px)",
       }}
     >
-      {/* ── 발행자 헤더 ── */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
+      {/* ── 발행자 + 날짜 ── */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <div style={{
-            width: "22px", height: "22px",
+            width: "26px", height: "26px",
             backgroundColor: "var(--text-primary)",
             display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
           }}>
-            <span style={{ color: "var(--bg-primary)", fontSize: "9px", fontWeight: 900, fontFamily: "Pretendard, sans-serif", letterSpacing: "-0.02em" }}>선</span>
+            <span style={{ color: "var(--bg-primary)", fontSize: "10px", fontWeight: 900, fontFamily: "Pretendard, sans-serif" }}>선</span>
           </div>
-          <span style={{ fontSize: "11px", fontWeight: 700, fontFamily: "Inter, sans-serif", color: "var(--text-primary)", letterSpacing: "0.08em" }}>SEONIK</span>
-          <span style={{ fontSize: "11px", color: "var(--text-disabled)", fontFamily: "Inter, sans-serif" }}>·</span>
-          <span style={{ fontSize: "11px", color: "var(--text-placeholder)", fontFamily: "Inter, sans-serif" }}>{formatRelativeTime(post.createdAt)}</span>
+          <span style={{ fontSize: "13px", fontWeight: 700, fontFamily: "'Pretendard', sans-serif", color: "var(--text-primary)" }}>선익 SEONIK</span>
+          <span style={{ fontSize: "13px", color: "var(--text-disabled)", fontFamily: "Inter, sans-serif" }}>·</span>
+          <span style={{ fontSize: "13px", color: "var(--text-placeholder)", fontFamily: "'Pretendard', sans-serif" }}>{formatRelativeTime(post.createdAt)}</span>
         </div>
-        <span style={{ fontSize: "10px", fontFamily: "Inter, sans-serif", color: "var(--text-disabled)", letterSpacing: "0.06em" }}>
-          {formatDate(post.createdAt)}
-        </span>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          {post.isFree ? (
+            <span style={{ fontSize: "10px", fontWeight: 700, color: "#16A34A", fontFamily: "Inter, sans-serif" }}>🔓 무료</span>
+          ) : (
+            <span style={{ fontSize: "10px", fontWeight: 700, color: "#D4AF37", fontFamily: "Inter, sans-serif" }}>🔒 구독</span>
+          )}
+          <span style={{ fontSize: "12px", color: "var(--text-disabled)", fontFamily: "Inter, sans-serif" }}>{formatDate(post.createdAt)}</span>
+        </div>
       </div>
 
-      {/* ── 분류 스탬프 + 배지 ── */}
-      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px", flexWrap: "wrap" }}>
-        <span style={{
-          fontSize: "9px", fontWeight: 700, letterSpacing: "0.18em",
-          backgroundColor: "var(--text-primary)", color: "var(--bg-primary)",
-          padding: "2px 9px", fontFamily: "Inter, sans-serif",
-        }}>
-          INTEL BRIEF
-        </span>
-        <span style={{ fontSize: "9px", color: "var(--text-disabled)", fontFamily: "Inter, sans-serif", letterSpacing: "0.1em", fontWeight: 600 }}>
-          {post.code || formatDocId(index, post.createdAt)}
-        </span>
-        {featured && (
+      {/* ── 코드명 배지 ── */}
+      {(post.code || featured) && (
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
           <span style={{
-            fontSize: "8px", fontWeight: 700, letterSpacing: "0.14em",
-            border: "1px solid var(--text-primary)", color: "var(--text-primary)",
-            padding: "1px 6px", fontFamily: "Inter, sans-serif", marginLeft: "2px",
-          }}>LATEST</span>
-        )}
-        {/* 무료/구독 배지 */}
-        {post.isFree ? (
-          <span style={{
-            marginLeft: "auto", fontSize: "9px", fontWeight: 700, letterSpacing: "0.08em",
-            color: "#16A34A", border: "1px solid #16A34A", padding: "1px 7px",
-            fontFamily: "Inter, sans-serif",
-          }}>🔓 무료</span>
-        ) : (
-          <span style={{
-            marginLeft: "auto", fontSize: "9px", fontWeight: 700, letterSpacing: "0.08em",
-            color: "#D4AF37", border: "1px solid #D4AF37", padding: "1px 7px",
-            fontFamily: "Inter, sans-serif",
-          }}>🔒 구독</span>
-        )}
-      </div>
+            fontSize: "9px", fontWeight: 700, letterSpacing: "0.18em",
+            backgroundColor: "var(--text-primary)", color: "var(--bg-primary)",
+            padding: "2px 8px", fontFamily: "Inter, sans-serif",
+          }}>INTEL BRIEF</span>
+          {post.code && (
+            <span style={{ fontSize: "10px", color: "var(--text-disabled)", fontFamily: "Inter, sans-serif", letterSpacing: "0.08em", fontWeight: 600 }}>
+              {post.code}
+            </span>
+          )}
+          {featured && (
+            <span style={{
+              fontSize: "8px", fontWeight: 700, letterSpacing: "0.14em",
+              border: "1px solid var(--text-primary)", color: "var(--text-primary)",
+              padding: "1px 6px", fontFamily: "Inter, sans-serif",
+            }}>LATEST</span>
+          )}
+        </div>
+      )}
 
       {/* ── 제목 ── */}
       <h2 style={{
-        fontSize: featured ? "clamp(17px, 2.8vw, 22px)" : "clamp(14px, 2vw, 17px)",
-        fontFamily: "'Pretendard', sans-serif", fontWeight: 800,
-        color: "var(--text-primary)", lineHeight: 1.35, letterSpacing: "-0.02em",
-        marginBottom: "8px", wordBreak: "break-word",
+        fontSize: featured ? "clamp(20px, 3.5vw, 28px)" : "clamp(16px, 2.5vw, 21px)",
+        fontFamily: "'Pretendard', sans-serif",
+        fontWeight: 800,
+        color: "var(--text-primary)",
+        lineHeight: 1.3,
+        letterSpacing: "-0.02em",
+        marginBottom: "10px",
+        wordBreak: "break-word",
       }}>
         {post.title}
       </h2>
@@ -135,18 +119,21 @@ function BriefCard({
       {/* ── 출처 ── */}
       {post.source && (
         <p style={{
-          fontSize: "11px", fontFamily: "'Pretendard', sans-serif",
-          color: "var(--text-placeholder)", lineHeight: 1.6, marginBottom: "8px",
+          fontSize: "12px", fontFamily: "'Pretendard', sans-serif",
+          color: "var(--text-placeholder)", marginBottom: "10px",
         }}>
-          📡 출처: {post.source}
+          📡 {post.source}
         </p>
       )}
 
       {/* ── 요약 ── */}
       {post.summary && (
         <p style={{
-          fontSize: "13px", fontFamily: "'Pretendard', sans-serif",
-          color: "var(--text-secondary)", lineHeight: 1.8, marginBottom: "12px",
+          fontSize: featured ? "15px" : "14px",
+          fontFamily: "'Pretendard', sans-serif",
+          color: "var(--text-secondary)",
+          lineHeight: 1.85,
+          marginBottom: "16px",
           display: "-webkit-box",
           WebkitLineClamp: featured ? 3 : 2,
           WebkitBoxOrient: "vertical" as React.CSSProperties["WebkitBoxOrient"],
@@ -156,53 +143,46 @@ function BriefCard({
         </p>
       )}
 
-      {/* ── 잠금 블러 (구독 전용 + 비구독자) ── */}
+      {/* ── 잠금 안내 ── */}
       {isLocked && (
         <div style={{
-          position: "relative", marginBottom: "12px",
-          padding: "14px 18px",
-          backgroundColor: "var(--bg-subtle)",
-          border: "1px solid #D4AF37",
-          filter: "blur(2px)",
-          userSelect: "none",
+          marginBottom: "14px", padding: "12px 16px",
+          border: "1px dashed #D4AF37", color: "var(--text-muted)",
+          fontSize: "13px", fontFamily: "'Pretendard', sans-serif",
         }}>
-          <p style={{ fontSize: "13px", color: "var(--text-muted)", margin: 0, fontFamily: "'Pretendard', sans-serif" }}>
-            전략 가이드와 실행 체크리스트는 구독 후 열람 가능합니다.
-          </p>
+          🔒 전략 가이드와 체크리스트는 구독 후 열람 가능합니다.
         </div>
       )}
 
-      {/* ── 인게이지먼트 바 ── */}
+      {/* ── 하단 메타 ── */}
       <div style={{
-        display: "flex", alignItems: "center", gap: "14px",
-        borderTop: "1px solid var(--border-light)", paddingTop: "12px",
-        fontFamily: "Inter, sans-serif", fontSize: "11px",
+        display: "flex", alignItems: "center", gap: "16px",
+        fontFamily: "Inter, sans-serif", fontSize: "13px",
+        color: "var(--text-placeholder)",
       }}>
-        <span style={{ display: "flex", alignItems: "center", gap: "4px", color: "var(--text-muted)" }}>
-          <Check size={10} strokeWidth={2.5} />
+        <span style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+          <Check size={12} strokeWidth={2.5} />
           {post.likeCount ?? 0}
         </span>
-        {post.viewCount != null && (
-          <span style={{ display: "flex", alignItems: "center", gap: "4px", color: "var(--text-placeholder)" }}>
-            <Eye size={10} strokeWidth={2} />
-            {post.viewCount}
-          </span>
-        )}
+        <span style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+          <Eye size={12} strokeWidth={2} />
+          {post.viewCount ?? 0}
+        </span>
         {isLocked ? (
           <span style={{
-            marginLeft: "auto", fontWeight: 700, letterSpacing: "0.1em",
-            color: "#D4AF37", display: "flex", alignItems: "center", gap: "4px", fontSize: "10px",
+            marginLeft: "auto", fontWeight: 700, color: "#D4AF37",
+            display: "flex", alignItems: "center", gap: "5px", fontSize: "12px",
           }}>
-            <Lock size={10} /> 구독하고 전략 받기
+            <Lock size={11} /> 구독하고 전략 받기
           </span>
         ) : (
           <span style={{
-            marginLeft: "auto", fontWeight: 700, letterSpacing: "0.1em",
+            marginLeft: "auto", fontWeight: 600,
             color: hover ? "var(--text-primary)" : "var(--text-muted)",
-            display: "flex", alignItems: "center", gap: "4px",
-            transition: "color 0.15s", fontSize: "10px",
+            display: "flex", alignItems: "center", gap: "5px",
+            transition: "color 0.15s", fontSize: "12px", letterSpacing: "0.05em",
           }}>
-            READ BRIEF <ArrowRight size={10} strokeWidth={2.5} />
+            READ BRIEF <ArrowRight size={12} strokeWidth={2.5} />
           </span>
         )}
       </div>
@@ -249,35 +229,38 @@ export default function FeedSection() {
     finally { setLoadingMore(false); }
   };
 
-  const [lead, ...rest] = posts;
-
   return (
     <>
-      <div style={{ backgroundColor: "var(--bg-subtle)", minHeight: "70vh", paddingBottom: "96px" }}>
+      <div style={{ backgroundColor: "var(--bg-primary)", minHeight: "70vh", paddingBottom: "96px" }}>
+
         {/* ── 피드 서브헤더 (sticky) ── */}
         <div style={{
-          backgroundColor: "var(--header-bg)", borderBottom: "1px solid var(--border)",
+          backgroundColor: "var(--header-bg)",
+          borderBottom: "1px solid var(--border)",
           position: "sticky", top: "64px", zIndex: 10,
         }}>
           <div style={{
-            maxWidth: "720px", margin: "0 auto", padding: "9px 20px",
+            maxWidth: "680px", margin: "0 auto",
+            padding: "10px clamp(16px, 4vw, 24px)",
             display: "flex", alignItems: "center", justifyContent: "space-between",
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", fontFamily: "Inter, sans-serif" }}>
-              <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.2em", color: "var(--text-primary)" }}>INTEL FEED</span>
+              <span style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.18em", color: "var(--text-primary)" }}>INTEL FEED</span>
               <span style={{ width: "1px", height: "10px", backgroundColor: "var(--border)", display: "inline-block" }} />
-              <span style={{ fontSize: "10px", letterSpacing: "0.1em", color: "var(--text-placeholder)", fontWeight: 500 }}>SEONIK INTELLIGENCE</span>
+              <span style={{ fontSize: "11px", letterSpacing: "0.08em", color: "var(--text-placeholder)" }}>SEONIK</span>
             </div>
             {!loading && posts.length > 0 && (
-              <span style={{ fontSize: "10px", fontFamily: "Inter, sans-serif", color: "var(--text-disabled)", letterSpacing: "0.06em" }}>
-                {posts.length}{cursor ? "+" : ""}건
+              <span style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "var(--text-disabled)" }}>
+                {posts.length}{cursor ? "+" : ""}
               </span>
             )}
           </div>
         </div>
 
         {/* ── 피드 컨텐츠 ── */}
-        <div style={{ maxWidth: "720px", margin: "0 auto", padding: "20px 20px 0" }}>
+        <div style={{ maxWidth: "680px", margin: "0 auto", padding: "0 clamp(16px, 4vw, 24px)" }}>
+
+          {/* 로딩 */}
           {loading && (
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", paddingTop: "96px", gap: "4px" }}>
               <p style={{ fontFamily: "'Pretendard', sans-serif", fontWeight: 700, fontSize: "22px", color: "var(--text-primary)", lineHeight: 1 }}>선익</p>
@@ -293,38 +276,42 @@ export default function FeedSection() {
             </div>
           )}
 
+          {/* 빈 상태 */}
           {!loading && posts.length === 0 && (
             <div style={{ textAlign: "center", paddingTop: "96px" }}>
-              <p style={{ fontSize: "12px", fontFamily: "Inter, sans-serif", color: "var(--text-disabled)", letterSpacing: "0.1em" }}>
+              <p style={{ fontSize: "13px", fontFamily: "Inter, sans-serif", color: "var(--text-disabled)", letterSpacing: "0.1em" }}>
                 NO BRIEFINGS AVAILABLE
               </p>
             </div>
           )}
 
+          {/* 카드 목록 */}
           {!loading && posts.length > 0 && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              {[lead, ...rest].map((post, i) =>
-                post && (
-                  <BriefCard
-                    key={post.id}
-                    post={post}
-                    index={i}
-                    featured={i === 0}
-                    onClick={() => setSelectedPost(post)}
-                  />
-                )
-              )}
+            <>
+              <div style={{ borderTop: "1px solid var(--border)" }}>
+                {posts.map((post, i) =>
+                  post && (
+                    <BriefCard
+                      key={post.id}
+                      post={post}
+                      featured={i === 0}
+                      onClick={() => setSelectedPost(post)}
+                    />
+                  )
+                )}
+              </div>
 
+              {/* 더보기 */}
               {cursor && (
-                <div style={{ display: "flex", justifyContent: "center", paddingTop: "20px", paddingBottom: "8px" }}>
+                <div style={{ display: "flex", justifyContent: "center", paddingTop: "32px" }}>
                   <button
                     onClick={loadMore}
                     disabled={loadingMore}
                     style={{
-                      fontFamily: "Inter, sans-serif", fontSize: "10px", letterSpacing: "0.14em",
-                      fontWeight: 700, color: "var(--text-muted)", background: "none",
+                      fontFamily: "Inter, sans-serif", fontSize: "12px", letterSpacing: "0.1em",
+                      fontWeight: 600, color: "var(--text-muted)", background: "none",
                       border: "1px solid var(--border)", cursor: loadingMore ? "not-allowed" : "pointer",
-                      opacity: loadingMore ? 0.5 : 1, padding: "10px 28px", transition: "all 0.15s",
+                      opacity: loadingMore ? 0.5 : 1, padding: "12px 36px", transition: "all 0.15s",
                     }}
                     onMouseEnter={(e) => {
                       if (!loadingMore) {
@@ -337,11 +324,11 @@ export default function FeedSection() {
                       (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)";
                     }}
                   >
-                    {loadingMore ? "LOADING..." : "LOAD MORE ↓"}
+                    {loadingMore ? "LOADING..." : "더 보기"}
                   </button>
                 </div>
               )}
-            </div>
+            </>
           )}
         </div>
       </div>
