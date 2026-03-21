@@ -173,28 +173,7 @@ export default function IntroAnimation({ onEnterFeed, isLoggedIn, onLoginClick, 
               className="flex md:flex-row flex-col items-center"
               style={{ gap: "12px" }}
             >
-              {/* 회원가입하기 — 채워진 버튼 (주요 액션) */}
-              <button
-                onClick={onSignupClick}
-                className="px-8 py-4 font-medium text-base transition-colors duration-200 md:w-auto w-[calc(100vw-40px)]"
-                style={{
-                  fontFamily: "'Pretendard', sans-serif", borderRadius: 0, fontSize: "16px",
-                  border: "1px solid var(--text-primary)",
-                  color: "var(--bg-primary)",
-                  backgroundColor: "var(--text-primary)",
-                  minWidth: "160px",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLButtonElement).style.opacity = "0.82";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLButtonElement).style.opacity = "1";
-                }}
-              >
-                회원가입하기
-              </button>
-
-              {/* 로그인하기 — 아웃라인 버튼 */}
+              {/* 로그인 — 아웃라인 버튼 */}
               <button
                 onClick={onLoginClick}
                 className="px-8 py-4 font-medium text-base transition-colors duration-200 md:w-auto w-[calc(100vw-40px)]"
@@ -214,7 +193,28 @@ export default function IntroAnimation({ onEnterFeed, isLoggedIn, onLoginClick, 
                   (e.currentTarget as HTMLButtonElement).style.color = "var(--text-primary)";
                 }}
               >
-                로그인하기
+                로그인
+              </button>
+
+              {/* 회원가입 — 채워진 버튼 */}
+              <button
+                onClick={onSignupClick}
+                className="px-8 py-4 font-medium text-base transition-colors duration-200 md:w-auto w-[calc(100vw-40px)]"
+                style={{
+                  fontFamily: "'Pretendard', sans-serif", borderRadius: 0, fontSize: "16px",
+                  border: "1px solid var(--text-primary)",
+                  color: "var(--bg-primary)",
+                  backgroundColor: "var(--text-primary)",
+                  minWidth: "160px",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.opacity = "0.82";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.opacity = "1";
+                }}
+              >
+                회원가입
               </button>
             </div>
           )}
