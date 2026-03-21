@@ -30,18 +30,6 @@ export default function Home() {
     introRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
-  // Google OAuth 후 자동 피드 스크롤
-  useEffect(() => {
-    if (status !== "authenticated") return;
-    try {
-      const flag = sessionStorage.getItem("seonik_oauth_redirect");
-      if (flag === "feed") {
-        sessionStorage.removeItem("seonik_oauth_redirect");
-        setTimeout(() => feedRef.current?.scrollIntoView({ behavior: "smooth" }), 600);
-      }
-    } catch {}
-  }, [status]);
-
   // ?unsubscribed=1 파라미터 처리 - 수신거부 완료 알림
   useEffect(() => {
     try {
