@@ -459,7 +459,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
               </div>
               <button
                 type="button"
-                onClick={() => signIn("google", { callbackUrl: "/" })}
+                onClick={() => { try { sessionStorage.setItem("seonik_oauth_redirect", "feed"); } catch {} signIn("google", { callbackUrl: "/" }); }}
                 style={{
                   width: "100%", padding: "11px", backgroundColor: "white",
                   border: "1px solid #E2E8F0", cursor: "pointer", borderRadius: 0,
@@ -478,6 +478,15 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
                 </svg>
                 Google로 계속하기
               </button>
+              <p style={{ fontSize: "11px", color: "#94A3B8", fontFamily: "'Pretendard', sans-serif", textAlign: "center", lineHeight: 1.6 }}>
+                계속하면 선익의{" "}
+                <a href="/terms" target="_blank" rel="noopener noreferrer" style={{ color: "#64748B", textDecoration: "underline" }}>이용약관</a>
+                ,{" "}
+                <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "#64748B", textDecoration: "underline" }}>개인정보처리방침</a>
+                {" "}및{" "}
+                <a href="/disclaimer" target="_blank" rel="noopener noreferrer" style={{ color: "#64748B", textDecoration: "underline" }}>면책조항</a>
+                에 동의하는 것으로 간주합니다.
+              </p>
             </div>
 
             {/* 계정 찾기 링크 */}
@@ -591,7 +600,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
             <div style={{ marginBottom: "20px", display: "flex", flexDirection: "column", gap: "12px" }}>
               <button
                 type="button"
-                onClick={() => signIn("google", { callbackUrl: "/" })}
+                onClick={() => { try { sessionStorage.setItem("seonik_oauth_redirect", "feed"); } catch {} signIn("google", { callbackUrl: "/" }); }}
                 style={{
                   width: "100%", padding: "11px", backgroundColor: "white",
                   border: "1px solid #E2E8F0", cursor: "pointer", borderRadius: 0,
@@ -610,6 +619,15 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
                 </svg>
                 Google로 가입하기
               </button>
+              <p style={{ fontSize: "11px", color: "#94A3B8", fontFamily: "'Pretendard', sans-serif", textAlign: "center", lineHeight: 1.6 }}>
+                가입하면 선익의{" "}
+                <a href="/terms" target="_blank" rel="noopener noreferrer" style={{ color: "#64748B", textDecoration: "underline" }}>이용약관</a>
+                ,{" "}
+                <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "#64748B", textDecoration: "underline" }}>개인정보처리방침</a>
+                {" "}및{" "}
+                <a href="/disclaimer" target="_blank" rel="noopener noreferrer" style={{ color: "#64748B", textDecoration: "underline" }}>면책조항</a>
+                에 동의하는 것으로 간주합니다.
+              </p>
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                 <div style={{ flex: 1, height: "1px", backgroundColor: "#E2E8F0" }} />
                 <span style={{ fontSize: "11px", color: "#94A3B8", fontFamily: "'Pretendard', sans-serif", whiteSpace: "nowrap" }}>또는 이메일로 가입</span>
