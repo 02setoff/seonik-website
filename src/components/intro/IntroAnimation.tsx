@@ -9,15 +9,20 @@ import { useTheme } from "@/components/ThemeProvider";
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 interface IntroAnimationProps {
-  onEnterFeed: () => void;
+  onEnterFeed?: () => void;
+  isLoggedIn?: boolean;
+  onLoginClick?: () => void;
+  onSignupClick?: () => void;
 }
 
-export default function IntroAnimation({ onEnterFeed }: IntroAnimationProps) {
+export default function IntroAnimation({ onEnterFeed, isLoggedIn, onLoginClick, onSignupClick }: IntroAnimationProps) {
   const hasEnteredFeed = useRef(false);
   const { theme, toggleTheme } = useTheme();
 
-  // 휠 / 키보드로 피드 진입 (최초 1회만)
+  // 로그인된 경우에만 휠 / 키보드로 피드 진입
   useEffect(() => {
+    if (!isLoggedIn || !onEnterFeed) return;
+
     const enter = () => {
       if (hasEnteredFeed.current) return;
       hasEnteredFeed.current = true;
@@ -40,7 +45,7 @@ export default function IntroAnimation({ onEnterFeed }: IntroAnimationProps) {
       window.removeEventListener("wheel", handleWheel);
       window.removeEventListener("keydown", handleKey);
     };
-  }, [onEnterFeed]);
+  }, [onEnterFeed, isLoggedIn]);
 
   return (
     <div
@@ -123,41 +128,96 @@ export default function IntroAnimation({ onEnterFeed }: IntroAnimationProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.0, duration: 0.5, ease: EASE }}
         >
-          <button
-            onClick={onEnterFeed}
-            className="px-8 py-4 font-medium text-base transition-colors duration-200 md:w-auto w-[calc(100vw-40px)]"
-            style={{
-              fontFamily: "'Pretendard', sans-serif", borderRadius: 0, fontSize: "16px",
-              border: "1px solid var(--text-primary)",
-              color: "var(--text-primary)",
-              backgroundColor: "transparent",
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.backgroundColor = "var(--text-primary)";
-              (e.currentTarget as HTMLButtonElement).style.color = "var(--bg-primary)";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent";
-              (e.currentTarget as HTMLButtonElement).style.color = "var(--text-primary)";
-            }}
-          >
-            브리핑 열람하기
-          </button>
+          {isLoggedIn ? (
+            /* 로그인 상태: 브리핑 열람하기 */
+            <>
+              <button
+                onClick={onEnterFeed}
+                className="px-8 py-4 font-medium text-base transition-colors duration-200 md:w-auto w-[calc(100vw-40px)]"
+                style={{
+                  fontFamily: "'Pretendard', sans-serif", borderRadius: 0, fontSize: "16px",
+                  border: "1px solid var(--text-primary)",
+                  color: "var(--text-primary)",
+                  backgroundColor: "transparent",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.backgroundColor = "var(--text-primary)";
+                  (e.currentTarget as HTMLButtonElement).style.color = "var(--bg-primary)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent";
+                  (e.currentTarget as HTMLButtonElement).style.color = "var(--text-primary)";
+                }}
+              >
+                브리핑 열람하기
+              </button>
 
-          {/* 바운싱 화살표 */}
-          <motion.div
-            style={{ marginTop: "16px", color: "var(--text-placeholder)" }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.35, duration: 0.4 }}
-          >
-            <motion.div
-              animate={{ y: [0, 7, 0] }}
-              transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut", delay: 1.35 }}
+              {/* 바운싱 화살표 */}
+              <motion.div
+                style={{ marginTop: "16px", color: "var(--text-placeholder)" }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.35, duration: 0.4 }}
+              >
+                <motion.div
+                  animate={{ y: [0, 7, 0] }}
+                  transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut", delay: 1.35 }}
+                >
+                  <ChevronDown size={16} />
+                </motion.div>
+              </motion.div>
+            </>
+          ) : (
+            /* 비로그인 상태: 회원가입 + 로그인 */
+            <div
+              className="flex md:flex-row flex-col items-center"
+              style={{ gap: "12px" }}
             >
-              <ChevronDown size={16} />
-            </motion.div>
-          </motion.div>
+              {/* 회원가입하기 — 채워진 버튼 (주요 액션) */}
+              <button
+                onClick={onSignupClick}
+                className="px-8 py-4 font-medium text-base transition-colors duration-200 md:w-auto w-[calc(100vw-40px)]"
+                style={{
+                  fontFamily: "'Pretendard', sans-serif", borderRadius: 0, fontSize: "16px",
+                  border: "1px solid var(--text-primary)",
+                  color: "var(--bg-primary)",
+                  backgroundColor: "var(--text-primary)",
+                  minWidth: "160px",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.opacity = "0.82";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.opacity = "1";
+                }}
+              >
+                회원가입하기
+              </button>
+
+              {/* 로그인하기 — 아웃라인 버튼 */}
+              <button
+                onClick={onLoginClick}
+                className="px-8 py-4 font-medium text-base transition-colors duration-200 md:w-auto w-[calc(100vw-40px)]"
+                style={{
+                  fontFamily: "'Pretendard', sans-serif", borderRadius: 0, fontSize: "16px",
+                  border: "1px solid var(--text-primary)",
+                  color: "var(--text-primary)",
+                  backgroundColor: "transparent",
+                  minWidth: "160px",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.backgroundColor = "var(--text-primary)";
+                  (e.currentTarget as HTMLButtonElement).style.color = "var(--bg-primary)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent";
+                  (e.currentTarget as HTMLButtonElement).style.color = "var(--text-primary)";
+                }}
+              >
+                로그인하기
+              </button>
+            </div>
+          )}
         </motion.div>
 
       </div>

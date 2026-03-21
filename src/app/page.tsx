@@ -1,15 +1,24 @@
 "use client";
 
 import { useRef, useCallback, useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import IntroAnimation from "@/components/intro/IntroAnimation";
 import FeedHeader from "@/components/layout/Header";
 import FeedSection from "@/components/feed/FeedSection";
 import FeedFooter from "@/components/layout/Footer";
+import AuthModal from "@/components/auth/AuthModal";
 
 export default function Home() {
+  const { status } = useSession();
+  const isLoggedIn = status === "authenticated";
+
   const introRef = useRef<HTMLDivElement>(null);
   const feedRef = useRef<HTMLDivElement>(null);
   const [showUnsubscribed, setShowUnsubscribed] = useState(false);
+  const [authModal, setAuthModal] = useState<{ open: boolean; tab: "login" | "signup" }>({
+    open: false,
+    tab: "login",
+  });
 
   // 인트로 → 피드: 부드럽게 스크롤
   const scrollToFeed = useCallback(() => {
@@ -56,17 +65,31 @@ export default function Home() {
         </div>
       )}
 
-      {/* 인트로 영역 — 항상 DOM에 유지, 언제든 위아래 스크롤 가능 */}
+      {/* 인트로 영역 — 항상 DOM에 유지 */}
       <div ref={introRef}>
-        <IntroAnimation onEnterFeed={scrollToFeed} />
+        <IntroAnimation
+          onEnterFeed={isLoggedIn ? scrollToFeed : undefined}
+          isLoggedIn={isLoggedIn}
+          onLoginClick={() => setAuthModal({ open: true, tab: "login" })}
+          onSignupClick={() => setAuthModal({ open: true, tab: "signup" })}
+        />
       </div>
 
-      {/* 피드 영역 */}
-      <div ref={feedRef}>
-        <FeedHeader onLogoClick={scrollToIntro} />
-        <FeedSection />
-        <FeedFooter />
-      </div>
+      {/* 피드 영역 — 로그인한 사용자만 */}
+      {isLoggedIn && (
+        <div ref={feedRef}>
+          <FeedHeader onLogoClick={scrollToIntro} />
+          <FeedSection />
+          <FeedFooter />
+        </div>
+      )}
+
+      {/* 인트로 화면용 Auth 모달 */}
+      <AuthModal
+        isOpen={authModal.open}
+        onClose={() => setAuthModal((prev) => ({ ...prev, open: false }))}
+        defaultTab={authModal.tab}
+      />
     </>
   );
 }
