@@ -104,9 +104,9 @@ export default function VisionPage() {
         </h2>
         <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
           {[
-            { phase: "PHASE 01", period: "2026", title: "선익 인텔리전스 — 리포트 구독", desc: "RADAR·CORE·FLASH 3대 브리핑 채널 정착, 핵심 독자 커뮤니티 형성" },
-            { phase: "PHASE 02", period: "2027", title: "선익 아카데미 & 벤처스", desc: "창업 교육 프로그램, 투자 파트너십, 유료 구독 고도화" },
-            { phase: "PHASE 03", period: "2028+", title: "선익 솔루션즈 & 재단", desc: "B2B 기업 자문, 글로벌 진출, UMBRA 홀딩스 체계 구축" },
+            { phase: "PHASE 01", title: "브리핑 & 창업 AI", desc: "글로벌 창업 정보 브리핑 채널 정착 및 핵심 독자층 확보. 창업 특화 AI 서비스 런칭으로 정보 제공을 넘어 실행 도구로 확장." },
+            { phase: "PHASE 02", title: "커뮤니티 & 벤처스", desc: "독자 기반 창업가 커뮤니티 구축. 유망 창업팀 발굴 및 벤처 투자 파트너십을 통해 정보기관에서 생태계 플랫폼으로 도약." },
+            { phase: "PHASE 03", title: "재단", desc: "민간 싱크탱크로서의 사회적 역할 수행. 창업 생태계 지원을 제도화하고 지속 가능한 사회적 임팩트 구조를 완성." },
           ].map((item, i, arr) => (
             <div key={item.phase} style={{ display: "flex", gap: "20px" }}>
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: "2px" }}>
@@ -116,7 +116,6 @@ export default function VisionPage() {
               <div style={{ padding: "18px 0 26px", flex: 1 }}>
                 <div style={{ display: "flex", gap: "10px", alignItems: "center", marginBottom: "6px" }}>
                   <span style={{ fontSize: "10px", fontFamily: "Inter, sans-serif", fontWeight: 700, color: "var(--text-disabled)", letterSpacing: "0.1em" }}>{item.phase}</span>
-                  <span style={{ fontSize: "12px", fontFamily: "Inter, sans-serif", color: "var(--text-placeholder)" }}>{item.period}</span>
                 </div>
                 <p style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif", fontWeight: 700, color: "var(--text-primary)", marginBottom: "4px" }}>{item.title}</p>
                 <p style={{ fontSize: "13px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-muted)", lineHeight: "1.6", margin: 0 }}>{item.desc}</p>
