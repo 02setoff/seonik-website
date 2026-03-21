@@ -184,7 +184,7 @@ export default function PostModal({ post, onClose }: PostModalProps) {
                   </p>
                 )}
                 <p style={{ fontSize: "12px", fontFamily: "Inter, sans-serif", color: "var(--text-disabled)" }}>
-                  발행일: {formatDate(post.createdAt)}{post.readingTime ? `  |  읽는 시간: ${post.readingTime}분` : ""}
+                  발행일: {formatDate(post.createdAt)}
                 </p>
               </div>
             </div>
