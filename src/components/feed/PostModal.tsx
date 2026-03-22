@@ -13,7 +13,10 @@ export interface PostItem {
   bmBreakdown?: string | null;
   playbook?: string | null;
   actionItems?: string | null;
+  deepDive?: string | null;    // 05단계 — 구독자 전용
+  seonikNote?: string | null;  // 06단계 — 구독자 전용
   content: string | null;
+  postType?: string;           // BRIEFING | NOTICE | GENERAL
   category: string;
   isFree?: boolean;
   isSubscriberOnly?: boolean;

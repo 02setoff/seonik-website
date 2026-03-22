@@ -82,9 +82,12 @@ model Post {
   playbook         String?           // 실행 가이드 (구독자 전용)
   actionItems      String?           // 체크리스트 (구독자 전용)
   content          String?           // 기존 HTML 본문 (하위 호환)
-  category         String   @default("")      // 하위 호환용 (UI에서 미사용)
-  isFree           Boolean  @default(true)   // 무료 여부
-  isSubscriberOnly Boolean  @default(false)  // 구독 전용 여부
+  deepDive         String?           // 05단계: 심층 분석 (구독자 전용)
+  seonikNote       String?           // 06단계: 선익 코멘트 (구독자 전용)
+  postType         String   @default("BRIEFING")  // BRIEFING | NOTICE | GENERAL
+  category         String   @default("")           // 하위 호환용
+  isFree           Boolean  @default(true)
+  isSubscriberOnly Boolean  @default(false)
   published        Boolean  @default(false)
   viewCount        Int      @default(0)
   createdAt        DateTime @default(now())

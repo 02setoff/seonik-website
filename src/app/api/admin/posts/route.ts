@@ -18,16 +18,19 @@ export async function GET() {
 export async function POST(request: Request) {
   if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { title, summary, source, bmBreakdown, playbook, actionItems, content,
+  const { title, summary, source, bmBreakdown, playbook, actionItems,
+          deepDive, seonikNote, content, postType,
           category, code, isFree, isSubscriberOnly, published } = await request.json();
-  if (!title || !category) return NextResponse.json({ error: "제목과 카테고리는 필수입니다." }, { status: 400 });
+  if (!title) return NextResponse.json({ error: "제목은 필수입니다." }, { status: 400 });
 
   const session = await getServerSession(authOptions);
   const author = await prisma.user.findUnique({ where: { email: session!.user!.email! } });
 
   const post = await prisma.post.create({
     data: {
-      title, summary, source, bmBreakdown, playbook, actionItems, content,
+      title, summary, source, bmBreakdown, playbook, actionItems,
+      deepDive: deepDive || null, seonikNote: seonikNote || null,
+      content, postType: postType || "BRIEFING",
       category: category || "", code: code || null,
       isFree: isFree ?? true, isSubscriberOnly: isSubscriberOnly ?? false,
       published: published ?? false, authorId: author?.id,

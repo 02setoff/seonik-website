@@ -9,7 +9,9 @@ export async function GET(request: Request) {
 
   const select = {
     id: true, code: true, title: true, summary: true, source: true,
-    bmBreakdown: true, playbook: true, actionItems: true, content: true,
+    bmBreakdown: true, playbook: true, actionItems: true,
+    deepDive: true, seonikNote: true,
+    content: true, postType: true,
     category: true, isFree: true, isSubscriberOnly: true,
     createdAt: true, viewCount: true, _count: { select: { likes: true } },
   };
@@ -34,7 +36,8 @@ export async function GET(request: Request) {
       posts: items.map(p => ({
         id: p.id, code: p.code, title: p.title, summary: p.summary,
         source: p.source, bmBreakdown: p.bmBreakdown, playbook: p.playbook,
-        actionItems: p.actionItems, content: p.content,
+        actionItems: p.actionItems, deepDive: p.deepDive, seonikNote: p.seonikNote,
+        content: p.content, postType: p.postType,
         category: p.category, isFree: p.isFree, isSubscriberOnly: p.isSubscriberOnly,
         createdAt: p.createdAt.toISOString(),
         viewCount: p.viewCount, likeCount: p._count.likes,

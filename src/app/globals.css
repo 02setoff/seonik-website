@@ -35,11 +35,11 @@
   --input-bg: #F8FAFC;
   --input-border: #E2E8F0;
 
-  /* ── A4 정보 문서 (intel-doc) 전용 ── */
-  --doc-paper: #FDFCF8;
-  --doc-band: #F0EBE1;
-  --doc-border: #C8BFAF;
-  --doc-rule: #DDD5C8;
+  /* ── 문서 전용 변수 (미사용 시 무해) ── */
+  --doc-paper: #FFFFFF;
+  --doc-band: #F8F9FA;
+  --doc-border: #E2E8F0;
+  --doc-rule: #F1F5F9;
 }
 
 /* ── 다크 모드 ── */
@@ -61,11 +61,10 @@
   --input-bg: #0F172A;
   --input-border: #1E293B;
 
-  /* ── A4 정보 문서 — 다크 모드에서도 문서는 크림 백지 유지 ── */
-  --doc-paper: #FDFCF8;
-  --doc-band: #ECE6DC;
-  --doc-border: #C8BFAF;
-  --doc-rule: #DDD5C8;
+  --doc-paper: #111C30;
+  --doc-band: #0F172A;
+  --doc-border: #1E293B;
+  --doc-rule: #243248;
 }
 
 * {
