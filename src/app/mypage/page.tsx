@@ -30,7 +30,6 @@ function formatDateTime(iso: string) {
 }
 
 const LABEL: Record<string, string> = { occupation: "직업", howFound: "선익을 알게 된 경로", joinReason: "가입 이유" };
-const CATEGORY_COLORS: Record<string, string> = { RADAR: "#3B82F6", CORE: "#8B5CF6", FLASH: "#F59E0B" };
 
 export default function MyPage() {
   const { data: session, status } = useSession();
@@ -62,7 +61,6 @@ export default function MyPage() {
   const toPostItem = (p2: RecentView["post"] | LikedPost["post"]): PostItem => ({ id: p2.id, title: p2.title, summary: p2.summary, content: p2.content, category: p2.category, createdAt: p2.createdAt, viewCount: p2.viewCount, likeCount: p2._count.likes });
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const likedPostItems = profile.likes.map(l => toPostItem(l.post));
-  const maxCatCount = profile.categoryStats[0]?.count || 1;
 
   const SectionTitle = ({ text, count }: { text: string; count?: number }) => (
     <h2 style={{ fontSize: "16px", fontFamily: "Inter, sans-serif", fontWeight: 700, color: "var(--text-primary)", marginBottom: "16px", letterSpacing: "0.05em" }}>
@@ -103,35 +101,23 @@ export default function MyPage() {
 
         {/* 읽기 통계 */}
         <div style={{ marginBottom: "32px" }}>
-          <SectionTitle text="나의 읽기 통계" />
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "12px" }}>
+          <SectionTitle text="나의 활동" />
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
             <div style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border)", padding: "20px 24px" }}>
-              <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "var(--text-placeholder)", letterSpacing: "0.05em", marginBottom: "6px" }}>TOTAL READ</p>
-              <p style={{ fontSize: "28px", fontFamily: "Inter, sans-serif", fontWeight: 700, color: "var(--text-primary)" }}>{profile.totalRead}<span style={{ fontSize: "13px", color: "var(--text-placeholder)", fontWeight: 400, marginLeft: "4px" }}>편</span></p>
+              <p style={{ fontSize: "10px", fontFamily: "Courier New, monospace", color: "var(--text-placeholder)", letterSpacing: "0.12em", marginBottom: "8px" }}>TOTAL READ</p>
+              <p style={{ fontSize: "28px", fontFamily: "Courier New, monospace", fontWeight: 700, color: "var(--text-primary)" }}>
+                {profile.totalRead}
+                <span style={{ fontSize: "12px", color: "var(--text-placeholder)", fontWeight: 400, marginLeft: "4px", fontFamily: "'Pretendard', sans-serif" }}>편</span>
+              </p>
             </div>
             <div style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border)", padding: "20px 24px" }}>
-              <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "var(--text-placeholder)", letterSpacing: "0.05em", marginBottom: "6px" }}>MOST READ</p>
-              <p style={{ fontSize: "20px", fontFamily: "Inter, sans-serif", fontWeight: 700, color: profile.categoryStats[0] ? (CATEGORY_COLORS[profile.categoryStats[0].category] || "var(--text-primary)") : "var(--text-disabled)" }}>{profile.categoryStats[0]?.category || "—"}</p>
+              <p style={{ fontSize: "10px", fontFamily: "Courier New, monospace", color: "var(--text-placeholder)", letterSpacing: "0.12em", marginBottom: "8px" }}>SAVED</p>
+              <p style={{ fontSize: "28px", fontFamily: "Courier New, monospace", fontWeight: 700, color: "var(--text-primary)" }}>
+                {profile.likes.length}
+                <span style={{ fontSize: "12px", color: "var(--text-placeholder)", fontWeight: 400, marginLeft: "4px", fontFamily: "'Pretendard', sans-serif" }}>건</span>
+              </p>
             </div>
           </div>
-          {profile.categoryStats.length > 0 && (
-            <div style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border)", padding: "20px 24px" }}>
-              <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "var(--text-placeholder)", letterSpacing: "0.05em", marginBottom: "16px" }}>CATEGORY BREAKDOWN</p>
-              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                {profile.categoryStats.map(({ category, count }) => (
-                  <div key={category}>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
-                      <span style={{ fontSize: "13px", fontFamily: "Inter, sans-serif", color: "var(--text-primary)", fontWeight: 600 }}>{category}</span>
-                      <span style={{ fontSize: "12px", fontFamily: "Inter, sans-serif", color: "var(--text-placeholder)" }}>{count}회</span>
-                    </div>
-                    <div style={{ height: "6px", backgroundColor: "var(--bg-subtle)", borderRadius: "3px", overflow: "hidden" }}>
-                      <div style={{ height: "100%", width: `${Math.round((count / maxCatCount) * 100)}%`, backgroundColor: CATEGORY_COLORS[category] || "var(--text-primary)", borderRadius: "3px" }} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
 
         {/* 최근 읽은 게시물 */}
@@ -145,8 +131,8 @@ export default function MyPage() {
                 <button key={v.post.id + i} onClick={() => setSelectedPost(toPostItem(v.post))}
                   style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border)", padding: "14px 20px", textAlign: "left", cursor: "pointer", display: "flex", alignItems: "center" }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "var(--text-placeholder)", marginBottom: "3px" }}>
-                      <span style={{ color: CATEGORY_COLORS[v.post.category] || "var(--text-placeholder)", fontWeight: 600 }}>{v.post.category}</span>{" · "}{formatDateTime(v.viewedAt)}
+                    <p style={{ fontSize: "10px", fontFamily: "Courier New, monospace", color: "var(--text-placeholder)", letterSpacing: "0.04em", marginBottom: "4px" }}>
+                      {formatDateTime(v.viewedAt)}
                     </p>
                     <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", fontWeight: 600, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{v.post.title}</p>
                   </div>
@@ -172,14 +158,8 @@ export default function MyPage() {
                   <button key={post.id} onClick={() => setSelectedPost(post)}
                     style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border)", padding: "16px 20px", textAlign: "left", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", transition: "box-shadow 0.15s" }}>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "5px" }}>
-                        <span style={{
-                          fontSize: "10px", fontFamily: "Inter, sans-serif", fontWeight: 700,
-                          letterSpacing: "0.06em", padding: "2px 8px",
-                          backgroundColor: (CATEGORY_COLORS[l.post.category] || "#94A3B8") + "18",
-                          color: CATEGORY_COLORS[l.post.category] || "var(--text-placeholder)",
-                        }}>{l.post.category}</span>
-                        <span style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "var(--text-disabled)" }}>
+                      <div style={{ marginBottom: "5px" }}>
+                        <span style={{ fontSize: "10px", fontFamily: "Courier New, monospace", color: "var(--text-placeholder)", letterSpacing: "0.06em" }}>
                           저장 {formatDate(l.createdAt)}
                         </span>
                       </div>

@@ -34,6 +34,12 @@
   --modal-bg: #FFFFFF;
   --input-bg: #F8FAFC;
   --input-border: #E2E8F0;
+
+  /* ── A4 정보 문서 (intel-doc) 전용 ── */
+  --doc-paper: #FDFCF8;
+  --doc-band: #F0EBE1;
+  --doc-border: #C8BFAF;
+  --doc-rule: #DDD5C8;
 }
 
 /* ── 다크 모드 ── */
@@ -54,6 +60,12 @@
   --modal-bg: #111C30;
   --input-bg: #0F172A;
   --input-border: #1E293B;
+
+  /* ── A4 정보 문서 — 다크 모드에서도 문서는 크림 백지 유지 ── */
+  --doc-paper: #FDFCF8;
+  --doc-band: #ECE6DC;
+  --doc-border: #C8BFAF;
+  --doc-rule: #DDD5C8;
 }
 
 * {
@@ -173,3 +185,19 @@ body {
 [data-theme="dark"] .post-content s { color: #475569; }
 [data-theme="dark"] .post-content img { border-color: #1E293B; }
 [data-theme="dark"] .post-content hr { border-top-color: #1E293B; }
+
+/* ── 다크 모드: intel-doc 내부는 항상 라이트 컬러 (문서는 백지) ── */
+[data-theme="dark"] .intel-doc .post-content h2 { color: #0F172A; border-bottom-color: #0F172A; }
+[data-theme="dark"] .intel-doc .post-content h3 { color: #0F172A; border-left-color: #94A3B8; }
+[data-theme="dark"] .intel-doc .post-content p { color: #374151; }
+[data-theme="dark"] .intel-doc .post-content ul li { color: #374151; }
+[data-theme="dark"] .intel-doc .post-content ul li::before { color: #94A3B8; }
+[data-theme="dark"] .intel-doc .post-content ol li { color: #374151; }
+[data-theme="dark"] .intel-doc .post-content ol li::before { color: #94A3B8; }
+[data-theme="dark"] .intel-doc .post-content blockquote { background: #F8F9FA; border-left-color: #E2E8F0; color: #475569; }
+[data-theme="dark"] .intel-doc .post-content blockquote::before { color: #94A3B8; }
+[data-theme="dark"] .intel-doc .post-content strong { color: #0F172A; background: linear-gradient(transparent 60%, rgba(15,23,42,0.08) 60%); }
+[data-theme="dark"] .intel-doc .post-content em { color: #475569; }
+[data-theme="dark"] .intel-doc .post-content s { color: #94A3B8; }
+[data-theme="dark"] .intel-doc .post-content img { border-color: #E2E8F0; }
+[data-theme="dark"] .intel-doc .post-content hr { border-top-color: #E2E8F0; }
