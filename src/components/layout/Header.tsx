@@ -76,13 +76,13 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
             {onLogoClick ? (
               <button onClick={onLogoClick}
                 style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", flexDirection: "column", alignItems: "flex-start", flexShrink: 0 }}>
-                <span style={{ fontSize: "17px", fontFamily: "'Pretendard', sans-serif", fontWeight: 700, color: "var(--text-primary)", lineHeight: 1 }}>선익</span>
-                <span style={{ fontSize: "9px", fontFamily: "Inter, sans-serif", fontWeight: 600, color: "var(--text-primary)", letterSpacing: "0.15em", marginTop: "2px" }}>SEONIK</span>
+                <span style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif", fontWeight: 700, color: "var(--text-primary)", lineHeight: 1 }}>선익 인텔리전스</span>
+                <span style={{ fontSize: "8px", fontFamily: "Inter, sans-serif", fontWeight: 600, color: "var(--text-primary)", letterSpacing: "0.12em", marginTop: "3px" }}>SEONIK Intelligence</span>
               </button>
             ) : (
               <Link href="/" style={{ textDecoration: "none", display: "flex", flexDirection: "column", alignItems: "flex-start", flexShrink: 0 }}>
-                <span style={{ fontSize: "17px", fontFamily: "'Pretendard', sans-serif", fontWeight: 700, color: "var(--text-primary)", lineHeight: 1 }}>선익</span>
-                <span style={{ fontSize: "9px", fontFamily: "Inter, sans-serif", fontWeight: 600, color: "var(--text-primary)", letterSpacing: "0.15em", marginTop: "2px" }}>SEONIK</span>
+                <span style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif", fontWeight: 700, color: "var(--text-primary)", lineHeight: 1 }}>선익 인텔리전스</span>
+                <span style={{ fontSize: "8px", fontFamily: "Inter, sans-serif", fontWeight: 600, color: "var(--text-primary)", letterSpacing: "0.12em", marginTop: "3px" }}>SEONIK Intelligence</span>
               </Link>
             )}
 

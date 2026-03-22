@@ -24,7 +24,7 @@ const MILESTONES = [
   {
     date: "2026.03",
     title: "선익 웹사이트 런칭",
-    desc: "RADAR·CORE·FLASH 3대 브리핑 채널 오픈. 이메일 인증 기반 회원 서비스 정식 시작.",
+    desc: "선익 인텔리전스 브리핑 플랫폼 정식 오픈. 이메일 인증 기반 회원 서비스 시작.",
     tag: "LAUNCH",
   },
 ];
