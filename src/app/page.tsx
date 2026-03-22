@@ -3,7 +3,7 @@
 import { useRef, useCallback, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import IntroAnimation from "@/components/intro/IntroAnimation";
-import FeedHeader from "@/components/layout/Header";
+import FeedSidebar from "@/components/layout/FeedSidebar";
 import FeedSection from "@/components/feed/FeedSection";
 import FeedFooter from "@/components/layout/Footer";
 import AuthModal from "@/components/auth/AuthModal";
@@ -77,10 +77,12 @@ export default function Home() {
 
       {/* 피드 영역 — 로그인한 사용자만 */}
       {isLoggedIn && (
-        <div ref={feedRef}>
-          <FeedHeader onLogoClick={scrollToIntro} />
-          <FeedSection />
-          <FeedFooter />
+        <div ref={feedRef} className="md:flex" style={{ minHeight: "100vh" }}>
+          <main style={{ flex: 1, minWidth: 0 }}>
+            <FeedSection />
+            <FeedFooter />
+          </main>
+          <FeedSidebar onLogoClick={scrollToIntro} />
         </div>
       )}
 

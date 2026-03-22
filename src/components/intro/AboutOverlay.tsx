@@ -1,0 +1,394 @@
+"use client";
+
+import { useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { X } from "lucide-react";
+
+export type AboutKey = "mission" | "vision" | "company" | "slogan" | "history";
+
+interface Props {
+  open: AboutKey | null;
+  onClose: () => void;
+}
+
+const TABS: { key: AboutKey; label: string; code: string }[] = [
+  { key: "mission",  label: "미션",   code: "OUR MISSION"    },
+  { key: "vision",   label: "비전",   code: "OUR VISION"     },
+  { key: "company",  label: "회사명", code: "COMPANY NAME"   },
+  { key: "slogan",   label: "슬로건", code: "SLOGAN"         },
+  { key: "history",  label: "연혁",   code: "MILESTONES"     },
+];
+
+/* ─────────────────────────────────────────────
+   각 섹션 콘텐츠
+───────────────────────────────────────────── */
+
+function MissionContent() {
+  return (
+    <div>
+      <div style={{ padding: "28px 32px", backgroundColor: "#0F172A", marginBottom: "36px" }}>
+        <p style={{ fontSize: "10px", fontFamily: "Inter, sans-serif", color: "#64748B", letterSpacing: "0.15em", marginBottom: "16px" }}>MISSION STATEMENT</p>
+        <blockquote style={{ fontSize: "18px", fontFamily: "'Pretendard', sans-serif", fontWeight: 700, color: "white", lineHeight: "1.75", margin: 0 }}>
+          "정보 비대칭의 장벽을 파괴하여,<br />
+          대한민국의 저성장을 돌파할<br />
+          실행가들을 무장시킨다."
+        </blockquote>
+      </div>
+
+      <Section title="정보 비대칭의 잔혹한 현실">
+        <p style={bodyText}>현대 비즈니스는 총성 없는 전쟁터입니다. 대기업은 맥킨지·BCG 같은 컨설팅 펌에 수억~수십억 원을 지불하고 글로벌 시장의 미세한 진동조차 감지하여 데이터 기반의 의사결정을 내립니다.</p>
+        <div style={callout}>
+          <p style={{ ...bodyText, fontWeight: 700, color: "var(--text-primary)", marginBottom: "6px" }}>1인 사업자·소규모 창업가는?</p>
+          <p style={{ ...bodyText, margin: 0 }}>구조적으로 이와 같은 수준의 전략 컨설팅에 접근하지 못합니다. 결국 유튜브, 파편화된 블로그, 그리고 "감"에 의존하여 회사의 명운이 걸린 결정을 내립니다.</p>
+        </div>
+      </Section>
+
+      <Section title="4가지 정보 비대칭 장벽">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "12px" }}>
+          {[
+            { no: "01", title: "비용의 장벽", desc: "고급 리포트에 접근하기 위한 압도적인 자본의 격차" },
+            { no: "02", title: "언어의 장벽", desc: "실리콘밸리·런던 등 영어권 중심으로 쏟아지는 원천 데이터" },
+            { no: "03", title: "시간의 장벽", desc: "당장 오늘의 생존을 위해 뛰느라 리서치에 투자할 물리적 시간 부족" },
+            { no: "04", title: "해석의 장벽", desc: "정보를 모았어도 내 사업에 어떻게 적용할지 모르는 막막함" },
+          ].map(item => (
+            <div key={item.no} style={{ border: "1px solid var(--border)", padding: "18px", backgroundColor: "var(--bg-subtle)" }}>
+              <p style={{ fontSize: "10px", fontFamily: "Inter", color: "var(--text-disabled)", fontWeight: 700, marginBottom: "8px" }}>{item.no}</p>
+              <p style={{ fontSize: "13px", fontFamily: "'Pretendard'", fontWeight: 700, color: "var(--text-primary)", marginBottom: "5px" }}>{item.title}</p>
+              <p style={{ fontSize: "12px", fontFamily: "'Pretendard'", color: "var(--text-muted)", lineHeight: "1.65", margin: 0 }}>{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="개선이 아닌 파괴, 그리고 무장">
+        <p style={bodyText}>선익은 이 장벽을 단순히 줄이는 수준에 머물지 않습니다. 우리의 미션은 이 장벽을 철저히 <strong style={{ color: "var(--text-primary)" }}>파괴(Destroy)</strong>하는 것입니다.</p>
+        <p style={{ ...bodyText, margin: 0 }}>선익은 실행가들을 철저히 <strong style={{ color: "var(--text-primary)" }}>무장(Arming)</strong>시킵니다. 정보는 곧 무기이며, 분석은 전략이 되고, 실행 가이드는 전술이 됩니다.</p>
+      </Section>
+    </div>
+  );
+}
+
+function VisionContent() {
+  return (
+    <div>
+      <div style={{ padding: "28px 32px", backgroundColor: "#0F172A", marginBottom: "36px" }}>
+        <p style={{ fontSize: "10px", fontFamily: "Inter, sans-serif", color: "#64748B", letterSpacing: "0.15em", marginBottom: "16px" }}>VISION STATEMENT</p>
+        <blockquote style={{ fontSize: "18px", fontFamily: "'Pretendard', sans-serif", fontWeight: 700, color: "white", lineHeight: "1.75", margin: 0 }}>
+          "전 세계의 창업 정보를 누구보다 빠르게<br />
+          수집하고 브리핑하는<br />
+          제1의 민간 정보기관."
+        </blockquote>
+      </div>
+
+      <Section title="전 세계(Global)의 데이터를 향한 첩보전">
+        <p style={bodyText}>최신 스타트업, 마이크로 SaaS, 비즈니스 트렌드는 실리콘밸리를 비롯한 영어권 커뮤니티에서 가장 먼저 폭발합니다. Product Hunt, Indie Hackers, Hacker News, Crunchbase 등 수많은 글로벌 소스가 존재하지만, 한국의 사업자들은 언어·시간·맥락 해석의 장벽 때문에 이를 직접 활용하기 어렵습니다.</p>
+      </Section>
+
+      <Section title="누구보다 빠른 속도 — AI 네이티브 운영">
+        <div style={callout}>
+          <p style={{ ...bodyText, margin: 0 }}>우리는 세상의 모든 정보를 다 다루지 않습니다. <strong style={{ color: "var(--text-primary)" }}>"창업·마이크로 SaaS·AI 비즈니스"</strong>라는 뾰족한 니치(Niche)에 집중하여, 대형 기관보다 훨씬 빠르게 글로벌 소스를 모니터링하고 번역하며 패턴을 포착합니다.</p>
+        </div>
+      </Section>
+
+      <Section title="성장 로드맵">
+        <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
+          {[
+            { phase: "PHASE 01", title: "브리핑 & 창업 AI", desc: "글로벌 창업 정보 브리핑 채널 정착 및 핵심 독자층 확보." },
+            { phase: "PHASE 02", title: "커뮤니티 & 벤처스", desc: "독자 기반 창업가 커뮤니티 구축. 유망 창업팀 발굴 및 벤처 투자 파트너십." },
+            { phase: "PHASE 03", title: "재단",              desc: "민간 싱크탱크로서의 사회적 역할 수행. 창업 생태계 지원 제도화." },
+          ].map((item, i, arr) => (
+            <div key={item.phase} style={{ display: "flex", gap: "16px" }}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "10px" }}>
+                <div style={{ width: "10px", height: "10px", borderRadius: "50%", backgroundColor: "var(--text-primary)", flexShrink: 0, marginTop: "20px" }} />
+                {i < arr.length - 1 && <div style={{ width: "2px", flex: 1, backgroundColor: "var(--border)", minHeight: "28px" }} />}
+              </div>
+              <div style={{ padding: "16px 0 22px", flex: 1, paddingLeft: "8px" }}>
+                <span style={{ fontSize: "10px", fontFamily: "Inter", fontWeight: 700, color: "var(--text-disabled)", letterSpacing: "0.1em" }}>{item.phase}</span>
+                <p style={{ fontSize: "14px", fontFamily: "'Pretendard'", fontWeight: 700, color: "var(--text-primary)", margin: "4px 0" }}>{item.title}</p>
+                <p style={{ fontSize: "13px", fontFamily: "'Pretendard'", color: "var(--text-muted)", lineHeight: "1.6", margin: 0 }}>{item.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Section>
+    </div>
+  );
+}
+
+function CompanyContent() {
+  return (
+    <div>
+      <div style={{ padding: "36px", backgroundColor: "#0F172A", marginBottom: "36px", textAlign: "center" }}>
+        <p style={{ fontSize: "56px", fontFamily: "'Pretendard', sans-serif", fontWeight: 800, color: "white", lineHeight: 1, marginBottom: "16px" }}>선익</p>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "14px", marginBottom: "12px" }}>
+          <span style={{ fontSize: "24px", fontFamily: "'Pretendard'", fontWeight: 700, color: "#475569" }}>先益</span>
+          <span style={{ color: "#334155", fontSize: "16px" }}>·</span>
+          <span style={{ fontSize: "20px", fontFamily: "Inter", fontWeight: 600, color: "#475569", letterSpacing: "0.25em" }}>SEONIK</span>
+        </div>
+        <p style={{ fontSize: "12px", fontFamily: "Inter", color: "#334155", fontStyle: "italic", margin: 0, letterSpacing: "0.05em" }}>[선·익] — seon·ik</p>
+      </div>
+
+      <Section title="이름의 의미">
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "20px" }}>
+          {[
+            { char: "先", label: "FIRST",   ko: "먼저",   desc: "남보다 먼저 알고, 먼저 움직인다" },
+            { char: "益", label: "BENEFIT", ko: "이롭다", desc: "알면 이롭고, 이기고, 성장한다" },
+          ].map(item => (
+            <div key={item.char} style={{ border: "1px solid var(--border)", padding: "24px", textAlign: "center", backgroundColor: "var(--bg-subtle)" }}>
+              <p style={{ fontSize: "36px", fontFamily: "'Pretendard'", fontWeight: 800, color: "var(--text-primary)", marginBottom: "8px" }}>{item.char}</p>
+              <p style={{ fontSize: "10px", fontFamily: "Inter", color: "var(--text-placeholder)", letterSpacing: "0.1em", marginBottom: "6px" }}>{item.label}</p>
+              <p style={{ fontSize: "14px", fontFamily: "'Pretendard'", fontWeight: 600, color: "var(--text-primary)", marginBottom: "4px" }}>{item.ko}</p>
+              <p style={{ fontSize: "12px", fontFamily: "'Pretendard'", color: "var(--text-muted)", lineHeight: "1.6", margin: 0 }}>{item.desc}</p>
+            </div>
+          ))}
+        </div>
+        <div style={callout}>
+          <p style={{ ...bodyText, margin: 0 }}><strong>先益(선익)</strong>은 "먼저 알아야 먼저 이긴다"는 철학을 담고 있습니다. 정보의 시간차가 곧 비즈니스의 승패를 결정짓는 시대에, 선익은 모든 실행가가 <strong>先</strong>을 쥘 수 있도록 합니다.</p>
+        </div>
+      </Section>
+
+      <Section title="영문 표기 — SEONIK">
+        <p style={{ ...bodyText, margin: 0 }}>영문 표기 <strong style={{ fontFamily: "Inter" }}>SEONIK</strong>은 한국어 발음 "선익"을 로마자 표기한 것으로, 국제 시장에서도 직관적으로 읽힐 수 있도록 설계했습니다.</p>
+      </Section>
+    </div>
+  );
+}
+
+function SloganContent() {
+  return (
+    <div>
+      <div style={{ padding: "36px", backgroundColor: "#0F172A", textAlign: "center", marginBottom: "36px" }}>
+        <p style={{ fontSize: "10px", fontFamily: "Inter", color: "#64748B", letterSpacing: "0.15em", marginBottom: "16px" }}>OFFICIAL SLOGAN</p>
+        <p style={{ fontSize: "24px", fontFamily: "'Pretendard'", fontWeight: 800, color: "white", lineHeight: "1.5", marginBottom: "10px" }}>
+          앞서나가는 정보로<br />실행가들을 이롭게
+        </p>
+        <p style={{ fontSize: "13px", fontFamily: "Inter", color: "#475569", margin: 0, letterSpacing: "0.1em" }}>先益 (SEONIK)</p>
+      </div>
+
+      <div style={{ padding: "36px", border: "2px solid var(--text-primary)", textAlign: "center", backgroundColor: "var(--bg-card)", marginBottom: "36px" }}>
+        <p style={{ fontSize: "10px", fontFamily: "Inter", color: "var(--text-placeholder)", letterSpacing: "0.15em", marginBottom: "16px" }}>MARKETING SLOGAN</p>
+        <p style={{ fontSize: "28px", fontFamily: "Inter", fontWeight: 800, color: "var(--text-primary)", letterSpacing: "-0.01em", lineHeight: 1.2, marginBottom: "12px" }}>
+          Know First,<br />Win First.
+        </p>
+        <p style={{ fontSize: "14px", fontFamily: "'Pretendard'", color: "var(--text-muted)", margin: 0 }}>먼저 아는 자가 이긴다</p>
+      </div>
+
+      <Section title="슬로건에 담긴 철학">
+        {[
+          { ko: "앞서나가는 정보로", en: "Know First", desc: "정보의 시간차가 곧 비즈니스의 승패를 결정합니다. 경쟁자보다 단 하루 먼저 시장의 변화를 감지하면 전략적 우위를 선점할 수 있습니다." },
+          { ko: "실행가들을 이롭게", en: "Win First",  desc: "지식은 실행으로 이어질 때 의미를 갖습니다. 선익의 인텔리전스는 단순한 정보가 아닌, 즉시 사업에 적용할 수 있는 실행 가이드를 제공합니다." },
+        ].map(item => (
+          <div key={item.ko} style={{ display: "flex", gap: "0", border: "1px solid var(--border)", backgroundColor: "var(--bg-card)", marginBottom: "10px" }}>
+            <div style={{ width: "3px", backgroundColor: "var(--text-primary)", flexShrink: 0 }} />
+            <div style={{ padding: "18px 20px", flex: 1 }}>
+              <div style={{ display: "flex", gap: "10px", alignItems: "center", marginBottom: "8px" }}>
+                <span style={{ fontSize: "14px", fontFamily: "'Pretendard'", fontWeight: 700, color: "var(--text-primary)" }}>{item.ko}</span>
+                <span style={{ fontSize: "11px", fontFamily: "Inter", color: "var(--text-placeholder)" }}>= {item.en}</span>
+              </div>
+              <p style={{ fontSize: "13px", fontFamily: "'Pretendard'", color: "var(--text-muted)", lineHeight: "1.65", margin: 0 }}>{item.desc}</p>
+            </div>
+          </div>
+        ))}
+      </Section>
+    </div>
+  );
+}
+
+function HistoryContent() {
+  const milestones = [
+    { date: "2026.03", title: "선익 창업", desc: "정보 비대칭 해소를 목표로 선익(SEONIK) 창업. AI 네이티브 비즈니스 인텔리전스 브리핑 서비스 개발 시작.", tag: "FOUNDED" },
+    { date: "2026.03", title: "선익 웹사이트 런칭", desc: "선익 인텔리전스 브리핑 플랫폼 정식 오픈. 이메일 인증 기반 회원 서비스 시작.", tag: "LAUNCH" },
+  ];
+  return (
+    <div>
+      <Section title="주요 마일스톤">
+        <div>
+          {milestones.map((item, i) => (
+            <div key={i} style={{ display: "flex", gap: "20px" }}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "12px" }}>
+                <div style={{ width: "12px", height: "12px", borderRadius: "50%", backgroundColor: "var(--text-primary)", border: "2px solid var(--bg-primary)", boxShadow: "0 0 0 2px var(--text-primary)", flexShrink: 0, marginTop: "18px" }} />
+                {i < milestones.length - 1 && <div style={{ width: "2px", flex: 1, backgroundColor: "var(--border)", minHeight: "36px" }} />}
+              </div>
+              <div style={{ paddingBottom: i < milestones.length - 1 ? "28px" : "0", flex: 1, paddingLeft: "10px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+                  <span style={{ fontSize: "13px", fontFamily: "Inter", fontWeight: 700, color: "var(--text-primary)" }}>{item.date}</span>
+                  <span style={{ fontSize: "10px", fontFamily: "Inter", fontWeight: 700, color: "var(--text-placeholder)", letterSpacing: "0.08em", backgroundColor: "var(--bg-subtle)", padding: "2px 8px" }}>{item.tag}</span>
+                </div>
+                <p style={{ fontSize: "16px", fontFamily: "'Pretendard'", fontWeight: 700, color: "var(--text-primary)", marginBottom: "6px" }}>{item.title}</p>
+                <p style={{ fontSize: "13px", fontFamily: "'Pretendard'", color: "var(--text-muted)", lineHeight: "1.7", margin: 0 }}>{item.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <div style={{ padding: "24px 28px", backgroundColor: "#0F172A", marginTop: "8px" }}>
+        <p style={{ fontSize: "10px", fontFamily: "Inter", color: "#64748B", letterSpacing: "0.15em", marginBottom: "12px" }}>CURRENT STATUS</p>
+        <p style={{ fontSize: "16px", fontFamily: "'Pretendard'", fontWeight: 700, color: "white", marginBottom: "8px" }}>지금, 선익은 성장 중입니다.</p>
+        <p style={{ fontSize: "13px", fontFamily: "'Pretendard'", color: "#64748B", lineHeight: "1.8", margin: 0 }}>초기 단계로서 핵심 독자 커뮤니티를 구축하고 인텔리전스 브리핑의 질을 높이는 데 집중하고 있습니다.</p>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   공통 서브 컴포넌트
+───────────────────────────────────────────── */
+const bodyText: React.CSSProperties = {
+  fontSize: "14px", fontFamily: "'Pretendard', sans-serif",
+  color: "var(--text-secondary)", lineHeight: "1.85", marginBottom: "14px",
+};
+const callout: React.CSSProperties = {
+  padding: "18px 22px", borderLeft: "3px solid var(--text-primary)",
+  backgroundColor: "var(--bg-subtle)", marginBottom: "14px",
+};
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div style={{ marginBottom: "32px" }}>
+      <h2 style={{
+        fontSize: "11px", fontFamily: "Inter, sans-serif", fontWeight: 700,
+        letterSpacing: "0.12em", textTransform: "uppercase",
+        color: "var(--text-primary)", borderBottom: "2px solid var(--text-primary)",
+        paddingBottom: "7px", marginBottom: "18px",
+      }}>{title}</h2>
+      {children}
+    </div>
+  );
+}
+
+const CONTENT_MAP: Record<AboutKey, React.FC> = {
+  mission: MissionContent,
+  vision:  VisionContent,
+  company: CompanyContent,
+  slogan:  SloganContent,
+  history: HistoryContent,
+};
+
+/* ─────────────────────────────────────────────
+   메인 오버레이
+───────────────────────────────────────────── */
+export default function AboutOverlay({ open, onClose }: Props) {
+  // ESC 닫기
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [open, onClose]);
+
+  // 배경 스크롤 잠금
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
+
+  const activeTab = open;
+  const ContentComponent = activeTab ? CONTENT_MAP[activeTab] : null;
+  const activeInfo = TABS.find(t => t.key === activeTab);
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <>
+          {/* 배경 딤 */}
+          <motion.div
+            key="overlay-bg"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={onClose}
+            style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.55)", zIndex: 900 }}
+          />
+
+          {/* 패널 */}
+          <motion.div
+            key="overlay-panel"
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 40 }}
+            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            style={{
+              position: "fixed", top: 0, right: 0, bottom: 0,
+              width: "min(560px, 100vw)",
+              backgroundColor: "var(--bg-card)",
+              zIndex: 901,
+              display: "flex", flexDirection: "column",
+              boxShadow: "-8px 0 40px rgba(0,0,0,0.18)",
+            }}
+          >
+            {/* 상단 헤더 */}
+            <div style={{
+              display: "flex", alignItems: "flex-start", justifyContent: "space-between",
+              padding: "24px 28px 20px",
+              borderBottom: "1px solid var(--border)",
+              flexShrink: 0,
+            }}>
+              <div>
+                <p style={{ fontSize: "10px", fontFamily: "Inter, sans-serif", color: "var(--text-placeholder)", letterSpacing: "0.15em", marginBottom: "6px" }}>
+                  {activeInfo?.code}
+                </p>
+                <h1 style={{ fontSize: "22px", fontFamily: "'Pretendard', sans-serif", fontWeight: 800, color: "var(--text-primary)" }}>
+                  {activeInfo?.label}
+                </h1>
+              </div>
+              <button
+                onClick={onClose}
+                aria-label="닫기"
+                style={{
+                  background: "none", border: "none", cursor: "pointer",
+                  color: "var(--text-placeholder)", padding: "4px", marginTop: "2px",
+                  transition: "color 0.15s",
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = "var(--text-primary)"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = "var(--text-placeholder)"; }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* 탭 네비 */}
+            <div style={{
+              display: "flex", gap: "0",
+              borderBottom: "1px solid var(--border)",
+              flexShrink: 0, overflowX: "auto",
+            }}>
+              {TABS.map(tab => (
+                <button key={tab.key}
+                  onClick={() => {
+                    // 탭 전환을 부모에서 하려면 onClose+reopen이 필요하므로
+                    // 여기서는 외부 onTabChange 콜백을 통해 처리
+                    // — 부모에서 open state를 직접 바꾸도록 이벤트 전달
+                    const ev = new CustomEvent("about-tab-change", { detail: tab.key });
+                    window.dispatchEvent(ev);
+                  }}
+                  style={{
+                    padding: "10px 16px", background: "none", border: "none", cursor: "pointer",
+                    fontSize: "12px", fontFamily: "'Pretendard', sans-serif",
+                    fontWeight: activeTab === tab.key ? 700 : 400,
+                    color: activeTab === tab.key ? "var(--text-primary)" : "var(--text-placeholder)",
+                    borderBottom: activeTab === tab.key ? "2px solid var(--text-primary)" : "2px solid transparent",
+                    marginBottom: "-1px", whiteSpace: "nowrap", transition: "all 0.15s",
+                  }}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* 스크롤 본문 */}
+            <div style={{ flex: 1, overflowY: "auto", padding: "28px" }}>
+              {ContentComponent && <ContentComponent />}
+
+              {/* 푸터 */}
+              <div style={{ borderTop: "1px solid var(--border-light)", paddingTop: "20px", marginTop: "8px" }}>
+                <p style={{ fontSize: "11px", color: "var(--text-placeholder)", fontFamily: "Inter, sans-serif", textAlign: "center" }}>
+                  先益 — 앞서나가는 정보로 실행가들을 이롭게
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+}

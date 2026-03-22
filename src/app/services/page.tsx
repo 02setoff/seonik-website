@@ -4,7 +4,6 @@ import {
   BarChart3,
   Users,
   ArrowUpRight,
-  Instagram,
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -23,8 +22,8 @@ const tiers = [
       "시장 트렌드 분석 리포트",
       "경쟁사 벤치마킹 케이스",
     ],
-    cta: "인스타그램에서 먼저 만나보세요",
-    ctaLink: "https://instagram.com/seonik_official",
+    cta: "Coming Soon",
+    ctaLink: null,
     icon: FileText,
     comingSoon: true,
   },
@@ -121,25 +120,9 @@ export default function ServicesPage() {
                       ))}
                     </ul>
 
-                    {tier.ctaLink ? (
-                      <a
-                        href={tier.ctaLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-sm font-medium text-midnight-slate hover:text-accent-gold transition-colors duration-200 group"
-                      >
-                        <Instagram size={14} />
-                        {tier.cta}
-                        <ArrowUpRight
-                          size={14}
-                          className="transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-                        />
-                      </a>
-                    ) : (
-                      <span className="inline-flex items-center gap-2 text-sm font-medium text-slate-400">
-                        {tier.cta}
-                      </span>
-                    )}
+                    <span className="inline-flex items-center gap-2 text-sm font-medium text-slate-400">
+                      {tier.cta}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -155,17 +138,8 @@ export default function ServicesPage() {
             서비스 출시 소식을 가장 먼저 받아보세요.
           </h2>
           <p className="text-sm text-slate-400 mb-8">
-            인스타그램에서 선익의 인사이트를 먼저 만나보세요.
+            선익 인텔리전스에서 최신 브리핑을 만나보세요.
           </p>
-          <a
-            href="https://instagram.com/seonik_official"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-8 py-4 border border-white/20 text-pure-white text-sm font-medium tracking-wide hover:bg-white/5 transition-all duration-200"
-          >
-            <Instagram size={16} />
-            @seonik_official 팔로우
-          </a>
         </div>
       </section>
     </div>

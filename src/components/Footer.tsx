@@ -75,16 +75,6 @@ export default function Footer() {
                   contact@seonik.kr
                 </a>
               </li>
-              <li>
-                <a
-                  href="https://instagram.com/seonik_official"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-slate-400 hover:text-pure-white transition-colors duration-200"
-                >
-                  @seonik_official
-                </a>
-              </li>
             </ul>
           </div>
         </div>
