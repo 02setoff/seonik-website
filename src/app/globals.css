@@ -202,10 +202,12 @@ body {
 [data-theme="dark"] .intel-doc .post-content hr { border-top-color: #E2E8F0; }
 
 /* ── About 모달 스크롤바 숨김 ── */
-.about-modal-body {
-  scrollbar-width: none;        /* Firefox */
-  -ms-overflow-style: none;     /* IE / Edge */
+.about-modal-body,
+.about-modal-tabs {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
-.about-modal-body::-webkit-scrollbar {
-  display: none;                /* Chrome / Safari */
+.about-modal-body::-webkit-scrollbar,
+.about-modal-tabs::-webkit-scrollbar {
+  display: none;
 }

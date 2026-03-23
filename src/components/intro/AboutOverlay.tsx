@@ -346,7 +346,7 @@ export default function AboutOverlay({ open, onClose }: Props) {
             </div>
 
             {/* 탭 네비 */}
-            <div style={{
+            <div className="about-modal-tabs" style={{
               display: "flex",
               borderBottom: "1px solid var(--border)",
               flexShrink: 0, overflowX: "auto",
