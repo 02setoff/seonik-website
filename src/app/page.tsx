@@ -17,17 +17,17 @@ export default function Home() {
   const [showUnsubscribed, setShowUnsubscribed] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(false);
 
-  // 인트로가 화면에서 사라지면 사이드바 표시
+  // 피드 영역이 화면에 들어오면 사이드바 표시 (이후 fixed로 따라다님)
   useEffect(() => {
-    const el = introRef.current;
+    const el = feedRef.current;
     if (!el) return;
     const observer = new IntersectionObserver(
-      ([entry]) => setSidebarVisible(!entry.isIntersecting),
-      { threshold: 0.05 }
+      ([entry]) => { if (entry.isIntersecting) setSidebarVisible(true); },
+      { threshold: 0.01 }
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [isLoggedIn]);
   const [authModal, setAuthModal] = useState<{ open: boolean; tab: "login" | "signup" }>({
     open: false,
     tab: "login",
