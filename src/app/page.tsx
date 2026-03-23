@@ -15,6 +15,19 @@ export default function Home() {
   const introRef = useRef<HTMLDivElement>(null);
   const feedRef = useRef<HTMLDivElement>(null);
   const [showUnsubscribed, setShowUnsubscribed] = useState(false);
+  const [sidebarVisible, setSidebarVisible] = useState(false);
+
+  // 인트로가 화면에서 사라지면 사이드바 표시
+  useEffect(() => {
+    const el = introRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setSidebarVisible(!entry.isIntersecting),
+      { threshold: 0.05 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
   const [authModal, setAuthModal] = useState<{ open: boolean; tab: "login" | "signup" }>({
     open: false,
     tab: "login",
@@ -80,7 +93,7 @@ export default function Home() {
         <div ref={feedRef}>
           <FeedSection />
           <FeedFooter />
-          <FeedSidebar onLogoClick={scrollToIntro} />
+          <FeedSidebar onLogoClick={scrollToIntro} visible={sidebarVisible} />
         </div>
       )}
 

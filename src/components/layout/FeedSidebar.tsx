@@ -9,9 +9,10 @@ import PostModal, { PostItem } from "@/components/feed/PostModal";
 
 interface Props {
   onLogoClick?: () => void;
+  visible?: boolean;
 }
 
-export default function FeedSidebar({ onLogoClick }: Props) {
+export default function FeedSidebar({ onLogoClick, visible = true }: Props) {
   const { data: session } = useSession();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState<PostItem | null>(null);
@@ -33,6 +34,9 @@ export default function FeedSidebar({ onLogoClick }: Props) {
           backgroundColor: "var(--bg-card)",
           padding: "20px 12px",
           zIndex: 50,
+          opacity: visible ? 1 : 0,
+          pointerEvents: visible ? "auto" : "none",
+          transition: "opacity 0.3s ease",
         }}
       >
         {/* 로고 */}
