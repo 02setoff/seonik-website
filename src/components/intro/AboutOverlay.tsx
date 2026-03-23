@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 
@@ -252,6 +252,12 @@ const CONTENT_MAP: Record<AboutKey, React.FC> = {
 /* ─── 메인 오버레이 ─── */
 export default function AboutOverlay({ open, onClose }: Props) {
   const backdropMouseDown = useRef(false);
+  const [activeTab, setActiveTab] = useState<AboutKey | null>(open);
+
+  // open prop이 바뀌면 activeTab 동기화
+  useEffect(() => {
+    if (open) setActiveTab(open);
+  }, [open]);
 
   // ESC 닫기
   useEffect(() => {
@@ -267,16 +273,6 @@ export default function AboutOverlay({ open, onClose }: Props) {
     return () => { document.body.style.overflow = ""; };
   }, [open]);
 
-  // AboutOverlay 탭 전환 이벤트 수신
-  useEffect(() => {
-    const handler = (e: Event) => {
-      // (이미 open 상태에서 탭만 바꾸는 경우는 부모가 처리)
-    };
-    window.addEventListener("about-tab-change", handler);
-    return () => window.removeEventListener("about-tab-change", handler);
-  }, []);
-
-  const activeTab = open;
   const ContentComponent = activeTab ? CONTENT_MAP[activeTab] : null;
   const activeInfo = TABS.find(t => t.key === activeTab);
 
@@ -358,10 +354,7 @@ export default function AboutOverlay({ open, onClose }: Props) {
               {TABS.map(tab => (
                 <button
                   key={tab.key}
-                  onClick={() => {
-                    const ev = new CustomEvent("about-tab-change", { detail: tab.key });
-                    window.dispatchEvent(ev);
-                  }}
+                  onClick={() => setActiveTab(tab.key)}
                   style={{
                     padding: "10px 18px", background: "none", border: "none", cursor: "pointer",
                     fontSize: "13px", fontFamily: "'Pretendard'",
@@ -377,7 +370,7 @@ export default function AboutOverlay({ open, onClose }: Props) {
             </div>
 
             {/* 스크롤 본문 */}
-            <div style={{ flex: 1, overflowY: "auto", padding: "24px 24px 28px" }}>
+            <div className="about-modal-body" style={{ flex: 1, overflowY: "auto", padding: "24px 24px 28px" }}>
               {ContentComponent && <ContentComponent />}
 
               {/* 모달 푸터 */}
