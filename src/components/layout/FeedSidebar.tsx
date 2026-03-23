@@ -25,14 +25,15 @@ export default function FeedSidebar({ onLogoClick }: Props) {
         style={{
           width: "220px",
           flexShrink: 0,
+          alignSelf: "flex-start",
           position: "sticky",
           top: "24px",
-          height: "fit-content",
           border: "1px solid var(--border)",
           borderRadius: "14px",
           backgroundColor: "var(--bg-card)",
           padding: "20px 12px",
           marginTop: "24px",
+          marginRight: "24px",
         }}
       >
         {/* 로고 */}
