@@ -3,7 +3,7 @@
 import { useRef, useCallback, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import IntroAnimation from "@/components/intro/IntroAnimation";
-import FeedSidebar from "@/components/layout/FeedSidebar";
+import FeedHeader from "@/components/layout/Header";
 import FeedSection from "@/components/feed/FeedSection";
 import FeedFooter from "@/components/layout/Footer";
 import AuthModal from "@/components/auth/AuthModal";
@@ -15,19 +15,6 @@ export default function Home() {
   const introRef = useRef<HTMLDivElement>(null);
   const feedRef = useRef<HTMLDivElement>(null);
   const [showUnsubscribed, setShowUnsubscribed] = useState(false);
-  const [sidebarVisible, setSidebarVisible] = useState(false);
-
-  // 인트로/피드 교차 감지로 사이드바 토글
-  useEffect(() => {
-    const intro = introRef.current;
-    if (!intro) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setSidebarVisible(!entry.isIntersecting),
-      { threshold: 0.1 }
-    );
-    observer.observe(intro);
-    return () => observer.disconnect();
-  }, []);
   const [authModal, setAuthModal] = useState<{ open: boolean; tab: "login" | "signup" }>({
     open: false,
     tab: "login",
@@ -91,9 +78,9 @@ export default function Home() {
       {/* 피드 영역 — 로그인한 사용자만 */}
       {isLoggedIn && (
         <div ref={feedRef}>
+          <FeedHeader onLogoClick={scrollToIntro} />
           <FeedSection />
           <FeedFooter />
-          <FeedSidebar onLogoClick={scrollToIntro} visible={sidebarVisible} />
         </div>
       )}
 
