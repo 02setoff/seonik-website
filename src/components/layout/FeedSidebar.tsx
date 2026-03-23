@@ -24,16 +24,15 @@ export default function FeedSidebar({ onLogoClick }: Props) {
         className="hidden md:flex flex-col"
         style={{
           width: "220px",
-          flexShrink: 0,
-          alignSelf: "flex-start",
-          position: "sticky",
-          top: "24px",
+          position: "fixed",
+          right: "24px",
+          top: "50%",
+          transform: "translateY(-50%)",
           border: "1px solid var(--border)",
           borderRadius: "14px",
           backgroundColor: "var(--bg-card)",
           padding: "20px 12px",
-          marginTop: "24px",
-          marginRight: "24px",
+          zIndex: 50,
         }}
       >
         {/* 로고 */}

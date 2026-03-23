@@ -77,11 +77,9 @@ export default function Home() {
 
       {/* 피드 영역 — 로그인한 사용자만 */}
       {isLoggedIn && (
-        <div ref={feedRef} className="md:flex" style={{ minHeight: "100vh" }}>
-          <main style={{ flex: 1, minWidth: 0 }}>
-            <FeedSection />
-            <FeedFooter />
-          </main>
+        <div ref={feedRef}>
+          <FeedSection />
+          <FeedFooter />
           <FeedSidebar onLogoClick={scrollToIntro} />
         </div>
       )}
