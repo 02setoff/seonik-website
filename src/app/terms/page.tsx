@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Metadata } from "next";
+import PageShell from "@/components/layout/PageShell";
 
 export const metadata: Metadata = {
   title: "이용약관 | 선익 SEONIK",
@@ -29,19 +30,7 @@ export default function TermsPage() {
   const tableStyle: React.CSSProperties = { width: "100%", borderCollapse: "collapse", marginBottom: "16px", fontSize: "13px", fontFamily: "'Pretendard', sans-serif" };
 
   return (
-    <div style={{ maxWidth: "800px", margin: "0 auto", padding: "64px 40px 96px" }}>
-      {/* 헤더 */}
-      <div style={{ marginBottom: "48px" }}>
-        <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "var(--text-placeholder)", letterSpacing: "0.12em", marginBottom: "12px" }}>
-          TERMS OF SERVICE
-        </p>
-        <h1 style={{ fontSize: "28px", fontFamily: "'Pretendard', sans-serif", fontWeight: 800, color: "var(--text-primary)", marginBottom: "8px" }}>
-          이용약관
-        </h1>
-        <p style={{ fontSize: "13px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-placeholder)" }}>
-          시행일: {EFFECTIVE_DATE}
-        </p>
-      </div>
+    <PageShell code="TERMS OF SERVICE" title="이용약관" subtitle={`시행일: ${EFFECTIVE_DATE}`}>
 
       <div style={{ ...pStyle, marginBottom: "48px", padding: "20px 24px", backgroundColor: "var(--bg-subtle)", borderLeft: "3px solid var(--text-primary)" }}>
         선익(SEONIK, 이하 &ldquo;회사&rdquo;)가 제공하는 AI 기반 비즈니스 인텔리전스 브리핑 서비스(이하 &ldquo;서비스&rdquo;)를 이용함으로써 본 약관에 동의한 것으로 간주합니다. 본 약관을 주의 깊게 읽어 주시기 바랍니다.
@@ -294,22 +283,6 @@ export default function TermsPage() {
         </table>
       </div>
 
-      <div style={{ borderTop: "1px solid var(--border-light)", paddingTop: "32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
-        <p style={{ fontSize: "12px", color: "var(--text-placeholder)", fontFamily: "Inter, sans-serif" }}>
-          先益 — 앞서나가는 정보로 실행가들을 이롭게
-        </p>
-        <div style={{ display: "flex", gap: "16px" }}>
-          <Link href="/privacy" style={{ fontSize: "13px", color: "var(--text-muted)", fontFamily: "'Pretendard', sans-serif", textDecoration: "none" }}>
-            개인정보처리방침
-          </Link>
-          <Link href="/disclaimer" style={{ fontSize: "13px", color: "var(--text-muted)", fontFamily: "'Pretendard', sans-serif", textDecoration: "none" }}>
-            면책 조항
-          </Link>
-          <Link href="/" style={{ fontSize: "13px", color: "var(--text-muted)", fontFamily: "'Pretendard', sans-serif", textDecoration: "none" }}>
-            ← 홈으로
-          </Link>
-        </div>
-      </div>
-    </div>
+    </PageShell>
   );
 }

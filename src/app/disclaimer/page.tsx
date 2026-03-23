@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { Metadata } from "next";
+import PageShell from "@/components/layout/PageShell";
 
 export const metadata: Metadata = {
   title: "면책 조항 | 선익 SEONIK",
@@ -22,19 +22,7 @@ export default function DisclaimerPage() {
   const section: React.CSSProperties = { marginBottom: "48px" };
 
   return (
-    <div style={{ maxWidth: "800px", margin: "0 auto", padding: "64px 40px 96px" }}>
-      {/* 헤더 */}
-      <div style={{ marginBottom: "48px" }}>
-        <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "var(--text-placeholder)", letterSpacing: "0.12em", marginBottom: "12px" }}>
-          DISCLAIMER
-        </p>
-        <h1 style={{ fontSize: "28px", fontFamily: "'Pretendard', sans-serif", fontWeight: 800, color: "var(--text-primary)", marginBottom: "8px" }}>
-          면책 조항
-        </h1>
-        <p style={{ fontSize: "13px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-placeholder)" }}>
-          시행일: {EFFECTIVE_DATE}
-        </p>
-      </div>
+    <PageShell code="DISCLAIMER" title="면책 조항" subtitle={`시행일: ${EFFECTIVE_DATE}`}>
 
       {/* 핵심 경고 박스 */}
       <div style={{ ...pStyle, marginBottom: "48px", padding: "20px 24px", backgroundColor: "var(--bg-subtle)", borderLeft: "3px solid var(--text-primary)" }}>
@@ -161,22 +149,6 @@ export default function DisclaimerPage() {
         </div>
       </div>
 
-      <div style={{ borderTop: "1px solid var(--border-light)", paddingTop: "32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
-        <p style={{ fontSize: "12px", color: "var(--text-placeholder)", fontFamily: "Inter, sans-serif" }}>
-          先益 — 앞서나가는 정보로 실행가들을 이롭게
-        </p>
-        <div style={{ display: "flex", gap: "16px" }}>
-          <Link href="/terms" style={{ fontSize: "13px", color: "var(--text-muted)", fontFamily: "'Pretendard', sans-serif", textDecoration: "none" }}>
-            이용약관
-          </Link>
-          <Link href="/privacy" style={{ fontSize: "13px", color: "var(--text-muted)", fontFamily: "'Pretendard', sans-serif", textDecoration: "none" }}>
-            개인정보처리방침
-          </Link>
-          <Link href="/" style={{ fontSize: "13px", color: "var(--text-muted)", fontFamily: "'Pretendard', sans-serif", textDecoration: "none" }}>
-            ← 홈으로
-          </Link>
-        </div>
-      </div>
-    </div>
+    </PageShell>
   );
 }

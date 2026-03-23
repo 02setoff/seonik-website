@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Check } from "lucide-react";
 import PostModal, { PostItem } from "@/components/feed/PostModal";
+import PageShell from "@/components/layout/PageShell";
 
 interface LikedPost {
   post: { id: string; title: string; summary: string | null; content: string | null; category: string; createdAt: string; viewCount: number; _count: { likes: number }; };
@@ -70,11 +71,7 @@ export default function MyPage() {
 
   return (
     <>
-      <div style={{ maxWidth: "800px", margin: "0 auto", padding: "clamp(40px,8vw,64px) clamp(20px,5vw,40px)" }}>
-        <div style={{ marginBottom: "48px" }}>
-          <h1 style={{ fontSize: "28px", fontFamily: "'Pretendard', sans-serif", fontWeight: 700, color: "var(--text-primary)", marginBottom: "4px" }}>마이페이지</h1>
-          <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-placeholder)" }}>회원 정보 및 활동 내역</p>
-        </div>
+      <PageShell code="MYPAGE" title="마이페이지" subtitle="회원 정보 및 활동 내역" backLabel="피드로">
 
         {/* 프로필 카드 */}
         <div style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border)", padding: "32px", marginBottom: "32px" }}>
@@ -182,7 +179,7 @@ export default function MyPage() {
           <p style={{ fontSize: "13px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-placeholder)", marginBottom: "16px" }}>탈퇴 시 모든 데이터가 삭제되며 복구할 수 없습니다.</p>
           <button onClick={() => setDeleteConfirm(true)} style={{ padding: "8px 18px", backgroundColor: "var(--bg-card)", color: "#EF4444", border: "1px solid #FCA5A5", cursor: "pointer", fontSize: "13px", fontFamily: "'Pretendard', sans-serif" }}>회원 탈퇴</button>
         </div>
-      </div>
+      </PageShell>
       {/* 회원 탈퇴 확인 오버레이 */}
       {deleteConfirm && (
         <div

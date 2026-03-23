@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import PageShell from "@/components/layout/PageShell";
 
 export const metadata: Metadata = {
   title: "공지사항 | 선익 SEONIK",
@@ -28,20 +28,7 @@ export default async function NoticePage() {
   });
 
   return (
-    <div style={{ maxWidth: "800px", margin: "0 auto", padding: "clamp(40px,8vw,64px) clamp(20px,5vw,40px) 96px" }}>
-      {/* 헤더 */}
-      <div style={{ marginBottom: "48px" }}>
-        <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", color: "var(--text-placeholder)", letterSpacing: "0.15em", marginBottom: "12px" }}>
-          NOTICE
-        </p>
-        <h1 style={{ fontSize: "32px", fontFamily: "'Pretendard', sans-serif", fontWeight: 800, color: "var(--text-primary)", marginBottom: "8px" }}>
-          공지사항
-        </h1>
-        <p style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-muted)" }}>
-          서비스 업데이트, 약관 변경, 운영 안내를 확인하세요.
-        </p>
-      </div>
-
+    <PageShell code="NOTICE" title="공지사항" subtitle="서비스 업데이트, 약관 변경, 운영 안내를 확인하세요." backLabel="피드로">
       {/* 공지 목록 */}
       {notices.length === 0 ? (
         <div style={{ padding: "64px", textAlign: "center", border: "1px solid var(--border)" }}>
@@ -95,24 +82,6 @@ export default async function NoticePage() {
           <div style={{ borderTop: "1px solid var(--border)" }} />
         </div>
       )}
-
-      {/* 하단 */}
-      <div style={{ marginTop: "48px", borderTop: "1px solid var(--border-light)", paddingTop: "28px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
-        <p style={{ fontSize: "12px", color: "var(--text-placeholder)", fontFamily: "Inter, sans-serif" }}>
-          先益 — 앞서나가는 정보로 실행가들을 이롭게
-        </p>
-        <div style={{ display: "flex", gap: "16px" }}>
-          <Link href="/terms" style={{ fontSize: "13px", color: "var(--text-muted)", fontFamily: "'Pretendard', sans-serif", textDecoration: "none" }}>
-            이용약관
-          </Link>
-          <Link href="/privacy" style={{ fontSize: "13px", color: "var(--text-muted)", fontFamily: "'Pretendard', sans-serif", textDecoration: "none" }}>
-            개인정보처리방침
-          </Link>
-          <Link href="/disclaimer" style={{ fontSize: "13px", color: "var(--text-muted)", fontFamily: "'Pretendard', sans-serif", textDecoration: "none" }}>
-            면책 조항
-          </Link>
-        </div>
-      </div>
-    </div>
+    </PageShell>
   );
 }
