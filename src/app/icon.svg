@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Light blue/slate background square (offset bottom-left) -->
+  <rect x="0" y="22" width="74" height="74" fill="#DCE8F0"/>
+  <!-- Dark navy arrow: top horizontal bar -->
+  <rect x="22" y="0" width="78" height="16" fill="#0F172A"/>
+  <!-- Dark navy arrow: right vertical bar -->
+  <rect x="84" y="0" width="16" height="78" fill="#0F172A"/>
+  <!-- Dark navy arrow: diagonal line (rotated rect) -->
+  <rect x="-2" y="46" width="96" height="14" transform="rotate(-45 46 53)" fill="#0F172A"/>
+</svg>
