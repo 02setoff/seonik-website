@@ -93,7 +93,7 @@ function BriefingRow({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        padding: "10px 0",
+        padding: "0 0 10px",
         cursor: "pointer",
         opacity: visible ? 1 : 0,
         transform: visible ? "translateX(0)" : "translateX(10px)",
@@ -154,7 +154,7 @@ function ArchiveSection({ posts }: { posts: FeedPost[] }) {
     }}>
 
       {/* ── 1열: 연도 ── */}
-      <div>
+      <div style={{ display: "flex", flexDirection: "column" }}>
         {years.map(year => {
           const months = Object.keys(grouped[year]).map(Number).sort((a, b) => b - a);
           const active = selectedYear === year;
@@ -164,12 +164,13 @@ function ArchiveSection({ posts }: { posts: FeedPost[] }) {
               onClick={() => selectMonth(year, months[0])}
               style={{
                 display: "block", background: "none", border: "none",
-                cursor: "pointer", padding: "0 0 20px",
-                fontSize: "26px", fontFamily: "Inter, sans-serif",
+                cursor: "pointer",
+                padding: "0", margin: "0 0 16px",
+                fontSize: "20px", fontFamily: "Inter, sans-serif",
                 fontWeight: active ? 800 : 300,
                 color: active ? "var(--text-primary)" : "var(--text-disabled)",
-                letterSpacing: "-0.03em", lineHeight: 1.15,
-                transition: "color 0.2s",
+                letterSpacing: "-0.03em", lineHeight: "28px",
+                transition: "color 0.2s", textAlign: "left",
               }}
             >
               {year}
@@ -179,7 +180,7 @@ function ArchiveSection({ posts }: { posts: FeedPost[] }) {
       </div>
 
       {/* ── 2열: 월 (가운데 정렬) ── */}
-      <div style={{ paddingTop: "4px", display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
         {selectedYear && Object.keys(grouped[selectedYear])
           .map(Number).sort((a, b) => b - a)
           .map(month => {
@@ -190,13 +191,13 @@ function ArchiveSection({ posts }: { posts: FeedPost[] }) {
                 onClick={() => selectMonth(selectedYear, month)}
                 style={{
                   display: "block", background: "none", border: "none",
-                  cursor: "pointer", padding: "6px 0",
+                  cursor: "pointer",
+                  padding: "0", margin: "0 0 16px",
                   fontSize: "20px", fontFamily: "Inter, sans-serif",
                   fontWeight: isMonth ? 700 : 300,
                   color: isMonth ? "var(--text-primary)" : "var(--text-disabled)",
-                  letterSpacing: "-0.02em", lineHeight: 1.2,
-                  transition: "color 0.15s",
-                  textAlign: "center",
+                  letterSpacing: "-0.02em", lineHeight: "28px",
+                  transition: "color 0.15s", textAlign: "center",
                 }}
                 onMouseEnter={e => { if (!isMonth) (e.currentTarget as HTMLButtonElement).style.color = "var(--text-muted)"; }}
                 onMouseLeave={e => { if (!isMonth) (e.currentTarget as HTMLButtonElement).style.color = "var(--text-disabled)"; }}
@@ -209,7 +210,7 @@ function ArchiveSection({ posts }: { posts: FeedPost[] }) {
       </div>
 
       {/* ── 3열: 브리핑 목록 ── */}
-      <div style={{ paddingLeft: "0" }} key={animKey}>
+      <div key={animKey}>
         {currentPosts.length === 0 ? (
           <p style={{
             paddingTop: "40px",
