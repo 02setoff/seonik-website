@@ -64,7 +64,7 @@ export default function PageShell({ code, title, subtitle, backHref = "/", backL
           flexWrap: "wrap", gap: "12px",
         }}>
           <p style={{ fontSize: "11px", color: "var(--text-placeholder)", fontFamily: "Inter, sans-serif" }}>
-            先益 — SEONIK Intelligence
+            先益 — SEONIK
           </p>
           <div style={{ display: "flex", gap: "16px" }}>
             {[{ href: "/terms", label: "이용약관" }, { href: "/privacy", label: "개인정보처리방침" }, { href: "/disclaimer", label: "면책 조항" }].map(item => (

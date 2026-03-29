@@ -208,7 +208,7 @@ function SloganContent() {
 function HistoryContent() {
   const milestones = [
     { date: "2026.03", title: "선익 창업", desc: "정보 비대칭 해소를 목표로 선익(SEONIK) 창업. AI 네이티브 비즈니스 인텔리전스 브리핑 서비스 개발 시작.", tag: "FOUNDED" },
-    { date: "2026.03", title: "선익 웹사이트 런칭", desc: "선익 인텔리전스 브리핑 플랫폼 정식 오픈. 이메일 인증 기반 회원 서비스 시작.", tag: "LAUNCH" },
+    { date: "2026.03", title: "선익 웹사이트 런칭", desc: "선익 브리핑 플랫폼 정식 오픈. 이메일 인증 기반 회원 서비스 시작.", tag: "LAUNCH" },
   ];
   return (
     <div>

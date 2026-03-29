@@ -138,7 +138,7 @@ export default function ServicesPage() {
             서비스 출시 소식을 가장 먼저 받아보세요.
           </h2>
           <p className="text-sm text-slate-400 mb-8">
-            선익 인텔리전스에서 최신 브리핑을 만나보세요.
+            선익에서 최신 브리핑을 만나보세요.
           </p>
         </div>
       </section>

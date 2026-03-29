@@ -21,13 +21,13 @@ export default function FeedFooter() {
               className="font-bold text-white leading-none"
               style={{ fontSize: "18px", fontFamily: "'Pretendard', sans-serif" }}
             >
-              선익 인텔리전스
+              선익
             </p>
             <p
               className="font-semibold text-[#475569] leading-none"
               style={{ fontSize: "10px", marginTop: "4px", fontFamily: "Inter, sans-serif", letterSpacing: "0.15em" }}
             >
-              SEONIK Intelligence
+              SEONIK
             </p>
           </div>
 
