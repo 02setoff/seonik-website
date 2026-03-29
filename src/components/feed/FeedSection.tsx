@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Eye, Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface FeedPost {
@@ -21,48 +20,116 @@ function formatDate(iso: string) {
 
 function estimateReadTime(text: string | null) {
   if (!text) return 1;
-  const plain = text.replace(/<[^>]*>/g, "");
-  return Math.max(1, Math.ceil(plain.length / 400));
+  return Math.max(1, Math.ceil(text.replace(/<[^>]*>/g, "").length / 400));
 }
 
-// ── 타입 배지 ──────────────────────────────────────────────────────
-function TypeBadge({ type }: { type: string }) {
-  if (type === "BRIEFING") {
-    return (
-      <span style={{
-        fontSize: "11px", fontFamily: "Inter, monospace", fontWeight: 700,
-        letterSpacing: "0.18em", color: "var(--text-primary)",
-        border: "1px solid var(--text-primary)",
-        padding: "3px 10px", whiteSpace: "nowrap", flexShrink: 0,
-      }}>BRIEFING</span>
-    );
-  }
-  if (type === "NOTICE") {
-    return (
-      <span style={{
-        fontSize: "11px", fontFamily: "Inter, monospace", fontWeight: 700,
-        letterSpacing: "0.15em", color: "#64748B",
-        border: "1px solid #CBD5E1",
-        padding: "3px 10px", whiteSpace: "nowrap", flexShrink: 0,
-      }}>NOTICE</span>
-    );
-  }
-  return null;
+function stripHtml(text: string | null) {
+  if (!text) return null;
+  return text.replace(/<[^>]*>/g, "");
 }
 
-// ── 피드 아이템 ───────────────────────────────────────────────────
-function FeedItem({ post, index }: { post: FeedPost; index: number }) {
+// ── 커버스토리 (첫 번째 브리핑) ───────────────────────────────────
+function CoverStory({ post, index }: { post: FeedPost; index: number }) {
   const router = useRouter();
   const [hovered, setHovered] = useState(false);
-  const isBriefing = post.postType === "BRIEFING";
+  const summary = stripHtml(post.summary);
+  const lead = summary ? summary.slice(0, 200) + (summary.length > 200 ? "…" : "") : null;
 
-  const summaryText = post.summary
-    ? post.summary.replace(/<[^>]*>/g, "")
-    : null;
-  const summary = summaryText
-    ? summaryText.slice(0, 140) + (summaryText.length > 140 ? "…" : "")
-    : null;
+  return (
+    <article
+      onClick={() => router.push(`/post/${post.id}`)}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{ cursor: "pointer", padding: "48px 0 52px" }}
+    >
+      {/* 에디션 메타 */}
+      <div style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        marginBottom: "32px",
+      }}>
+        <span style={{
+          fontSize: "10px", fontFamily: "Inter, monospace", fontWeight: 700,
+          letterSpacing: "0.25em", color: "var(--text-placeholder)",
+          textTransform: "uppercase",
+        }}>
+          {post.postType === "NOTICE" ? "Notice" : "Cover Story"}
+        </span>
+        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          <span style={{
+            fontSize: "10px", fontFamily: "Inter, monospace",
+            color: "var(--text-disabled)", letterSpacing: "0.12em",
+          }}>
+            {formatDate(post.createdAt)}
+          </span>
+          <span style={{
+            fontSize: "10px", fontFamily: "Inter, monospace",
+            color: "var(--text-disabled)", letterSpacing: "0.15em",
+          }}>
+            #{String(index + 1).padStart(3, "0")}
+          </span>
+        </div>
+      </div>
 
+      {/* 큰 제목 */}
+      <h1 style={{
+        fontSize: "clamp(32px, 5vw, 52px)",
+        fontFamily: "'Pretendard', sans-serif",
+        fontWeight: 900,
+        color: "var(--text-primary)",
+        letterSpacing: "-0.035em",
+        lineHeight: 1.1,
+        margin: 0,
+        transition: "opacity 0.2s",
+        opacity: hovered ? 0.75 : 1,
+        wordBreak: "keep-all",
+      }}>
+        {post.title}
+      </h1>
+
+      {/* 리드 문장 */}
+      {lead && (
+        <p style={{
+          fontSize: "17px",
+          fontFamily: "'Pretendard', sans-serif",
+          color: "var(--text-muted)",
+          lineHeight: 1.85,
+          margin: "24px 0 0",
+          maxWidth: "560px",
+          wordBreak: "keep-all",
+        }}>
+          {lead}
+        </p>
+      )}
+
+      {/* 읽기 링크 */}
+      <div style={{ marginTop: "28px", display: "flex", alignItems: "center", gap: "6px" }}>
+        <span style={{
+          fontSize: "12px", fontFamily: "Inter, sans-serif", fontWeight: 700,
+          color: "var(--text-primary)", letterSpacing: "0.12em",
+          textTransform: "uppercase",
+          borderBottom: `1px solid ${hovered ? "var(--text-primary)" : "transparent"}`,
+          transition: "border-color 0.2s",
+          paddingBottom: "1px",
+        }}>
+          Read
+        </span>
+        <span style={{
+          fontSize: "12px", color: "var(--text-primary)",
+          transform: hovered ? "translateX(4px)" : "translateX(0)",
+          transition: "transform 0.2s",
+          display: "inline-block",
+        }}>→</span>
+      </div>
+    </article>
+  );
+}
+
+// ── 일반 브리핑 아이템 ─────────────────────────────────────────────
+function BriefingItem({ post, index }: { post: FeedPost; index: number }) {
+  const router = useRouter();
+  const [hovered, setHovered] = useState(false);
+  const summary = stripHtml(post.summary);
+  const lead = summary ? summary.slice(0, 110) + (summary.length > 110 ? "…" : "") : null;
   const readTime = estimateReadTime(post.summary);
 
   return (
@@ -71,107 +138,74 @@ function FeedItem({ post, index }: { post: FeedPost; index: number }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        padding: "28px 0 24px",
-        borderBottom: "1px solid var(--border)",
+        padding: "32px 0",
+        borderTop: "1px solid var(--border)",
         cursor: "pointer",
-        position: "relative",
-        transition: "background-color 0.15s",
+        display: "grid",
+        gridTemplateColumns: "40px 1fr",
+        gap: "0 24px",
+        alignItems: "start",
       }}
     >
-      {/* 호버 시 왼쪽 액센트 바 */}
-      <div style={{
-        position: "absolute", left: "-24px", top: 0, bottom: 0,
-        width: "2px",
-        backgroundColor: hovered ? "var(--text-primary)" : "transparent",
-        transition: "background-color 0.2s ease",
-      }} />
-
-      {/* 상단: 배지 + 날짜 + 인덱스 */}
-      <div style={{
-        display: "flex", alignItems: "center",
-        justifyContent: "space-between",
-        marginBottom: "12px",
+      {/* 인덱스 번호 */}
+      <span style={{
+        fontSize: "11px", fontFamily: "Inter, monospace",
+        color: "var(--text-disabled)", letterSpacing: "0.1em",
+        paddingTop: "4px",
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <TypeBadge type={post.postType ?? "BRIEFING"} />
+        {String(index + 1).padStart(3, "0")}
+      </span>
+
+      <div>
+        {/* 메타 */}
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
+          {post.postType === "NOTICE" && (
+            <span style={{
+              fontSize: "9px", fontFamily: "Inter, monospace", fontWeight: 700,
+              letterSpacing: "0.18em", color: "#64748B",
+              border: "1px solid #CBD5E1", padding: "2px 8px",
+            }}>NOTICE</span>
+          )}
           <span style={{
-            fontSize: "13px", fontFamily: "Inter, monospace",
+            fontSize: "11px", fontFamily: "Inter, monospace",
             color: "var(--text-placeholder)", letterSpacing: "0.08em",
           }}>
             {formatDate(post.createdAt)}
           </span>
-        </div>
-        {isBriefing && (
-          <span style={{
-            fontSize: "12px", fontFamily: "Inter, monospace",
-            color: "var(--text-disabled)", letterSpacing: "0.15em",
-          }}>
-            #{String(index + 1).padStart(3, "0")}
+          <span style={{ fontSize: "10px", color: "var(--text-disabled)", fontFamily: "Inter" }}>·</span>
+          <span style={{ fontSize: "11px", fontFamily: "Inter", color: "var(--text-disabled)" }}>
+            {readTime}min read
           </span>
-        )}
-      </div>
+        </div>
 
-      {/* 제목 */}
-      <h2 style={{
-        fontSize: "clamp(20px, 2.8vw, 26px)",
-        fontFamily: "'Pretendard', sans-serif",
-        fontWeight: 800,
-        color: "var(--text-primary)",
-        letterSpacing: "-0.025em",
-        lineHeight: 1.35,
-        margin: "0 0 10px",
-        wordBreak: "break-word",
-        transition: "opacity 0.15s",
-        opacity: hovered ? 0.85 : 1,
-      }}>
-        {post.title}
-      </h2>
-
-      {/* 요약 */}
-      {summary && (
-        <p style={{
-          fontSize: "15.5px",
+        {/* 제목 */}
+        <h2 style={{
+          fontSize: "clamp(17px, 2.2vw, 22px)",
           fontFamily: "'Pretendard', sans-serif",
-          color: "var(--text-muted)",
-          lineHeight: 1.8,
-          margin: "0 0 16px",
-          wordBreak: "break-word",
+          fontWeight: 800,
+          color: "var(--text-primary)",
+          letterSpacing: "-0.025em",
+          lineHeight: 1.25,
+          margin: "0 0 10px",
+          wordBreak: "keep-all",
+          opacity: hovered ? 0.75 : 1,
+          transition: "opacity 0.15s",
         }}>
-          {summary}
-        </p>
-      )}
+          {post.title}
+        </h2>
 
-      {/* 메타 정보 */}
-      <div style={{
-        display: "flex", alignItems: "center", gap: "14px",
-        marginTop: summary ? "0" : "12px",
-      }}>
-        <span style={{
-          fontSize: "11px", fontFamily: "Inter, monospace",
-          color: "var(--text-disabled)", letterSpacing: "0.04em",
-          display: "flex", alignItems: "center", gap: "4px",
-        }}>
-          <Eye size={10} strokeWidth={1.5} />
-          {post.viewCount}
-        </span>
-        <span style={{
-          fontSize: "11px", fontFamily: "Inter, monospace",
-          color: "var(--text-disabled)", letterSpacing: "0.04em",
-          display: "flex", alignItems: "center", gap: "4px",
-        }}>
-          <Check size={10} strokeWidth={2} />
-          {post.likeCount}
-        </span>
-        {isBriefing && (
-          <>
-            <span style={{ fontSize: "10px", color: "var(--text-disabled)", fontFamily: "Inter" }}>·</span>
-            <span style={{
-              fontSize: "11px", fontFamily: "Inter, monospace",
-              color: "var(--text-disabled)", letterSpacing: "0.04em",
-            }}>
-              {readTime}min read
-            </span>
-          </>
+        {/* 요약 */}
+        {lead && (
+          <p style={{
+            fontSize: "14px",
+            fontFamily: "'Pretendard', sans-serif",
+            color: "var(--text-muted)",
+            lineHeight: 1.75,
+            margin: 0,
+            wordBreak: "keep-all",
+          }}>
+            {lead}
+          </p>
         )}
       </div>
     </article>
@@ -179,35 +213,37 @@ function FeedItem({ post, index }: { post: FeedPost; index: number }) {
 }
 
 // ── 섹션 헤더 ─────────────────────────────────────────────────────
-function SectionHeader() {
+function MagazineHeader({ edition }: { edition: number }) {
+  const now = new Date();
+  const dateStr = `${now.getFullYear()} · ${now.toLocaleString("en-US", { month: "long" })}`;
+
   return (
-    <div style={{ paddingBottom: "20px", marginBottom: "0" }}>
+    <div style={{ paddingTop: "40px", marginBottom: "0" }}>
       <div style={{
-        display: "flex", alignItems: "center",
+        display: "flex", alignItems: "baseline",
         justifyContent: "space-between",
-        paddingBottom: "12px",
-        borderBottom: "2px solid var(--text-primary)",
+        paddingBottom: "14px",
+        borderBottom: "2.5px solid var(--text-primary)",
       }}>
         <span style={{
-          fontSize: "12px", fontFamily: "Inter, sans-serif",
-          fontWeight: 700, letterSpacing: "0.2em",
-          color: "var(--text-primary)",
-          textTransform: "uppercase",
+          fontSize: "11px", fontFamily: "Inter, sans-serif",
+          fontWeight: 700, letterSpacing: "0.28em",
+          color: "var(--text-primary)", textTransform: "uppercase",
         }}>
           Intelligence Briefing
         </span>
         <span style={{
-          fontSize: "12px", fontFamily: "Inter, monospace",
+          fontSize: "11px", fontFamily: "Inter, monospace",
           color: "var(--text-placeholder)", letterSpacing: "0.1em",
         }}>
-          SEONIK
+          {dateStr} · No.{String(edition).padStart(3, "0")}
         </span>
       </div>
     </div>
   );
 }
 
-// ── 메인 피드 섹션 ────────────────────────────────────────────────
+// ── 메인 피드 ─────────────────────────────────────────────────────
 export default function FeedSection() {
   const [posts, setPosts] = useState<FeedPost[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
@@ -216,7 +252,7 @@ export default function FeedSection() {
 
   useEffect(() => {
     fetch("/api/posts?take=20")
-      .then((r) => r.json())
+      .then(r => r.json())
       .then((data: { posts: FeedPost[]; nextCursor: string | null }) => {
         setPosts(data.posts ?? []);
         setCursor(data.nextCursor ?? null);
@@ -231,67 +267,83 @@ export default function FeedSection() {
     try {
       const res = await fetch(`/api/posts?take=20&cursor=${cursor}`);
       const data: { posts: FeedPost[]; nextCursor: string | null } = await res.json();
-      setPosts((prev) => [...prev, ...(data.posts ?? [])]);
+      setPosts(prev => [...prev, ...(data.posts ?? [])]);
       setCursor(data.nextCursor ?? null);
     } catch {}
     finally { setLoadingMore(false); }
   };
 
+  const coverPost = posts[0] ?? null;
+  const restPosts = posts.slice(1);
+  const edition = posts.length;
+
   return (
     <div style={{ backgroundColor: "var(--bg-primary)" }}>
       <div style={{
-        maxWidth: "680px", margin: "0 auto",
-        padding: "48px clamp(24px, 5vw, 40px) 80px",
+        maxWidth: "720px", margin: "0 auto",
+        padding: "0 clamp(24px, 5vw, 48px) 120px",
       }}>
 
         {/* 로딩 */}
         {loading && (
-          <div style={{ paddingTop: "100px", textAlign: "center" }}>
+          <div style={{ paddingTop: "120px", textAlign: "center" }}>
             <p style={{
               fontFamily: "Inter, monospace", fontSize: "10px",
-              letterSpacing: "0.25em", color: "var(--text-placeholder)",
-            }}>LOADING...</p>
+              letterSpacing: "0.3em", color: "var(--text-placeholder)",
+            }}>LOADING</p>
           </div>
         )}
 
         {/* 빈 상태 */}
         {!loading && posts.length === 0 && (
-          <div style={{ paddingTop: "100px", textAlign: "center" }}>
+          <div style={{ paddingTop: "120px", textAlign: "center" }}>
             <p style={{
               fontFamily: "Inter, monospace", fontSize: "10px",
-              letterSpacing: "0.2em", color: "var(--text-disabled)",
+              letterSpacing: "0.25em", color: "var(--text-disabled)",
             }}>NO BRIEFINGS YET</p>
           </div>
         )}
 
-        {/* 피드 목록 */}
+        {/* 매거진 레이아웃 */}
         {!loading && posts.length > 0 && (
           <>
-            <SectionHeader />
-            <div style={{ paddingLeft: "24px" }}>
-              {posts.map((post, i) => (
-                <FeedItem key={post.id} post={post} index={i} />
-              ))}
-            </div>
+            <MagazineHeader edition={edition} />
 
+            {/* 커버스토리 */}
+            <CoverStory post={coverPost!} index={0} />
+
+            {/* 구분선 */}
+            <div style={{
+              height: "2px",
+              background: "linear-gradient(90deg, var(--text-primary) 0%, transparent 100%)",
+              marginBottom: "0",
+            }} />
+
+            {/* 나머지 브리핑 */}
+            {restPosts.map((post, i) => (
+              <BriefingItem key={post.id} post={post} index={i + 1} />
+            ))}
+
+            {/* 더 보기 */}
             {cursor && (
-              <div style={{ textAlign: "center", paddingTop: "40px" }}>
+              <div style={{ borderTop: "1px solid var(--border)", paddingTop: "40px", textAlign: "center" }}>
                 <button
                   onClick={loadMore}
                   disabled={loadingMore}
                   style={{
                     fontFamily: "Inter, monospace", fontSize: "10px",
-                    fontWeight: 700, letterSpacing: "0.2em",
+                    fontWeight: 700, letterSpacing: "0.25em",
                     color: "var(--text-muted)", background: "none",
                     border: "1px solid var(--border)",
                     cursor: loadingMore ? "not-allowed" : "pointer",
                     opacity: loadingMore ? 0.5 : 1,
-                    padding: "11px 40px", transition: "all 0.15s",
+                    padding: "12px 48px", transition: "all 0.15s",
+                    textTransform: "uppercase",
                   }}
-                  onMouseEnter={e => { if (!loadingMore) { (e.currentTarget).style.borderColor = "var(--text-primary)"; (e.currentTarget).style.color = "var(--text-primary)"; } }}
+                  onMouseEnter={e => { if (!loadingMore) { (e.currentTarget).style.borderColor = "var(--text-primary)"; (e.currentTarget).style.color = "var(--text-primary)"; }}}
                   onMouseLeave={e => { (e.currentTarget).style.borderColor = "var(--border)"; (e.currentTarget).style.color = "var(--text-muted)"; }}
                 >
-                  {loadingMore ? "LOADING..." : "MORE"}
+                  {loadingMore ? "Loading..." : "More"}
                 </button>
               </div>
             )}

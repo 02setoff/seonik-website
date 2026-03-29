@@ -6,6 +6,7 @@ import IntroAnimation from "@/components/intro/IntroAnimation";
 import FeedHeader from "@/components/layout/Header";
 import FeedSection from "@/components/feed/FeedSection";
 import FeedFooter from "@/components/layout/Footer";
+import BottomSearchBar from "@/components/layout/BottomSearchBar";
 import AuthModal from "@/components/auth/AuthModal";
 
 export default function Home() {
@@ -63,6 +64,7 @@ export default function Home() {
           <FeedHeader />
           <FeedSection />
           <FeedFooter />
+          <BottomSearchBar />
         </>
       ) : (
         /* 비로그인 → 인트로 */
