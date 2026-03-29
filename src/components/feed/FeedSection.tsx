@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 interface FeedPost {
@@ -13,280 +14,337 @@ interface FeedPost {
   likeCount: number;
 }
 
-function formatDate(iso: string) {
-  const d = new Date(iso);
-  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
+const MONTHS_KR = ["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
+
+function groupByYearMonth(posts: FeedPost[]) {
+  const grouped: Record<number, Record<number, FeedPost[]>> = {};
+  for (const post of posts) {
+    const d = new Date(post.createdAt);
+    const y = d.getFullYear();
+    const m = d.getMonth() + 1;
+    if (!grouped[y]) grouped[y] = {};
+    if (!grouped[y][m]) grouped[y][m] = [];
+    grouped[y][m].push(post);
+  }
+  return grouped;
 }
 
-function estimateReadTime(text: string | null) {
-  if (!text) return 1;
-  return Math.max(1, Math.ceil(text.replace(/<[^>]*>/g, "").length / 400));
-}
-
-function stripHtml(text: string | null) {
-  if (!text) return null;
-  return text.replace(/<[^>]*>/g, "");
-}
-
-// ── 커버스토리 (첫 번째 브리핑) ───────────────────────────────────
-function CoverStory({ post, index }: { post: FeedPost; index: number }) {
-  const router = useRouter();
-  const [hovered, setHovered] = useState(false);
-  const summary = stripHtml(post.summary);
-  const lead = summary ? summary.slice(0, 200) + (summary.length > 200 ? "…" : "") : null;
-
+// ── 웰컴 섹션 ─────────────────────────────────────────────────────
+function WelcomeSection({ name, memberCount }: { name: string; memberCount: number | null }) {
   return (
-    <article
-      onClick={() => router.push(`/post/${post.id}`)}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{ cursor: "pointer", padding: "48px 0 52px" }}
-    >
-      {/* 에디션 메타 */}
-      <div style={{
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        marginBottom: "32px",
-      }}>
-        <span style={{
-          fontSize: "10px", fontFamily: "Inter, monospace", fontWeight: 700,
-          letterSpacing: "0.25em", color: "var(--text-placeholder)",
-          textTransform: "uppercase",
-        }}>
-          {post.postType === "NOTICE" ? "Notice" : "Cover Story"}
-        </span>
-        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          <span style={{
-            fontSize: "10px", fontFamily: "Inter, monospace",
-            color: "var(--text-disabled)", letterSpacing: "0.12em",
-          }}>
-            {formatDate(post.createdAt)}
-          </span>
-          <span style={{
-            fontSize: "10px", fontFamily: "Inter, monospace",
-            color: "var(--text-disabled)", letterSpacing: "0.15em",
-          }}>
-            #{String(index + 1).padStart(3, "0")}
-          </span>
-        </div>
-      </div>
-
-      {/* 큰 제목 */}
+    <div style={{ padding: "80px 0 64px" }}>
       <h1 style={{
-        fontSize: "clamp(32px, 5vw, 52px)",
+        fontSize: "clamp(26px, 3.5vw, 42px)",
         fontFamily: "'Pretendard', sans-serif",
         fontWeight: 900,
         color: "var(--text-primary)",
         letterSpacing: "-0.035em",
-        lineHeight: 1.1,
+        lineHeight: 1.25,
         margin: 0,
-        transition: "opacity 0.2s",
-        opacity: hovered ? 0.75 : 1,
         wordBreak: "keep-all",
       }}>
-        {post.title}
+        실행가 {name}의<br />
+        성장을 항상 응원합니다.
       </h1>
 
-      {/* 리드 문장 */}
-      {lead && (
+      {memberCount !== null && (
         <p style={{
-          fontSize: "17px",
+          marginTop: "24px",
+          fontSize: "15px",
           fontFamily: "'Pretendard', sans-serif",
-          color: "var(--text-muted)",
-          lineHeight: 1.85,
-          margin: "24px 0 0",
-          maxWidth: "560px",
-          wordBreak: "keep-all",
+          color: "var(--text-placeholder)",
+          lineHeight: 1.7,
         }}>
-          {lead}
+          선익은 실행가{" "}
+          <span style={{ color: "var(--text-primary)", fontWeight: 700 }}>
+            {memberCount.toLocaleString()}
+          </span>
+          명과 함께 나아가겠습니다.
         </p>
       )}
-
-      {/* 읽기 링크 */}
-      <div style={{ marginTop: "28px", display: "flex", alignItems: "center", gap: "6px" }}>
-        <span style={{
-          fontSize: "12px", fontFamily: "Inter, sans-serif", fontWeight: 700,
-          color: "var(--text-primary)", letterSpacing: "0.12em",
-          textTransform: "uppercase",
-          borderBottom: `1px solid ${hovered ? "var(--text-primary)" : "transparent"}`,
-          transition: "border-color 0.2s",
-          paddingBottom: "1px",
-        }}>
-          Read
-        </span>
-        <span style={{
-          fontSize: "12px", color: "var(--text-primary)",
-          transform: hovered ? "translateX(4px)" : "translateX(0)",
-          transition: "transform 0.2s",
-          display: "inline-block",
-        }}>→</span>
-      </div>
-    </article>
+    </div>
   );
 }
 
-// ── 일반 브리핑 아이템 ─────────────────────────────────────────────
-function BriefingItem({ post, index }: { post: FeedPost; index: number }) {
-  const router = useRouter();
+// ── 브리핑 행 ─────────────────────────────────────────────────────
+function BriefingRow({
+  post, index, animDelay, onClick,
+}: {
+  post: FeedPost; index: number; animDelay: number; onClick: () => void;
+}) {
   const [hovered, setHovered] = useState(false);
-  const summary = stripHtml(post.summary);
-  const lead = summary ? summary.slice(0, 110) + (summary.length > 110 ? "…" : "") : null;
-  const readTime = estimateReadTime(post.summary);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), animDelay);
+    return () => clearTimeout(t);
+  }, [animDelay]);
+
+  const d = new Date(post.createdAt);
+  const dateStr = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
 
   return (
-    <article
-      onClick={() => router.push(`/post/${post.id}`)}
+    <div
+      onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        padding: "32px 0",
-        borderTop: "1px solid var(--border)",
+        padding: "22px 0",
+        borderBottom: "1px solid var(--border)",
         cursor: "pointer",
-        display: "grid",
-        gridTemplateColumns: "40px 1fr",
-        gap: "0 24px",
-        alignItems: "start",
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateX(0)" : "translateX(12px)",
+        transition: `opacity 0.35s ease, transform 0.35s ease`,
+        display: "flex",
+        alignItems: "flex-start",
+        gap: "20px",
       }}
     >
-      {/* 인덱스 번호 */}
+      {/* 번호 */}
       <span style={{
         fontSize: "11px", fontFamily: "Inter, monospace",
         color: "var(--text-disabled)", letterSpacing: "0.1em",
-        paddingTop: "4px",
+        paddingTop: "3px", flexShrink: 0, minWidth: "22px",
       }}>
-        {String(index + 1).padStart(3, "0")}
+        {String(index + 1).padStart(2, "0")}
       </span>
 
-      <div>
-        {/* 메타 */}
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
-          {post.postType === "NOTICE" && (
-            <span style={{
-              fontSize: "9px", fontFamily: "Inter, monospace", fontWeight: 700,
-              letterSpacing: "0.18em", color: "#64748B",
-              border: "1px solid #CBD5E1", padding: "2px 8px",
-            }}>NOTICE</span>
-          )}
-          <span style={{
-            fontSize: "11px", fontFamily: "Inter, monospace",
-            color: "var(--text-placeholder)", letterSpacing: "0.08em",
-          }}>
-            {formatDate(post.createdAt)}
-          </span>
-          <span style={{ fontSize: "10px", color: "var(--text-disabled)", fontFamily: "Inter" }}>·</span>
-          <span style={{ fontSize: "11px", fontFamily: "Inter", color: "var(--text-disabled)" }}>
-            {readTime}min read
-          </span>
-        </div>
-
-        {/* 제목 */}
-        <h2 style={{
-          fontSize: "clamp(17px, 2.2vw, 22px)",
+      {/* 제목 + 날짜 */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <h3 style={{
+          fontSize: "clamp(15px, 1.8vw, 19px)",
           fontFamily: "'Pretendard', sans-serif",
-          fontWeight: 800,
+          fontWeight: 700,
           color: "var(--text-primary)",
-          letterSpacing: "-0.025em",
-          lineHeight: 1.25,
-          margin: "0 0 10px",
-          wordBreak: "keep-all",
-          opacity: hovered ? 0.75 : 1,
+          letterSpacing: "-0.02em",
+          lineHeight: 1.35,
+          margin: 0,
+          opacity: hovered ? 0.65 : 1,
           transition: "opacity 0.15s",
+          wordBreak: "keep-all",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
         }}>
           {post.title}
-        </h2>
-
-        {/* 요약 */}
-        {lead && (
-          <p style={{
-            fontSize: "14px",
-            fontFamily: "'Pretendard', sans-serif",
-            color: "var(--text-muted)",
-            lineHeight: 1.75,
-            margin: 0,
-            wordBreak: "keep-all",
-          }}>
-            {lead}
-          </p>
-        )}
+        </h3>
+        <p style={{
+          fontSize: "11px", fontFamily: "Inter, monospace",
+          color: "var(--text-disabled)", marginTop: "5px",
+          letterSpacing: "0.06em",
+        }}>
+          {dateStr}
+        </p>
       </div>
-    </article>
+
+      {/* 화살표 */}
+      <span style={{
+        fontSize: "14px", color: "var(--text-muted)",
+        paddingTop: "2px", flexShrink: 0,
+        opacity: hovered ? 1 : 0,
+        transform: hovered ? "translateX(0)" : "translateX(-6px)",
+        transition: "opacity 0.15s, transform 0.15s",
+      }}>
+        →
+      </span>
+    </div>
   );
 }
 
-// ── 섹션 헤더 ─────────────────────────────────────────────────────
-function MagazineHeader({ edition }: { edition: number }) {
-  const now = new Date();
-  const dateStr = `${now.getFullYear()} · ${now.toLocaleString("en-US", { month: "long" })}`;
+// ── 아카이브 섹션 ─────────────────────────────────────────────────
+function ArchiveSection({ posts }: { posts: FeedPost[] }) {
+  const router = useRouter();
+  const grouped = groupByYearMonth(posts);
+  const years = Object.keys(grouped).map(Number).sort((a, b) => b - a);
+
+  const defaultYear = years[0] ?? null;
+  const defaultMonth = defaultYear
+    ? Math.max(...Object.keys(grouped[defaultYear]).map(Number))
+    : null;
+
+  const [selectedYear, setSelectedYear] = useState<number | null>(defaultYear);
+  const [selectedMonth, setSelectedMonth] = useState<number | null>(defaultMonth);
+  const [animKey, setAnimKey] = useState(0);
+
+  const selectMonth = useCallback((y: number, m: number) => {
+    setSelectedYear(y);
+    setSelectedMonth(m);
+    setAnimKey(k => k + 1);
+  }, []);
+
+  const currentPosts =
+    selectedYear && selectedMonth
+      ? (grouped[selectedYear]?.[selectedMonth] ?? [])
+      : [];
 
   return (
-    <div style={{ paddingTop: "40px", marginBottom: "0" }}>
-      <div style={{
-        display: "flex", alignItems: "baseline",
-        justifyContent: "space-between",
-        paddingBottom: "14px",
-        borderBottom: "2.5px solid var(--text-primary)",
-      }}>
-        <span style={{
-          fontSize: "11px", fontFamily: "Inter, sans-serif",
-          fontWeight: 700, letterSpacing: "0.28em",
-          color: "var(--text-primary)", textTransform: "uppercase",
-        }}>
-          Intelligence Briefing
-        </span>
-        <span style={{
-          fontSize: "11px", fontFamily: "Inter, monospace",
-          color: "var(--text-placeholder)", letterSpacing: "0.1em",
-        }}>
-          {dateStr} · No.{String(edition).padStart(3, "0")}
-        </span>
+    <div style={{
+      display: "grid",
+      gridTemplateColumns: "140px 1fr",
+      borderTop: "2px solid var(--text-primary)",
+      paddingTop: "48px",
+      paddingBottom: "120px",
+      minHeight: "360px",
+      gap: "0 0",
+    }}>
+
+      {/* ── 왼쪽: 연도·월 네비 ── */}
+      <div style={{ paddingRight: "32px", borderRight: "1px solid var(--border)" }}>
+        {years.map(year => {
+          const months = Object.keys(grouped[year]).map(Number).sort((a, b) => b - a);
+          const active = selectedYear === year;
+
+          return (
+            <div key={year} style={{ marginBottom: "28px" }}>
+              <button
+                onClick={() => selectMonth(year, months[0])}
+                style={{
+                  display: "block", width: "100%", textAlign: "left",
+                  background: "none", border: "none", cursor: "pointer",
+                  padding: "2px 0",
+                  fontSize: "26px", fontFamily: "Inter, sans-serif",
+                  fontWeight: active ? 800 : 300,
+                  color: active ? "var(--text-primary)" : "var(--text-disabled)",
+                  letterSpacing: "-0.03em", lineHeight: 1.15,
+                  transition: "color 0.2s, font-weight 0.15s",
+                }}
+              >
+                {year}
+              </button>
+
+              {active && (
+                <div style={{ marginTop: "10px", paddingLeft: "2px" }}>
+                  {months.map(month => {
+                    const isMonth = selectedMonth === month;
+                    return (
+                      <button
+                        key={month}
+                        onClick={() => selectMonth(year, month)}
+                        style={{
+                          display: "flex", alignItems: "center", gap: "8px",
+                          width: "100%", textAlign: "left",
+                          background: "none", border: "none", cursor: "pointer",
+                          padding: "7px 0",
+                          fontSize: "13px", fontFamily: "'Pretendard', sans-serif",
+                          fontWeight: isMonth ? 700 : 400,
+                          color: isMonth ? "var(--text-primary)" : "var(--text-muted)",
+                          transition: "color 0.15s",
+                        }}
+                        onMouseEnter={e => { if (!isMonth) (e.currentTarget as HTMLButtonElement).style.color = "var(--text-primary)"; }}
+                        onMouseLeave={e => { if (!isMonth) (e.currentTarget as HTMLButtonElement).style.color = "var(--text-muted)"; }}
+                      >
+                        <span style={{
+                          width: "5px", height: "5px", borderRadius: "50%", flexShrink: 0,
+                          backgroundColor: isMonth ? "var(--text-primary)" : "transparent",
+                          border: `1.5px solid ${isMonth ? "var(--text-primary)" : "var(--border)"}`,
+                          transition: "background-color 0.15s, border-color 0.15s",
+                        }} />
+                        {MONTHS_KR[month - 1]}
+                        <span style={{
+                          marginLeft: "auto",
+                          fontSize: "10px", fontFamily: "Inter, monospace",
+                          color: "var(--text-disabled)",
+                        }}>
+                          {grouped[year][month].length}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* ── 오른쪽: 브리핑 목록 ── */}
+      <div style={{ paddingLeft: "48px" }} key={animKey}>
+        {currentPosts.length === 0 ? (
+          <p style={{
+            paddingTop: "40px",
+            fontSize: "11px", fontFamily: "Inter, monospace",
+            color: "var(--text-disabled)", letterSpacing: "0.2em",
+          }}>
+            NO BRIEFINGS
+          </p>
+        ) : (
+          <>
+            {/* 헤더 */}
+            <div style={{
+              paddingBottom: "16px",
+              marginBottom: "0",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}>
+              <span style={{
+                fontSize: "10px", fontFamily: "Inter, monospace",
+                fontWeight: 700, letterSpacing: "0.22em",
+                color: "var(--text-placeholder)", textTransform: "uppercase",
+              }}>
+                {selectedYear} · {selectedMonth !== null ? MONTHS_KR[selectedMonth - 1] : ""}
+              </span>
+              <span style={{
+                fontSize: "10px", fontFamily: "Inter, monospace",
+                color: "var(--text-disabled)", letterSpacing: "0.1em",
+              }}>
+                {currentPosts.length} BRIEFING{currentPosts.length !== 1 ? "S" : ""}
+              </span>
+            </div>
+
+            {currentPosts.map((post, i) => (
+              <BriefingRow
+                key={post.id}
+                post={post}
+                index={i}
+                animDelay={i * 50}
+                onClick={() => router.push(`/post/${post.id}`)}
+              />
+            ))}
+          </>
+        )}
       </div>
     </div>
   );
 }
 
-// ── 메인 피드 ─────────────────────────────────────────────────────
+// ── 메인 ─────────────────────────────────────────────────────────
 export default function FeedSection() {
+  const { data: session } = useSession();
   const [posts, setPosts] = useState<FeedPost[]>([]);
-  const [cursor, setCursor] = useState<string | null>(null);
+  const [memberCount, setMemberCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
+
+  const name = session?.user?.name || session?.user?.email?.split("@")[0] || "실행가";
 
   useEffect(() => {
-    fetch("/api/posts?take=20")
+    fetch("/api/posts?take=200")
       .then(r => r.json())
-      .then((data: { posts: FeedPost[]; nextCursor: string | null }) => {
+      .then((data: { posts: FeedPost[] }) => {
         setPosts(data.posts ?? []);
-        setCursor(data.nextCursor ?? null);
         setLoading(false);
       })
       .catch(() => setLoading(false));
+
+    fetch("/api/stats")
+      .then(r => r.json())
+      .then((data: { userCount: number | null }) => setMemberCount(data.userCount))
+      .catch(() => {});
   }, []);
-
-  const loadMore = async () => {
-    if (!cursor || loadingMore) return;
-    setLoadingMore(true);
-    try {
-      const res = await fetch(`/api/posts?take=20&cursor=${cursor}`);
-      const data: { posts: FeedPost[]; nextCursor: string | null } = await res.json();
-      setPosts(prev => [...prev, ...(data.posts ?? [])]);
-      setCursor(data.nextCursor ?? null);
-    } catch {}
-    finally { setLoadingMore(false); }
-  };
-
-  const coverPost = posts[0] ?? null;
-  const restPosts = posts.slice(1);
-  const edition = posts.length;
 
   return (
     <div style={{ backgroundColor: "var(--bg-primary)" }}>
       <div style={{
-        maxWidth: "720px", margin: "0 auto",
-        padding: "0 clamp(24px, 5vw, 48px) 120px",
+        maxWidth: "760px", margin: "0 auto",
+        padding: "0 clamp(24px, 5vw, 48px)",
       }}>
+
+        {/* 웰컴 */}
+        <WelcomeSection name={name} memberCount={memberCount} />
 
         {/* 로딩 */}
         {loading && (
-          <div style={{ paddingTop: "120px", textAlign: "center" }}>
+          <div style={{ padding: "80px 0", textAlign: "center" }}>
             <p style={{
               fontFamily: "Inter, monospace", fontSize: "10px",
               letterSpacing: "0.3em", color: "var(--text-placeholder)",
@@ -296,7 +354,7 @@ export default function FeedSection() {
 
         {/* 빈 상태 */}
         {!loading && posts.length === 0 && (
-          <div style={{ paddingTop: "120px", textAlign: "center" }}>
+          <div style={{ padding: "80px 0", textAlign: "center" }}>
             <p style={{
               fontFamily: "Inter, monospace", fontSize: "10px",
               letterSpacing: "0.25em", color: "var(--text-disabled)",
@@ -304,51 +362,11 @@ export default function FeedSection() {
           </div>
         )}
 
-        {/* 매거진 레이아웃 */}
+        {/* 아카이브 */}
         {!loading && posts.length > 0 && (
-          <>
-            <MagazineHeader edition={edition} />
-
-            {/* 커버스토리 */}
-            <CoverStory post={coverPost!} index={0} />
-
-            {/* 구분선 */}
-            <div style={{
-              height: "2px",
-              background: "linear-gradient(90deg, var(--text-primary) 0%, transparent 100%)",
-              marginBottom: "0",
-            }} />
-
-            {/* 나머지 브리핑 */}
-            {restPosts.map((post, i) => (
-              <BriefingItem key={post.id} post={post} index={i + 1} />
-            ))}
-
-            {/* 더 보기 */}
-            {cursor && (
-              <div style={{ borderTop: "1px solid var(--border)", paddingTop: "40px", textAlign: "center" }}>
-                <button
-                  onClick={loadMore}
-                  disabled={loadingMore}
-                  style={{
-                    fontFamily: "Inter, monospace", fontSize: "10px",
-                    fontWeight: 700, letterSpacing: "0.25em",
-                    color: "var(--text-muted)", background: "none",
-                    border: "1px solid var(--border)",
-                    cursor: loadingMore ? "not-allowed" : "pointer",
-                    opacity: loadingMore ? 0.5 : 1,
-                    padding: "12px 48px", transition: "all 0.15s",
-                    textTransform: "uppercase",
-                  }}
-                  onMouseEnter={e => { if (!loadingMore) { (e.currentTarget).style.borderColor = "var(--text-primary)"; (e.currentTarget).style.color = "var(--text-primary)"; }}}
-                  onMouseLeave={e => { (e.currentTarget).style.borderColor = "var(--border)"; (e.currentTarget).style.color = "var(--text-muted)"; }}
-                >
-                  {loadingMore ? "Loading..." : "More"}
-                </button>
-              </div>
-            )}
-          </>
+          <ArchiveSection posts={posts} />
         )}
+
       </div>
     </div>
   );
