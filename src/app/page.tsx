@@ -30,6 +30,13 @@ export default function Home() {
     introRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
+  // 로그인 상태이면 피드로 즉시 이동
+  useEffect(() => {
+    if (isLoggedIn) {
+      feedRef.current?.scrollIntoView({ behavior: "auto" });
+    }
+  }, [isLoggedIn]);
+
   // ?unsubscribed=1 파라미터 처리 - 수신거부 완료 알림
   useEffect(() => {
     try {
