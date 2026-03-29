@@ -212,7 +212,7 @@ function DesktopArchive({
                 fontWeight: active ? 800 : 300,
                 color: active ? "var(--text-primary)" : "var(--text-disabled)",
                 letterSpacing: "-0.03em", lineHeight: "28px",
-                transition: "color 0.2s", textAlign: "left",
+                transition: "color 0.2s", textAlign: "right",
               }}
             >
               {year}
