@@ -75,7 +75,7 @@ function WelcomeSection({ name, memberCount }: { name: string; memberCount: numb
 
 // ── 브리핑 행 ─────────────────────────────────────────────────────
 function BriefingRow({
-  post, index, animDelay, onClick,
+  post, animDelay, onClick,
 }: {
   post: FeedPost; index: number; animDelay: number; onClick: () => void;
 }) {
@@ -87,73 +87,33 @@ function BriefingRow({
     return () => clearTimeout(t);
   }, [animDelay]);
 
-  const d = new Date(post.createdAt);
-  const dateStr = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
-
   return (
     <div
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        padding: "22px 0",
-        borderBottom: "1px solid var(--border)",
+        padding: "10px 0",
         cursor: "pointer",
         opacity: visible ? 1 : 0,
-        transform: visible ? "translateX(0)" : "translateX(12px)",
-        transition: `opacity 0.35s ease, transform 0.35s ease`,
-        display: "flex",
-        alignItems: "flex-start",
-        gap: "20px",
+        transform: visible ? "translateX(0)" : "translateX(10px)",
+        transition: "opacity 0.3s ease, transform 0.3s ease",
       }}
     >
-      {/* 번호 */}
-      <span style={{
-        fontSize: "11px", fontFamily: "Inter, monospace",
-        color: "var(--text-disabled)", letterSpacing: "0.1em",
-        paddingTop: "3px", flexShrink: 0, minWidth: "22px",
+      <p style={{
+        fontSize: "clamp(15px, 1.8vw, 19px)",
+        fontFamily: "'Pretendard', sans-serif",
+        fontWeight: 700,
+        color: "var(--text-primary)",
+        letterSpacing: "-0.02em",
+        lineHeight: 1.4,
+        margin: 0,
+        opacity: hovered ? 0.5 : 1,
+        transition: "opacity 0.15s",
+        wordBreak: "keep-all",
       }}>
-        {String(index + 1).padStart(2, "0")}
-      </span>
-
-      {/* 제목 + 날짜 */}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <h3 style={{
-          fontSize: "clamp(15px, 1.8vw, 19px)",
-          fontFamily: "'Pretendard', sans-serif",
-          fontWeight: 700,
-          color: "var(--text-primary)",
-          letterSpacing: "-0.02em",
-          lineHeight: 1.35,
-          margin: 0,
-          opacity: hovered ? 0.65 : 1,
-          transition: "opacity 0.15s",
-          wordBreak: "keep-all",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-        }}>
-          {post.title}
-        </h3>
-        <p style={{
-          fontSize: "11px", fontFamily: "Inter, monospace",
-          color: "var(--text-disabled)", marginTop: "5px",
-          letterSpacing: "0.06em",
-        }}>
-          {dateStr}
-        </p>
-      </div>
-
-      {/* 화살표 */}
-      <span style={{
-        fontSize: "14px", color: "var(--text-muted)",
-        paddingTop: "2px", flexShrink: 0,
-        opacity: hovered ? 1 : 0,
-        transform: hovered ? "translateX(0)" : "translateX(-6px)",
-        transition: "opacity 0.15s, transform 0.15s",
-      }}>
-        →
-      </span>
+        {post.title}
+      </p>
     </div>
   );
 }
@@ -187,7 +147,7 @@ function ArchiveSection({ posts }: { posts: FeedPost[] }) {
   return (
     <div style={{
       display: "grid",
-      gridTemplateColumns: "100px 64px 1fr",
+      gridTemplateColumns: "1fr 1fr 2fr",
       paddingTop: "48px",
       paddingBottom: "120px",
       minHeight: "360px",
@@ -248,7 +208,7 @@ function ArchiveSection({ posts }: { posts: FeedPost[] }) {
       </div>
 
       {/* ── 3열: 브리핑 목록 ── */}
-      <div style={{ paddingLeft: "32px" }} key={animKey}>
+      <div style={{ paddingLeft: "0" }} key={animKey}>
         {currentPosts.length === 0 ? (
           <p style={{
             paddingTop: "40px",
@@ -259,29 +219,6 @@ function ArchiveSection({ posts }: { posts: FeedPost[] }) {
           </p>
         ) : (
           <>
-            {/* 헤더 */}
-            <div style={{
-              paddingBottom: "16px",
-              marginBottom: "0",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}>
-              <span style={{
-                fontSize: "10px", fontFamily: "Inter, monospace",
-                fontWeight: 700, letterSpacing: "0.22em",
-                color: "var(--text-placeholder)", textTransform: "uppercase",
-              }}>
-                {selectedYear} · {selectedMonth !== null ? MONTHS_KR[selectedMonth - 1] : ""}
-              </span>
-              <span style={{
-                fontSize: "10px", fontFamily: "Inter, monospace",
-                color: "var(--text-disabled)", letterSpacing: "0.1em",
-              }}>
-                {currentPosts.length} BRIEFING{currentPosts.length !== 1 ? "S" : ""}
-              </span>
-            </div>
-
             {currentPosts.map((post, i) => (
               <BriefingRow
                 key={post.id}
