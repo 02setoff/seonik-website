@@ -70,16 +70,17 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
   };
 
   const navBtn: React.CSSProperties = {
-    fontSize: "13px", fontFamily: "'Pretendard', sans-serif",
+    fontSize: "15px", fontFamily: "'Pretendard', sans-serif",
     fontWeight: 500, color: "var(--text-muted)",
     background: "none", border: "none", cursor: "pointer",
-    padding: "5px 8px", textDecoration: "none",
+    padding: "5px 10px", textDecoration: "none",
     transition: "color 0.15s",
   };
 
   const Logo = (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", flexShrink: 0 }}>
-      <span style={{ fontSize: "17px", fontFamily: "Inter, sans-serif", fontWeight: 800, color: "var(--text-primary)", lineHeight: 1, letterSpacing: "-0.03em" }}>SEONIK</span>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", flexShrink: 0, gap: "2px" }}>
+      <span style={{ fontSize: "18px", fontFamily: "'Pretendard', sans-serif", fontWeight: 800, color: "var(--text-primary)", lineHeight: 1, letterSpacing: "-0.02em" }}>선익</span>
+      <span style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", fontWeight: 700, color: "var(--text-placeholder)", lineHeight: 1, letterSpacing: "0.14em" }}>SEONIK</span>
     </div>
   );
 
@@ -88,7 +89,7 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
       <header
         className="sticky top-0 z-50"
         style={{
-          height: "56px",
+          height: "64px",
           backgroundColor: "var(--header-bg)",
           borderBottom: "1px solid var(--header-border)",
         }}
