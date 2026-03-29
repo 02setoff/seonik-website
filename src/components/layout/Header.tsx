@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
-import { LogOut } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import AuthModal from "@/components/auth/AuthModal";
@@ -25,12 +25,22 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
   const [aboutKey, setAboutKey] = useState<AboutKey | null>(null);
   const [aboutDropdown, setAboutDropdown] = useState(false);
   const [userDropdown, setUserDropdown] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const aboutRef = useRef<HTMLDivElement>(null);
   const userRef = useRef<HTMLDivElement>(null);
   const { data: session } = useSession();
 
-  const openLogin = useCallback(() => { setAuthTab("login"); setIsAuthOpen(true); }, []);
-  const openSignup = useCallback(() => { setAuthTab("signup"); setIsAuthOpen(true); }, []);
+  const openLogin = useCallback(() => {
+    setAuthTab("login");
+    setIsAuthOpen(true);
+    setMobileMenuOpen(false);
+  }, []);
+
+  const openSignup = useCallback(() => {
+    setAuthTab("signup");
+    setIsAuthOpen(true);
+    setMobileMenuOpen(false);
+  }, []);
 
   // 외부 클릭 시 드롭다운 닫기
   useEffect(() => {
@@ -41,6 +51,12 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
+
+  // 모바일 메뉴 열릴 때 body 스크롤 잠금
+  useEffect(() => {
+    document.body.style.overflow = mobileMenuOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileMenuOpen]);
 
   const dropdownBox: React.CSSProperties = {
     position: "absolute", top: "calc(100% + 6px)",
@@ -68,6 +84,27 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
     background: "none", border: "none", cursor: "pointer",
     padding: "5px 10px", textDecoration: "none",
     transition: "color 0.15s",
+  };
+
+  // 모바일 메뉴 섹션 라벨
+  const mobileSectionLabel: React.CSSProperties = {
+    fontSize: "10px", fontFamily: "Inter, sans-serif",
+    fontWeight: 700, letterSpacing: "0.18em",
+    color: "var(--text-disabled)",
+    margin: "0 0 8px",
+  };
+
+  // 모바일 메뉴 항목
+  const mobileMenuItem: React.CSSProperties = {
+    display: "block", width: "100%",
+    padding: "14px 0",
+    fontSize: "17px", fontFamily: "'Pretendard', sans-serif",
+    fontWeight: 500, color: "var(--text-primary)",
+    background: "none", border: "none",
+    borderBottom: "1px solid var(--border)",
+    cursor: "pointer", textAlign: "left",
+    textDecoration: "none",
+    transition: "opacity 0.15s",
   };
 
   const Logo = (
@@ -130,7 +167,7 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
               )}
             </div>
 
-            {/* Notice */}
+            {/* Notice — 데스크탑만 */}
             <Link
               href="/notice"
               className="hidden md:inline"
@@ -141,96 +178,181 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
               Notice
             </Link>
 
-            {/* ── 인증 영역 ── */}
+            {/* ── 인증 영역 — 데스크탑 ── */}
             {session ? (
-              <>
-                {/* 데스크탑: 사용자 이름 → 드롭다운 */}
-                <div ref={userRef} style={{ position: "relative" }} className="hidden md:block">
-                  <button
-                    onClick={() => setUserDropdown(v => !v)}
-                    style={{
-                      padding: "5px 10px", fontSize: "15px",
-                      fontFamily: "'Pretendard', sans-serif", fontWeight: 500,
-                      color: "var(--text-primary)", background: "none",
-                      border: "none", cursor: "pointer", borderRadius: "4px",
-                      transition: "background 0.15s",
-                    }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "var(--bg-hover)"; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent"; }}
-                  >
-                    {session.user?.name || session.user?.email?.split("@")[0]}
-                  </button>
-                  {userDropdown && (
-                    <div style={{ ...dropdownBox, right: 0 }}>
-                      <Link
-                        href="/mypage"
-                        style={dropdownItem}
-                        onClick={() => setUserDropdown(false)}
-                        onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "var(--bg-hover)"; (e.currentTarget as HTMLAnchorElement).style.color = "var(--text-primary)"; }}
-                        onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "transparent"; (e.currentTarget as HTMLAnchorElement).style.color = "var(--text-secondary)"; }}
-                      >
-                        마이페이지
-                      </Link>
-                      <button
-                        style={{ ...dropdownItem, color: "#94A3B8" }}
-                        onClick={() => signOut({ callbackUrl: "/" })}
-                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "var(--bg-hover)"; (e.currentTarget as HTMLButtonElement).style.color = "var(--text-primary)"; }}
-                        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent"; (e.currentTarget as HTMLButtonElement).style.color = "#94A3B8"; }}
-                      >
-                        로그아웃
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                {/* 모바일: 로그아웃 아이콘 */}
+              <div ref={userRef} style={{ position: "relative" }} className="hidden md:block">
                 <button
-                  onClick={() => signOut({ callbackUrl: "/" })}
-                  className="flex md:hidden items-center"
-                  style={{ background: "none", border: "none", cursor: "pointer", padding: "6px", color: "var(--text-placeholder)" }}
-                  aria-label="로그아웃"
+                  onClick={() => setUserDropdown(v => !v)}
+                  style={{
+                    padding: "5px 10px", fontSize: "15px",
+                    fontFamily: "'Pretendard', sans-serif", fontWeight: 500,
+                    color: "var(--text-primary)", background: "none",
+                    border: "none", cursor: "pointer", borderRadius: "4px",
+                    transition: "background 0.15s",
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "var(--bg-hover)"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent"; }}
                 >
-                  <LogOut size={19} strokeWidth={2} />
+                  {session.user?.name || session.user?.email?.split("@")[0]}
                 </button>
-              </>
+                {userDropdown && (
+                  <div style={{ ...dropdownBox, right: 0 }}>
+                    <Link
+                      href="/mypage"
+                      style={dropdownItem}
+                      onClick={() => setUserDropdown(false)}
+                      onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "var(--bg-hover)"; (e.currentTarget as HTMLAnchorElement).style.color = "var(--text-primary)"; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "transparent"; (e.currentTarget as HTMLAnchorElement).style.color = "var(--text-secondary)"; }}
+                    >
+                      마이페이지
+                    </Link>
+                    <button
+                      style={{ ...dropdownItem, color: "#94A3B8" }}
+                      onClick={() => signOut({ callbackUrl: "/" })}
+                      onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "var(--bg-hover)"; (e.currentTarget as HTMLButtonElement).style.color = "var(--text-primary)"; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent"; (e.currentTarget as HTMLButtonElement).style.color = "#94A3B8"; }}
+                    >
+                      로그아웃
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
-              <>
-                <div className="hidden md:flex items-center gap-1">
-                  <button
-                    onClick={openLogin}
-                    style={{ ...navBtn }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = "var(--text-primary)"; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = "var(--text-muted)"; }}
-                  >
-                    로그인
-                  </button>
-                  <button
-                    onClick={openSignup}
-                    style={{
-                      padding: "7px 16px", fontSize: "12px",
-                      fontFamily: "'Pretendard', sans-serif", fontWeight: 600,
-                      backgroundColor: "var(--text-primary)", color: "var(--bg-primary)",
-                      border: "none", cursor: "pointer", transition: "opacity 0.15s",
-                    }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.85"; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
-                  >
-                    회원가입
-                  </button>
-                </div>
-                <div className="flex md:hidden items-center gap-1">
-                  <button onClick={openLogin} style={{ background: "none", border: "none", cursor: "pointer", padding: "5px 8px", fontSize: "12px", fontFamily: "'Pretendard'", color: "var(--text-muted)" }}>
-                    로그인
-                  </button>
-                  <button onClick={openSignup} style={{ padding: "5px 10px", fontSize: "11px", fontFamily: "'Pretendard'", fontWeight: 600, backgroundColor: "var(--text-primary)", color: "var(--bg-primary)", border: "none", cursor: "pointer" }}>
-                    가입
-                  </button>
-                </div>
-              </>
+              <div className="hidden md:flex items-center gap-1">
+                <button
+                  onClick={openLogin}
+                  style={{ ...navBtn }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = "var(--text-primary)"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = "var(--text-muted)"; }}
+                >
+                  로그인
+                </button>
+                <button
+                  onClick={openSignup}
+                  style={{
+                    padding: "7px 16px", fontSize: "12px",
+                    fontFamily: "'Pretendard', sans-serif", fontWeight: 600,
+                    backgroundColor: "var(--text-primary)", color: "var(--bg-primary)",
+                    border: "none", cursor: "pointer", transition: "opacity 0.15s",
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.85"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
+                >
+                  회원가입
+                </button>
+              </div>
             )}
+
+            {/* ── 모바일: 햄버거 버튼 ── */}
+            <button
+              onClick={() => setMobileMenuOpen(v => !v)}
+              className="flex md:hidden items-center justify-center"
+              style={{
+                background: "none", border: "none", cursor: "pointer",
+                padding: "6px", marginLeft: "4px",
+                color: "var(--text-primary)",
+              }}
+              aria-label={mobileMenuOpen ? "메뉴 닫기" : "메뉴 열기"}
+            >
+              {mobileMenuOpen
+                ? <X size={22} strokeWidth={2} />
+                : <Menu size={22} strokeWidth={2} />
+              }
+            </button>
           </div>
         </div>
       </header>
+
+      {/* ── 모바일 풀스크린 메뉴 ── */}
+      <div
+        className="md:hidden"
+        style={{
+          position: "fixed",
+          top: "64px", left: 0, right: 0, bottom: 0,
+          backgroundColor: "var(--bg-primary)",
+          zIndex: 49,
+          overflowY: "auto",
+          padding: "32px 28px 48px",
+          opacity: mobileMenuOpen ? 1 : 0,
+          pointerEvents: mobileMenuOpen ? "auto" : "none",
+          transition: "opacity 0.2s ease",
+        }}
+      >
+        {/* About */}
+        <div style={{ marginBottom: "36px" }}>
+          <p style={mobileSectionLabel}>ABOUT</p>
+          {ABOUT_ITEMS.map(item => (
+            <button
+              key={item.key}
+              style={mobileMenuItem}
+              onClick={() => { setAboutKey(item.key); setMobileMenuOpen(false); }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.5"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Navigate */}
+        <div style={{ marginBottom: "36px" }}>
+          <p style={mobileSectionLabel}>NAVIGATE</p>
+          <Link
+            href="/notice"
+            style={mobileMenuItem}
+            onClick={() => setMobileMenuOpen(false)}
+            onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = "0.5"; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = "1"; }}
+          >
+            Notice
+          </Link>
+          {session && (
+            <Link
+              href="/mypage"
+              style={mobileMenuItem}
+              onClick={() => setMobileMenuOpen(false)}
+              onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = "0.5"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = "1"; }}
+            >
+              마이페이지
+            </Link>
+          )}
+        </div>
+
+        {/* Account */}
+        <div>
+          <p style={mobileSectionLabel}>ACCOUNT</p>
+          {session ? (
+            <button
+              style={{ ...mobileMenuItem, color: "#94A3B8" }}
+              onClick={() => { setMobileMenuOpen(false); signOut({ callbackUrl: "/" }); }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.5"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
+            >
+              로그아웃
+            </button>
+          ) : (
+            <>
+              <button
+                style={mobileMenuItem}
+                onClick={openLogin}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.5"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
+              >
+                로그인
+              </button>
+              <button
+                style={mobileMenuItem}
+                onClick={openSignup}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.5"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
+              >
+                회원가입
+              </button>
+            </>
+          )}
+        </div>
+      </div>
 
       <AboutOverlay open={aboutKey} onClose={() => setAboutKey(null)} />
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} defaultTab={authTab} />
