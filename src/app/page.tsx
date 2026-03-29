@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import IntroAnimation from "@/components/intro/IntroAnimation";
 import FeedHeader from "@/components/layout/Header";
@@ -11,33 +11,15 @@ import AuthModal from "@/components/auth/AuthModal";
 export default function Home() {
   const { status } = useSession();
   const isLoggedIn = status === "authenticated";
+  const isLoading = status === "loading";
 
-  const introRef = useRef<HTMLDivElement>(null);
-  const feedRef = useRef<HTMLDivElement>(null);
   const [showUnsubscribed, setShowUnsubscribed] = useState(false);
   const [authModal, setAuthModal] = useState<{ open: boolean; tab: "login" | "signup" }>({
     open: false,
     tab: "login",
   });
 
-  // 인트로 → 피드: 부드럽게 스크롤
-  const scrollToFeed = useCallback(() => {
-    feedRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, []);
-
-  // 로고 클릭 → 인트로로 스크롤 (언제나 가능)
-  const scrollToIntro = useCallback(() => {
-    introRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, []);
-
-  // 로그인 상태이면 피드로 즉시 이동
-  useEffect(() => {
-    if (isLoggedIn) {
-      feedRef.current?.scrollIntoView({ behavior: "auto" });
-    }
-  }, [isLoggedIn]);
-
-  // ?unsubscribed=1 파라미터 처리 - 수신거부 완료 알림
+  // ?unsubscribed=1 파라미터 처리
   useEffect(() => {
     try {
       const params = new URLSearchParams(window.location.search);
@@ -48,6 +30,9 @@ export default function Home() {
       }
     } catch {}
   }, []);
+
+  // 세션 로딩 중에는 아무것도 렌더하지 않음
+  if (isLoading) return null;
 
   return (
     <>
@@ -72,31 +57,29 @@ export default function Home() {
         </div>
       )}
 
-      {/* 인트로 영역 — 항상 DOM에 유지 */}
-      <div ref={introRef}>
-        <IntroAnimation
-          onEnterFeed={isLoggedIn ? scrollToFeed : undefined}
-          isLoggedIn={isLoggedIn}
-          onLoginClick={() => setAuthModal({ open: true, tab: "login" })}
-          onSignupClick={() => setAuthModal({ open: true, tab: "signup" })}
-        />
-      </div>
-
-      {/* 피드 영역 — 로그인한 사용자만 */}
-      {isLoggedIn && (
-        <div ref={feedRef}>
-          <FeedHeader onLogoClick={scrollToIntro} />
+      {/* 로그인 상태 → 피드만 표시 */}
+      {isLoggedIn ? (
+        <>
+          <FeedHeader />
           <FeedSection />
           <FeedFooter />
-        </div>
+        </>
+      ) : (
+        /* 비로그인 → 인트로 */
+        <>
+          <IntroAnimation
+            onEnterFeed={undefined}
+            isLoggedIn={false}
+            onLoginClick={() => setAuthModal({ open: true, tab: "login" })}
+            onSignupClick={() => setAuthModal({ open: true, tab: "signup" })}
+          />
+          <AuthModal
+            isOpen={authModal.open}
+            onClose={() => setAuthModal((prev) => ({ ...prev, open: false }))}
+            defaultTab={authModal.tab}
+          />
+        </>
       )}
-
-      {/* 인트로 화면용 Auth 모달 */}
-      <AuthModal
-        isOpen={authModal.open}
-        onClose={() => setAuthModal((prev) => ({ ...prev, open: false }))}
-        defaultTab={authModal.tab}
-      />
     </>
   );
 }
