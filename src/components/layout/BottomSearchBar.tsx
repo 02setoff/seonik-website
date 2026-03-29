@@ -194,7 +194,7 @@ export default function BottomSearchBar() {
           <input
             ref={inputRef}
             type="text"
-            placeholder={isAI ? "창업 AI — 서비스 준비 중입니다" : `브리핑 검색...  ${shortcut}`}
+            placeholder={isAI ? "선익 AI — 서비스 준비 중입니다" : `브리핑 검색  ${shortcut}`}
             value={query}
             onChange={e => { if (!isAI) setQuery(e.target.value); }}
             onFocus={() => setFocused(true)}
@@ -207,7 +207,7 @@ export default function BottomSearchBar() {
               outline: "none",
               fontFamily: "'Pretendard', sans-serif",
               fontSize: "15px",
-              color: isAI ? "#EAB308" : "var(--text-primary)",
+              color: isAI ? "#EAB308" : "var(--text-secondary)",
               caretColor: "var(--text-primary)",
               cursor: isAI ? "default" : "text",
               opacity: modeAnim ? 0 : 1,
@@ -248,7 +248,7 @@ export default function BottomSearchBar() {
               }
             }}
           >
-            {isAI ? "검색" : "창업 AI"}
+            {isAI ? "검색" : "선익 AI"}
           </button>
         </div>
       </div>

@@ -338,31 +338,31 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
           >
             Notice
           </Link>
-          {session && (
-            <Link
-              href="/mypage"
-              style={mobileMenuItem}
-              onClick={() => setMobileMenuOpen(false)}
-              onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = "0.5"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = "1"; }}
-            >
-              마이페이지
-            </Link>
-          )}
         </div>
 
         {/* Account */}
         <div style={{ marginBottom: "36px" }}>
           <p style={mobileSectionLabel}>ACCOUNT</p>
           {session ? (
-            <button
-              style={{ ...mobileMenuItem, color: "#94A3B8" }}
-              onClick={() => { setMobileMenuOpen(false); signOut({ callbackUrl: "/" }); }}
-              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.5"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
-            >
-              로그아웃
-            </button>
+            <>
+              <Link
+                href="/mypage"
+                style={mobileMenuItem}
+                onClick={() => setMobileMenuOpen(false)}
+                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = "0.5"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = "1"; }}
+              >
+                마이페이지
+              </Link>
+              <button
+                style={{ ...mobileMenuItem, color: "#94A3B8" }}
+                onClick={() => { setMobileMenuOpen(false); signOut({ callbackUrl: "/" }); }}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.5"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
+              >
+                로그아웃
+              </button>
+            </>
           ) : (
             <>
               <button
