@@ -1,12 +1,21 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { Search, User, LogOut } from "lucide-react";
+import { useState, useCallback, useRef, useEffect } from "react";
+import { Search, LogOut } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import SearchModal from "./SearchModal";
 import AuthModal from "@/components/auth/AuthModal";
 import PostModal, { PostItem } from "@/components/feed/PostModal";
+import AboutOverlay, { AboutKey } from "@/components/intro/AboutOverlay";
+
+const ABOUT_ITEMS: { key: AboutKey; label: string }[] = [
+  { key: "mission", label: "미션" },
+  { key: "vision", label: "비전" },
+  { key: "company", label: "회사명" },
+  { key: "slogan", label: "슬로건" },
+  { key: "history", label: "연혁" },
+];
 
 interface FeedHeaderProps {
   onLogoClick?: () => void;
@@ -17,6 +26,11 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authTab, setAuthTab] = useState<"login" | "signup">("login");
   const [selectedPost, setSelectedPost] = useState<PostItem | null>(null);
+  const [aboutKey, setAboutKey] = useState<AboutKey | null>(null);
+  const [aboutDropdown, setAboutDropdown] = useState(false);
+  const [userDropdown, setUserDropdown] = useState(false);
+  const aboutRef = useRef<HTMLDivElement>(null);
+  const userRef = useRef<HTMLDivElement>(null);
   const { data: session } = useSession();
 
   const openSearch = useCallback(() => setIsSearchOpen(true), []);
@@ -24,6 +38,50 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
   const handleSelectPost = useCallback((post: PostItem) => setSelectedPost(post), []);
   const openLogin = useCallback(() => { setAuthTab("login"); setIsAuthOpen(true); }, []);
   const openSignup = useCallback(() => { setAuthTab("signup"); setIsAuthOpen(true); }, []);
+
+  // 외부 클릭 시 드롭다운 닫기
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (aboutRef.current && !aboutRef.current.contains(e.target as Node)) setAboutDropdown(false);
+      if (userRef.current && !userRef.current.contains(e.target as Node)) setUserDropdown(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const dropdownBox: React.CSSProperties = {
+    position: "absolute", top: "calc(100% + 6px)",
+    backgroundColor: "var(--bg-card)",
+    border: "1px solid var(--border)",
+    boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+    zIndex: 200, minWidth: "110px",
+    padding: "5px 0",
+  };
+
+  const dropdownItem: React.CSSProperties = {
+    display: "block", width: "100%",
+    padding: "9px 16px",
+    fontSize: "13px", fontFamily: "'Pretendard', sans-serif",
+    color: "var(--text-secondary)",
+    background: "none", border: "none", cursor: "pointer",
+    textAlign: "left", textDecoration: "none",
+    transition: "background 0.1s, color 0.1s",
+    whiteSpace: "nowrap",
+  };
+
+  const navBtn: React.CSSProperties = {
+    fontSize: "13px", fontFamily: "'Pretendard', sans-serif",
+    fontWeight: 500, color: "var(--text-muted)",
+    background: "none", border: "none", cursor: "pointer",
+    padding: "5px 8px", textDecoration: "none",
+    transition: "color 0.15s",
+  };
+
+  const Logo = (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", flexShrink: 0 }}>
+      <span style={{ fontSize: "17px", fontFamily: "Inter, sans-serif", fontWeight: 800, color: "var(--text-primary)", lineHeight: 1, letterSpacing: "-0.03em" }}>SEONIK</span>
+    </div>
+  );
 
   return (
     <>
@@ -35,101 +93,154 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
           borderBottom: "1px solid var(--header-border)",
         }}
       >
-        <div className="h-full flex items-center justify-between mx-auto px-4 md:px-10" style={{ maxWidth: "1280px" }}>
+        <div
+          className="h-full flex items-center justify-between mx-auto px-4 md:px-10"
+          style={{ maxWidth: "1280px" }}
+        >
+          {/* ── 좌측: 로고 ── */}
+          {onLogoClick ? (
+            <button onClick={onLogoClick} style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+              {Logo}
+            </button>
+          ) : (
+            <Link href="/" style={{ textDecoration: "none" }}>{Logo}</Link>
+          )}
 
-          {/* ── 좌측: 로고 + Notice ── */}
-          <div className="flex items-center gap-6">
-            {onLogoClick ? (
-              <button onClick={onLogoClick}
-                style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", flexDirection: "column", alignItems: "flex-start", flexShrink: 0 }}>
-                <span style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif", fontWeight: 700, color: "var(--text-primary)", lineHeight: 1 }}>선익</span>
-                <span style={{ fontSize: "8px", fontFamily: "Inter, sans-serif", fontWeight: 600, color: "var(--text-placeholder)", letterSpacing: "0.12em", marginTop: "3px" }}>SEONIK</span>
+          {/* ── 우측: 네비게이션 ── */}
+          <div className="flex items-center gap-0.5">
+
+            {/* About 드롭다운 — 데스크탑만 */}
+            <div ref={aboutRef} style={{ position: "relative" }} className="hidden md:block">
+              <button
+                onClick={() => setAboutDropdown(v => !v)}
+                style={navBtn}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = "var(--text-primary)"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = "var(--text-muted)"; }}
+              >
+                About
               </button>
-            ) : (
-              <Link href="/" style={{ textDecoration: "none", display: "flex", flexDirection: "column", alignItems: "flex-start", flexShrink: 0 }}>
-                <span style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif", fontWeight: 700, color: "var(--text-primary)", lineHeight: 1 }}>선익</span>
-                <span style={{ fontSize: "8px", fontFamily: "Inter, sans-serif", fontWeight: 600, color: "var(--text-placeholder)", letterSpacing: "0.12em", marginTop: "3px" }}>SEONIK</span>
-              </Link>
-            )}
-            <Link href="/notice"
+              {aboutDropdown && (
+                <div style={{ ...dropdownBox, left: 0 }}>
+                  {ABOUT_ITEMS.map(item => (
+                    <button
+                      key={item.key}
+                      style={dropdownItem}
+                      onClick={() => { setAboutKey(item.key); setAboutDropdown(false); }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "var(--bg-hover)"; (e.currentTarget as HTMLButtonElement).style.color = "var(--text-primary)"; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent"; (e.currentTarget as HTMLButtonElement).style.color = "var(--text-secondary)"; }}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Notice */}
+            <Link
+              href="/notice"
               className="hidden md:inline"
-              style={{ padding: "5px 6px", color: "var(--text-muted)", fontFamily: "'Pretendard', sans-serif", fontWeight: 500, fontSize: "13px", textDecoration: "none", transition: "color 0.15s" }}
+              style={navBtn as React.CSSProperties}
               onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "var(--text-primary)"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "var(--text-muted)"; }}>
+              onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "var(--text-muted)"; }}
+            >
               Notice
             </Link>
-          </div>
 
-          {/* ── 우측 ── */}
-          <div className="flex items-center">
-
-            {/* 검색 — 데스크탑: 텍스트 / 모바일: 아이콘 */}
-            <button onClick={openSearch}
-              style={{ background: "none", border: "none", cursor: "pointer", padding: "6px 8px", color: "var(--text-muted)", transition: "color 0.15s", display: "flex", alignItems: "center", gap: "4px" }}
+            {/* 검색 */}
+            <button
+              onClick={openSearch}
+              style={{ ...navBtn, display: "flex", alignItems: "center", gap: "4px" }}
               onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = "var(--text-primary)"; }}
               onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = "var(--text-muted)"; }}
-              aria-label="검색">
-              <span className="hidden md:inline" style={{ fontSize: "14px", fontFamily: "'Pretendard', sans-serif", fontWeight: 500 }}>검색하기</span>
-              <Search className="md:hidden" size={20} strokeWidth={2} />
+              aria-label="검색"
+            >
+              <span className="hidden md:inline">검색</span>
+              <Search className="md:hidden" size={19} strokeWidth={2} />
             </button>
 
-            {/* 인증 영역 */}
+            {/* ── 인증 영역 ── */}
             {session ? (
               <>
-                {/* 데스크탑 로그인 상태 */}
-                <div className="hidden md:flex items-center gap-1">
-                  <Link href="/mypage"
-                    style={{ padding: "6px 10px", fontSize: "14px", fontFamily: "'Pretendard', sans-serif", fontWeight: 500, color: "var(--text-primary)", textDecoration: "none", borderRadius: "4px", transition: "background 0.15s" }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "var(--bg-hover)"; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "transparent"; }}>
+                {/* 데스크탑: 사용자 이름 → 드롭다운 */}
+                <div ref={userRef} style={{ position: "relative" }} className="hidden md:block">
+                  <button
+                    onClick={() => setUserDropdown(v => !v)}
+                    style={{
+                      padding: "5px 10px", fontSize: "13px",
+                      fontFamily: "'Pretendard', sans-serif", fontWeight: 500,
+                      color: "var(--text-primary)", background: "none",
+                      border: "none", cursor: "pointer", borderRadius: "4px",
+                      transition: "background 0.15s",
+                    }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "var(--bg-hover)"; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent"; }}
+                  >
                     {session.user?.name || session.user?.email?.split("@")[0]}
-                  </Link>
-                  <button onClick={() => signOut({ callbackUrl: "/" })}
-                    style={{ padding: "6px 10px", fontSize: "13px", fontFamily: "'Pretendard', sans-serif", background: "none", border: "none", cursor: "pointer", borderRadius: "4px", color: "var(--text-placeholder)", transition: "all 0.15s" }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = "var(--text-secondary)"; (e.currentTarget as HTMLButtonElement).style.backgroundColor = "var(--bg-hover)"; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = "var(--text-placeholder)"; (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent"; }}>
-                    로그아웃
                   </button>
+                  {userDropdown && (
+                    <div style={{ ...dropdownBox, right: 0 }}>
+                      <Link
+                        href="/mypage"
+                        style={dropdownItem}
+                        onClick={() => setUserDropdown(false)}
+                        onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "var(--bg-hover)"; (e.currentTarget as HTMLAnchorElement).style.color = "var(--text-primary)"; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "transparent"; (e.currentTarget as HTMLAnchorElement).style.color = "var(--text-secondary)"; }}
+                      >
+                        마이페이지
+                      </Link>
+                      <button
+                        style={{ ...dropdownItem, color: "#94A3B8" }}
+                        onClick={() => signOut({ callbackUrl: "/" })}
+                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "var(--bg-hover)"; (e.currentTarget as HTMLButtonElement).style.color = "var(--text-primary)"; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent"; (e.currentTarget as HTMLButtonElement).style.color = "#94A3B8"; }}
+                      >
+                        로그아웃
+                      </button>
+                    </div>
+                  )}
                 </div>
-                {/* 모바일 로그인 상태 — 아이콘만 */}
-                <div className="flex md:hidden items-center gap-0.5">
-                  <Link href="/mypage"
-                    style={{ padding: "6px 7px", display: "flex", alignItems: "center", color: "var(--text-primary)", transition: "color 0.15s" }}
-                    aria-label="마이페이지">
-                    <User size={20} strokeWidth={2} />
-                  </Link>
-                  <button onClick={() => signOut({ callbackUrl: "/" })}
-                    style={{ background: "none", border: "none", cursor: "pointer", padding: "6px 7px", display: "flex", alignItems: "center", color: "var(--text-placeholder)", transition: "color 0.15s" }}
-                    aria-label="로그아웃">
-                    <LogOut size={20} strokeWidth={2} />
-                  </button>
-                </div>
+
+                {/* 모바일: 로그아웃 아이콘 */}
+                <button
+                  onClick={() => signOut({ callbackUrl: "/" })}
+                  className="flex md:hidden items-center"
+                  style={{ background: "none", border: "none", cursor: "pointer", padding: "6px", color: "var(--text-placeholder)" }}
+                  aria-label="로그아웃"
+                >
+                  <LogOut size={19} strokeWidth={2} />
+                </button>
               </>
             ) : (
               <>
-                {/* 데스크탑 비로그인 */}
-                <div className="hidden md:flex items-center gap-2">
-                  <button onClick={openLogin}
-                    style={{ padding: "6px 12px", fontSize: "14px", fontFamily: "'Pretendard', sans-serif", fontWeight: 500, color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", borderRadius: "4px", transition: "all 0.15s" }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = "var(--text-primary)"; (e.currentTarget as HTMLButtonElement).style.backgroundColor = "var(--bg-hover)"; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = "var(--text-muted)"; (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent"; }}>
+                <div className="hidden md:flex items-center gap-1">
+                  <button
+                    onClick={openLogin}
+                    style={{ ...navBtn }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = "var(--text-primary)"; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = "var(--text-muted)"; }}
+                  >
                     로그인
                   </button>
-                  <button onClick={openSignup}
-                    style={{ padding: "8px 18px", fontSize: "13px", fontFamily: "'Pretendard', sans-serif", fontWeight: 600, backgroundColor: "var(--text-primary)", color: "var(--bg-primary)", border: "none", cursor: "pointer", transition: "opacity 0.15s" }}
+                  <button
+                    onClick={openSignup}
+                    style={{
+                      padding: "7px 16px", fontSize: "12px",
+                      fontFamily: "'Pretendard', sans-serif", fontWeight: 600,
+                      backgroundColor: "var(--text-primary)", color: "var(--bg-primary)",
+                      border: "none", cursor: "pointer", transition: "opacity 0.15s",
+                    }}
                     onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.85"; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}>
+                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
+                  >
                     회원가입
                   </button>
                 </div>
-                {/* 모바일 비로그인 */}
                 <div className="flex md:hidden items-center gap-1">
-                  <button onClick={openLogin}
-                    style={{ background: "none", border: "none", cursor: "pointer", padding: "4px 8px", fontSize: "12px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-muted)" }}>
+                  <button onClick={openLogin} style={{ background: "none", border: "none", cursor: "pointer", padding: "5px 8px", fontSize: "12px", fontFamily: "'Pretendard'", color: "var(--text-muted)" }}>
                     로그인
                   </button>
-                  <button onClick={openSignup}
-                    style={{ padding: "5px 10px", fontSize: "11px", fontFamily: "'Pretendard', sans-serif", fontWeight: 600, backgroundColor: "var(--text-primary)", color: "var(--bg-primary)", border: "none", cursor: "pointer" }}>
+                  <button onClick={openSignup} style={{ padding: "5px 10px", fontSize: "11px", fontFamily: "'Pretendard'", fontWeight: 600, backgroundColor: "var(--text-primary)", color: "var(--bg-primary)", border: "none", cursor: "pointer" }}>
                     가입
                   </button>
                 </div>
@@ -139,6 +250,7 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
         </div>
       </header>
 
+      <AboutOverlay open={aboutKey} onClose={() => setAboutKey(null)} />
       <SearchModal isOpen={isSearchOpen} onClose={closeSearch} onSelectPost={handleSelectPost} />
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} defaultTab={authTab} />
       <PostModal post={selectedPost} onClose={() => setSelectedPost(null)} />
