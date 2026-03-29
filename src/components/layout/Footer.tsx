@@ -2,7 +2,6 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import Link from "next/link";
-import { Search } from "lucide-react";
 import ContactModal from "./ContactModal";
 import { PostItem } from "@/components/feed/PostModal";
 import PostModal from "@/components/feed/PostModal";
@@ -82,15 +81,15 @@ export default function FeedFooter() {
       {/* ── 검색 섹션 (푸터 위) ── */}
       <div style={{ backgroundColor: "var(--bg-primary)", paddingTop: "80px" }}>
         <div style={{
-          maxWidth: "680px", margin: "0 auto",
-          padding: "0 clamp(24px, 5vw, 40px) 0",
+          maxWidth: "900px", margin: "0 auto",
+          padding: "0 clamp(20px, 4vw, 32px) 0",
           position: "relative",
         }}>
           {/* 결과 드롭업 (검색창 위로 펼침) */}
           {showResults && (
             <div style={{
-              position: "absolute", bottom: "100%", left: "clamp(24px, 5vw, 40px)",
-              right: "clamp(24px, 5vw, 40px)",
+              position: "absolute", bottom: "100%", left: "clamp(20px, 4vw, 32px)",
+              right: "clamp(20px, 4vw, 32px)",
               backgroundColor: "var(--modal-bg)",
               border: "1px solid var(--border)",
               borderBottom: "none",
@@ -155,48 +154,13 @@ export default function FeedFooter() {
           {/* 검색 입력창 */}
           <div style={{
             display: "flex", alignItems: "center", gap: "12px",
-            padding: "16px 20px",
+            padding: "14px 16px 14px 22px",
             border: "1px solid",
             borderRadius: showResults ? "0 0 16px 16px" : "16px",
             backgroundColor: isAI ? "rgba(234,179,8,0.06)" : "var(--bg-card)",
             transition: "background-color 0.3s ease, border-color 0.2s ease",
             borderColor: focused ? "var(--text-primary)" : "var(--border)",
           }}>
-            {/* 모드 전환 버튼 */}
-            <button
-              onMouseDown={e => { e.preventDefault(); handleModeToggle(); }}
-              title={isAI ? "검색 모드로 전환" : "창업 AI 모드로 전환"}
-              style={{
-                background: "none", border: "none", cursor: "pointer",
-                flexShrink: 0, padding: "2px",
-                opacity: modeAnim ? 0 : 1,
-                transition: "opacity 0.18s ease, transform 0.18s ease",
-                transform: modeAnim ? "scale(0.8)" : "scale(1)",
-                display: "flex", alignItems: "center",
-              }}
-            >
-              {isAI ? (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#EAB308" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-                </svg>
-              ) : (
-                <Search size={18} style={{ color: "var(--text-placeholder)" }} />
-              )}
-            </button>
-
-            {/* AI 모드 라벨 */}
-            {isAI && (
-              <span style={{
-                fontSize: "11px", fontFamily: "Inter, sans-serif",
-                fontWeight: 700, color: "#EAB308",
-                letterSpacing: "0.12em", flexShrink: 0,
-                opacity: modeAnim ? 0 : 1,
-                transition: "opacity 0.18s ease",
-              }}>
-                창업 AI
-              </span>
-            )}
-
             {/* 입력창 */}
             <input
               ref={inputRef}
@@ -218,6 +182,41 @@ export default function FeedFooter() {
               }}
             />
 
+            {/* 오른쪽 모드 전환 버튼 */}
+            <button
+              onMouseDown={e => { e.preventDefault(); handleModeToggle(); }}
+              style={{
+                flexShrink: 0,
+                padding: "6px 14px",
+                fontSize: "11px",
+                fontFamily: "Inter, sans-serif",
+                fontWeight: 700,
+                letterSpacing: "0.08em",
+                border: "1px solid",
+                borderRadius: "20px",
+                cursor: "pointer",
+                opacity: modeAnim ? 0 : 1,
+                transition: "opacity 0.18s ease, background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease",
+                transform: modeAnim ? "scale(0.9)" : "scale(1)",
+                backgroundColor: isAI ? "#EAB308" : "transparent",
+                color: isAI ? "#0F172A" : "var(--text-placeholder)",
+                borderColor: isAI ? "#EAB308" : "var(--border)",
+              }}
+              onMouseEnter={e => {
+                if (!isAI) {
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = "#EAB308";
+                  (e.currentTarget as HTMLButtonElement).style.color = "#EAB308";
+                }
+              }}
+              onMouseLeave={e => {
+                if (!isAI) {
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)";
+                  (e.currentTarget as HTMLButtonElement).style.color = "var(--text-placeholder)";
+                }
+              }}
+            >
+              {isAI ? "검색" : "창업 AI"}
+            </button>
           </div>
         </div>
       </div>
