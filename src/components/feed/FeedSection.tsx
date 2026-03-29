@@ -147,7 +147,7 @@ function ArchiveSection({ posts }: { posts: FeedPost[] }) {
   return (
     <div style={{
       display: "grid",
-      gridTemplateColumns: "1fr 1fr 2fr",
+      gridTemplateColumns: "1fr 1fr 1fr",
       paddingTop: "48px",
       paddingBottom: "120px",
       minHeight: "360px",
@@ -178,8 +178,8 @@ function ArchiveSection({ posts }: { posts: FeedPost[] }) {
         })}
       </div>
 
-      {/* ── 2열: 월 ── */}
-      <div style={{ paddingTop: "4px" }}>
+      {/* ── 2열: 월 (가운데 정렬) ── */}
+      <div style={{ paddingTop: "4px", display: "flex", flexDirection: "column", alignItems: "center" }}>
         {selectedYear && Object.keys(grouped[selectedYear])
           .map(Number).sort((a, b) => b - a)
           .map(month => {
@@ -196,6 +196,7 @@ function ArchiveSection({ posts }: { posts: FeedPost[] }) {
                   color: isMonth ? "var(--text-primary)" : "var(--text-disabled)",
                   letterSpacing: "-0.02em", lineHeight: 1.2,
                   transition: "color 0.15s",
+                  textAlign: "center",
                 }}
                 onMouseEnter={e => { if (!isMonth) (e.currentTarget as HTMLButtonElement).style.color = "var(--text-muted)"; }}
                 onMouseLeave={e => { if (!isMonth) (e.currentTarget as HTMLButtonElement).style.color = "var(--text-disabled)"; }}
