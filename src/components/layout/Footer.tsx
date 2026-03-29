@@ -80,7 +80,7 @@ export default function FeedFooter() {
   return (
     <>
       {/* ── 검색 섹션 (푸터 위) ── */}
-      <div style={{ backgroundColor: "var(--bg-primary)", paddingTop: "40px" }}>
+      <div style={{ backgroundColor: "var(--bg-primary)", paddingTop: "80px" }}>
         <div style={{
           maxWidth: "680px", margin: "0 auto",
           padding: "0 clamp(24px, 5vw, 40px) 0",
@@ -94,6 +94,7 @@ export default function FeedFooter() {
               backgroundColor: "var(--modal-bg)",
               border: "1px solid var(--border)",
               borderBottom: "none",
+              borderRadius: "16px 16px 0 0",
               boxShadow: "0 -8px 32px rgba(0,0,0,0.1)",
               maxHeight: "320px", overflowY: "auto",
               zIndex: 10,
@@ -155,7 +156,8 @@ export default function FeedFooter() {
           <div style={{
             display: "flex", alignItems: "center", gap: "12px",
             padding: "16px 20px",
-            border: "1px solid var(--border)",
+            border: "1px solid",
+            borderRadius: showResults ? "0 0 16px 16px" : "16px",
             backgroundColor: isAI ? "rgba(234,179,8,0.06)" : "var(--bg-card)",
             transition: "background-color 0.3s ease, border-color 0.2s ease",
             borderColor: focused ? "var(--text-primary)" : "var(--border)",
@@ -216,16 +218,6 @@ export default function FeedFooter() {
               }}
             />
 
-            {/* 힌트 텍스트 */}
-            {!isAI && (
-              <span style={{
-                fontSize: "11px", fontFamily: "Inter, sans-serif",
-                color: "var(--text-disabled)", flexShrink: 0,
-                letterSpacing: "0.06em",
-              }}>
-                ☆ 창업 AI
-              </span>
-            )}
           </div>
         </div>
       </div>

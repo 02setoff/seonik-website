@@ -1,12 +1,10 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
-import { Search, LogOut } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
-import SearchModal from "./SearchModal";
 import AuthModal from "@/components/auth/AuthModal";
-import PostModal, { PostItem } from "@/components/feed/PostModal";
 import AboutOverlay, { AboutKey } from "@/components/intro/AboutOverlay";
 
 const ABOUT_ITEMS: { key: AboutKey; label: string }[] = [
@@ -22,10 +20,8 @@ interface FeedHeaderProps {
 }
 
 export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authTab, setAuthTab] = useState<"login" | "signup">("login");
-  const [selectedPost, setSelectedPost] = useState<PostItem | null>(null);
   const [aboutKey, setAboutKey] = useState<AboutKey | null>(null);
   const [aboutDropdown, setAboutDropdown] = useState(false);
   const [userDropdown, setUserDropdown] = useState(false);
@@ -33,9 +29,6 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
   const userRef = useRef<HTMLDivElement>(null);
   const { data: session } = useSession();
 
-  const openSearch = useCallback(() => setIsSearchOpen(true), []);
-  const closeSearch = useCallback(() => setIsSearchOpen(false), []);
-  const handleSelectPost = useCallback((post: PostItem) => setSelectedPost(post), []);
   const openLogin = useCallback(() => { setAuthTab("login"); setIsAuthOpen(true); }, []);
   const openSignup = useCallback(() => { setAuthTab("signup"); setIsAuthOpen(true); }, []);
 
@@ -148,18 +141,6 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
               Notice
             </Link>
 
-            {/* 검색 */}
-            <button
-              onClick={openSearch}
-              style={{ ...navBtn, display: "flex", alignItems: "center", gap: "4px" }}
-              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = "var(--text-primary)"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = "var(--text-muted)"; }}
-              aria-label="검색"
-            >
-              <span className="hidden md:inline">검색</span>
-              <Search className="md:hidden" size={19} strokeWidth={2} />
-            </button>
-
             {/* ── 인증 영역 ── */}
             {session ? (
               <>
@@ -168,7 +149,7 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
                   <button
                     onClick={() => setUserDropdown(v => !v)}
                     style={{
-                      padding: "5px 10px", fontSize: "13px",
+                      padding: "5px 10px", fontSize: "15px",
                       fontFamily: "'Pretendard', sans-serif", fontWeight: 500,
                       color: "var(--text-primary)", background: "none",
                       border: "none", cursor: "pointer", borderRadius: "4px",
@@ -252,9 +233,7 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
       </header>
 
       <AboutOverlay open={aboutKey} onClose={() => setAboutKey(null)} />
-      <SearchModal isOpen={isSearchOpen} onClose={closeSearch} onSelectPost={handleSelectPost} />
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} defaultTab={authTab} />
-      <PostModal post={selectedPost} onClose={() => setSelectedPost(null)} />
     </>
   );
 }
