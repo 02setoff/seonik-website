@@ -74,7 +74,7 @@ export default function FeedFooter() {
     setFocused(false);
   }, []);
 
-  const showResults = focused && (results.length > 0 || (query.trim() !== "" && !isAI) || isAI);
+  const showResults = focused && !isAI && results.length > 0;
 
   return (
     <>
