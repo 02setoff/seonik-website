@@ -124,7 +124,7 @@ export default function SearchModal({ isOpen, onClose, onSelectPost }: SearchMod
             display: "flex", alignItems: "center", gap: "12px",
             padding: "16px 20px",
             borderBottom: "1px solid var(--border)",
-            backgroundColor: isAI ? "rgba(99,102,241,0.04)" : "transparent",
+            backgroundColor: isAI ? "rgba(234,179,8,0.06)" : "transparent",
             transition: "background-color 0.3s ease",
           }}
         >
@@ -142,8 +142,8 @@ export default function SearchModal({ isOpen, onClose, onSelectPost }: SearchMod
             }}
           >
             {isAI ? (
-              /* AI 모드 아이콘: 구분되는 색상 */
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366F1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              /* AI 모드 아이콘: 포인트 컬러 */
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#EAB308" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
               </svg>
             ) : (
@@ -155,7 +155,7 @@ export default function SearchModal({ isOpen, onClose, onSelectPost }: SearchMod
           {isAI && (
             <span style={{
               fontSize: "10px", fontFamily: "Inter, sans-serif",
-              fontWeight: 700, color: "#6366F1",
+              fontWeight: 700, color: "#EAB308",
               letterSpacing: "0.12em", flexShrink: 0,
               opacity: modeAnim ? 0 : 1,
               transition: "opacity 0.18s ease",
@@ -175,7 +175,7 @@ export default function SearchModal({ isOpen, onClose, onSelectPost }: SearchMod
             className="flex-1 text-base outline-none bg-transparent"
             style={{
               fontFamily: "'Pretendard', sans-serif",
-              color: isAI ? "#6366F1" : "var(--text-primary)",
+              color: isAI ? "#EAB308" : "var(--text-primary)",
               caretColor: "var(--text-primary)",
               cursor: isAI ? "default" : "text",
               opacity: modeAnim ? 0 : 1,
@@ -204,10 +204,10 @@ export default function SearchModal({ isOpen, onClose, onSelectPost }: SearchMod
             <div style={{ padding: "48px 20px", textAlign: "center" }}>
               <div style={{
                 width: "48px", height: "48px", margin: "0 auto 16px",
-                border: "1.5px solid #6366F1",
+                border: "1.5px solid #EAB308",
                 display: "flex", alignItems: "center", justifyContent: "center",
               }}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6366F1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#EAB308" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
                 </svg>
               </div>

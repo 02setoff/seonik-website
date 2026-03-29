@@ -30,20 +30,20 @@ function TypeBadge({ type }: { type: string }) {
   if (type === "BRIEFING") {
     return (
       <span style={{
-        fontSize: "9px", fontFamily: "Inter, monospace", fontWeight: 700,
+        fontSize: "11px", fontFamily: "Inter, monospace", fontWeight: 700,
         letterSpacing: "0.18em", color: "var(--text-primary)",
         border: "1px solid var(--text-primary)",
-        padding: "2px 8px", whiteSpace: "nowrap", flexShrink: 0,
+        padding: "3px 10px", whiteSpace: "nowrap", flexShrink: 0,
       }}>BRIEFING</span>
     );
   }
   if (type === "NOTICE") {
     return (
       <span style={{
-        fontSize: "9px", fontFamily: "Inter, monospace", fontWeight: 700,
+        fontSize: "11px", fontFamily: "Inter, monospace", fontWeight: 700,
         letterSpacing: "0.15em", color: "#64748B",
         border: "1px solid #CBD5E1",
-        padding: "2px 8px", whiteSpace: "nowrap", flexShrink: 0,
+        padding: "3px 10px", whiteSpace: "nowrap", flexShrink: 0,
       }}>NOTICE</span>
     );
   }
@@ -95,7 +95,7 @@ function FeedItem({ post, index }: { post: FeedPost; index: number }) {
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <TypeBadge type={post.postType ?? "BRIEFING"} />
           <span style={{
-            fontSize: "11px", fontFamily: "Inter, monospace",
+            fontSize: "13px", fontFamily: "Inter, monospace",
             color: "var(--text-placeholder)", letterSpacing: "0.08em",
           }}>
             {formatDate(post.createdAt)}
@@ -103,7 +103,7 @@ function FeedItem({ post, index }: { post: FeedPost; index: number }) {
         </div>
         {isBriefing && (
           <span style={{
-            fontSize: "10px", fontFamily: "Inter, monospace",
+            fontSize: "12px", fontFamily: "Inter, monospace",
             color: "var(--text-disabled)", letterSpacing: "0.15em",
           }}>
             #{String(index + 1).padStart(3, "0")}
@@ -113,7 +113,7 @@ function FeedItem({ post, index }: { post: FeedPost; index: number }) {
 
       {/* 제목 */}
       <h2 style={{
-        fontSize: "clamp(17px, 2.5vw, 21px)",
+        fontSize: "clamp(20px, 2.8vw, 26px)",
         fontFamily: "'Pretendard', sans-serif",
         fontWeight: 800,
         color: "var(--text-primary)",
@@ -130,7 +130,7 @@ function FeedItem({ post, index }: { post: FeedPost; index: number }) {
       {/* 요약 */}
       {summary && (
         <p style={{
-          fontSize: "13.5px",
+          fontSize: "15.5px",
           fontFamily: "'Pretendard', sans-serif",
           color: "var(--text-muted)",
           lineHeight: 1.8,
@@ -189,7 +189,7 @@ function SectionHeader() {
         borderBottom: "2px solid var(--text-primary)",
       }}>
         <span style={{
-          fontSize: "10px", fontFamily: "Inter, sans-serif",
+          fontSize: "12px", fontFamily: "Inter, sans-serif",
           fontWeight: 700, letterSpacing: "0.2em",
           color: "var(--text-primary)",
           textTransform: "uppercase",
@@ -197,7 +197,7 @@ function SectionHeader() {
           Intelligence Briefing
         </span>
         <span style={{
-          fontSize: "10px", fontFamily: "Inter, monospace",
+          fontSize: "12px", fontFamily: "Inter, monospace",
           color: "var(--text-placeholder)", letterSpacing: "0.1em",
         }}>
           SEONIK
