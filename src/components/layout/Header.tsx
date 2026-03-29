@@ -71,9 +71,9 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
   };
 
   const Logo = (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", flexShrink: 0, gap: "2px" }}>
-      <span style={{ fontSize: "18px", fontFamily: "'Pretendard', sans-serif", fontWeight: 800, color: "var(--text-primary)", lineHeight: 1, letterSpacing: "-0.02em" }}>선익</span>
-      <span style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", fontWeight: 700, color: "var(--text-placeholder)", lineHeight: 1, letterSpacing: "0.14em" }}>SEONIK</span>
+    <div style={{ display: "inline-flex", flexDirection: "column", alignItems: "stretch", flexShrink: 0, gap: "3px" }}>
+      <span style={{ fontSize: "24px", fontFamily: "'Pretendard', sans-serif", fontWeight: 800, color: "var(--text-primary)", lineHeight: 1, letterSpacing: "-0.02em" }}>선익</span>
+      <span style={{ fontSize: "10px", fontFamily: "Inter, sans-serif", fontWeight: 700, color: "var(--text-placeholder)", lineHeight: 1, letterSpacing: "0.05em", textAlign: "justify", textAlignLast: "justify" } as React.CSSProperties}>SEONIK</span>
     </div>
   );
 

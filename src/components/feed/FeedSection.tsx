@@ -238,7 +238,7 @@ export default function FeedSection() {
   };
 
   return (
-    <div style={{ backgroundColor: "var(--bg-primary)", minHeight: "70vh" }}>
+    <div style={{ backgroundColor: "var(--bg-primary)" }}>
       <div style={{
         maxWidth: "680px", margin: "0 auto",
         padding: "48px clamp(24px, 5vw, 40px) 80px",
