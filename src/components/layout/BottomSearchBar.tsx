@@ -78,14 +78,14 @@ export default function BottomSearchBar() {
       {showResults && (
         <div style={{
           position: "fixed",
-          bottom: "60px",
+          bottom: "96px",
           left: "50%",
           transform: "translateX(-50%)",
-          width: "min(680px, calc(100vw - 48px))",
+          width: "min(640px, calc(100vw - 48px))",
           backgroundColor: "var(--modal-bg)",
           border: "1px solid var(--border)",
-          borderBottom: "none",
-          boxShadow: "0 -12px 40px rgba(0,0,0,0.15)",
+          borderRadius: "16px",
+          boxShadow: "0 -8px 32px rgba(0,0,0,0.12)",
           maxHeight: "360px",
           overflowY: "auto",
           zIndex: 99,
@@ -127,24 +127,24 @@ export default function BottomSearchBar() {
         </div>
       )}
 
-      {/* 고정 바 */}
+      {/* 고정 바 — 떠있는 둥근 알약형 */}
       <div style={{
         position: "fixed",
-        bottom: 0, left: 0, right: 0,
+        bottom: "24px",
+        left: "50%",
+        transform: "translateX(-50%)",
         zIndex: 100,
-        backgroundColor: "var(--bg-primary)",
-        borderTop: "1px solid var(--border)",
-        height: "60px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "0 24px",
+        width: "min(640px, calc(100vw - 48px))",
       }}>
         <div style={{
-          width: "min(680px, 100%)",
           display: "flex",
           alignItems: "center",
           gap: "12px",
+          backgroundColor: "var(--bg-card)",
+          border: "1px solid var(--border)",
+          borderRadius: "999px",
+          padding: "12px 20px",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06)",
         }}>
           {/* 돋보기 아이콘 */}
           <Search
