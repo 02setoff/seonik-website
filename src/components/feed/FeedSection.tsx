@@ -14,8 +14,6 @@ interface FeedPost {
   likeCount: number;
 }
 
-const MONTHS_KR = ["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
-
 function groupByYearMonth(posts: FeedPost[]) {
   const grouped: Record<number, Record<number, FeedPost[]>> = {};
   for (const post of posts) {
@@ -29,10 +27,17 @@ function groupByYearMonth(posts: FeedPost[]) {
   return grouped;
 }
 
-// ── 웰컴 섹션 ─────────────────────────────────────────────────────
+// ── 웰컴 섹션 (뷰포트 정중앙) ────────────────────────────────────
 function WelcomeSection({ name, memberCount }: { name: string; memberCount: number | null }) {
   return (
-    <div style={{ padding: "80px 0 56px", textAlign: "center" }}>
+    <div style={{
+      minHeight: "calc(100vh - 64px)",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      textAlign: "center",
+    }}>
       <h1 style={{
         fontSize: "clamp(26px, 3.5vw, 42px)",
         fontFamily: "'Pretendard', sans-serif",
@@ -106,7 +111,7 @@ function BriefingRow({
         fontWeight: 700,
         color: "var(--text-primary)",
         letterSpacing: "-0.02em",
-        lineHeight: 1.4,
+        lineHeight: "28px",
         margin: 0,
         opacity: hovered ? 0.5 : 1,
         transition: "opacity 0.15s",
@@ -119,6 +124,10 @@ function BriefingRow({
 }
 
 // ── 아카이브 섹션 ─────────────────────────────────────────────────
+//
+// "브리핑 목차" 라벨 높이: fontSize 22px × lineHeight 28px + marginBottom 20px = 48px
+// → 연도 열·브리핑 열에 paddingTop: 48px 을 추가해 3열이 정확히 같은 높이에서 시작
+//
 function ArchiveSection({ posts }: { posts: FeedPost[] }) {
   const router = useRouter();
   const grouped = groupByYearMonth(posts);
@@ -144,17 +153,21 @@ function ArchiveSection({ posts }: { posts: FeedPost[] }) {
       ? (grouped[selectedYear]?.[selectedMonth] ?? [])
       : [];
 
+  /* 라벨 영역 높이 (px) — 세 열의 컨텐츠 시작 높이를 맞추는 데 사용 */
+  const LABEL_BLOCK_H = 48; // 28px lineHeight + 20px marginBottom
+
   return (
     <div style={{
       display: "grid",
       gridTemplateColumns: "1fr 1fr 1fr",
+      columnGap: "clamp(16px, 3vw, 40px)",
       paddingTop: "48px",
       paddingBottom: "120px",
       minHeight: "360px",
     }}>
 
       {/* ── 1열: 연도 ── */}
-      <div style={{ display: "flex", flexDirection: "column" }}>
+      <div style={{ display: "flex", flexDirection: "column", paddingTop: `${LABEL_BLOCK_H}px` }}>
         {years.map(year => {
           const months = Object.keys(grouped[year]).map(Number).sort((a, b) => b - a);
           const active = selectedYear === year;
@@ -179,8 +192,24 @@ function ArchiveSection({ posts }: { posts: FeedPost[] }) {
         })}
       </div>
 
-      {/* ── 2열: 월 (가운데 정렬) ── */}
+      {/* ── 2열: 브리핑 목차 라벨 + 월 ── */}
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+
+        {/* 라벨 */}
+        <p style={{
+          fontSize: "clamp(20px, 2.8vw, 34px)",
+          fontFamily: "'Pretendard', sans-serif",
+          fontWeight: 800,
+          color: "var(--text-primary)",
+          letterSpacing: "-0.03em",
+          lineHeight: "28px",
+          margin: `0 0 ${LABEL_BLOCK_H - 28}px`,
+          whiteSpace: "nowrap",
+        }}>
+          브리핑 목차
+        </p>
+
+        {/* 월 버튼 목록 */}
         {selectedYear && Object.keys(grouped[selectedYear])
           .map(Number).sort((a, b) => b - a)
           .map(month => {
@@ -210,10 +239,9 @@ function ArchiveSection({ posts }: { posts: FeedPost[] }) {
       </div>
 
       {/* ── 3열: 브리핑 목록 ── */}
-      <div key={animKey}>
+      <div key={animKey} style={{ paddingTop: `${LABEL_BLOCK_H}px` }}>
         {currentPosts.length === 0 ? (
           <p style={{
-            paddingTop: "40px",
             fontSize: "11px", fontFamily: "Inter, monospace",
             color: "var(--text-disabled)", letterSpacing: "0.2em",
           }}>
