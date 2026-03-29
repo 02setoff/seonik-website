@@ -32,7 +32,7 @@ function groupByYearMonth(posts: FeedPost[]) {
 // ── 웰컴 섹션 ─────────────────────────────────────────────────────
 function WelcomeSection({ name, memberCount }: { name: string; memberCount: number | null }) {
   return (
-    <div style={{ padding: "80px 0 64px" }}>
+    <div style={{ padding: "80px 0 56px", textAlign: "center" }}>
       <h1 style={{
         fontSize: "clamp(26px, 3.5vw, 42px)",
         fontFamily: "'Pretendard', sans-serif",
@@ -49,8 +49,8 @@ function WelcomeSection({ name, memberCount }: { name: string; memberCount: numb
 
       {memberCount !== null && (
         <p style={{
-          marginTop: "24px",
-          fontSize: "15px",
+          marginTop: "20px",
+          fontSize: "14px",
           fontFamily: "'Pretendard', sans-serif",
           color: "var(--text-placeholder)",
           lineHeight: 1.7,
@@ -62,6 +62,13 @@ function WelcomeSection({ name, memberCount }: { name: string; memberCount: numb
           명과 함께 나아가겠습니다.
         </p>
       )}
+
+      {/* 짧은 구분선 */}
+      <div style={{
+        width: "40px", height: "1px",
+        backgroundColor: "var(--border)",
+        margin: "40px auto 0",
+      }} />
     </div>
   );
 }
@@ -180,85 +187,68 @@ function ArchiveSection({ posts }: { posts: FeedPost[] }) {
   return (
     <div style={{
       display: "grid",
-      gridTemplateColumns: "140px 1fr",
-      borderTop: "2px solid var(--text-primary)",
+      gridTemplateColumns: "100px 64px 1fr",
       paddingTop: "48px",
       paddingBottom: "120px",
       minHeight: "360px",
-      gap: "0 0",
     }}>
 
-      {/* ── 왼쪽: 연도·월 네비 ── */}
-      <div style={{ paddingRight: "32px", borderRight: "1px solid var(--border)" }}>
+      {/* ── 1열: 연도 ── */}
+      <div>
         {years.map(year => {
           const months = Object.keys(grouped[year]).map(Number).sort((a, b) => b - a);
           const active = selectedYear === year;
-
           return (
-            <div key={year} style={{ marginBottom: "28px" }}>
-              <button
-                onClick={() => selectMonth(year, months[0])}
-                style={{
-                  display: "block", width: "100%", textAlign: "left",
-                  background: "none", border: "none", cursor: "pointer",
-                  padding: "2px 0",
-                  fontSize: "26px", fontFamily: "Inter, sans-serif",
-                  fontWeight: active ? 800 : 300,
-                  color: active ? "var(--text-primary)" : "var(--text-disabled)",
-                  letterSpacing: "-0.03em", lineHeight: 1.15,
-                  transition: "color 0.2s, font-weight 0.15s",
-                }}
-              >
-                {year}
-              </button>
-
-              {active && (
-                <div style={{ marginTop: "10px", paddingLeft: "2px" }}>
-                  {months.map(month => {
-                    const isMonth = selectedMonth === month;
-                    return (
-                      <button
-                        key={month}
-                        onClick={() => selectMonth(year, month)}
-                        style={{
-                          display: "flex", alignItems: "center", gap: "8px",
-                          width: "100%", textAlign: "left",
-                          background: "none", border: "none", cursor: "pointer",
-                          padding: "7px 0",
-                          fontSize: "13px", fontFamily: "'Pretendard', sans-serif",
-                          fontWeight: isMonth ? 700 : 400,
-                          color: isMonth ? "var(--text-primary)" : "var(--text-muted)",
-                          transition: "color 0.15s",
-                        }}
-                        onMouseEnter={e => { if (!isMonth) (e.currentTarget as HTMLButtonElement).style.color = "var(--text-primary)"; }}
-                        onMouseLeave={e => { if (!isMonth) (e.currentTarget as HTMLButtonElement).style.color = "var(--text-muted)"; }}
-                      >
-                        <span style={{
-                          width: "5px", height: "5px", borderRadius: "50%", flexShrink: 0,
-                          backgroundColor: isMonth ? "var(--text-primary)" : "transparent",
-                          border: `1.5px solid ${isMonth ? "var(--text-primary)" : "var(--border)"}`,
-                          transition: "background-color 0.15s, border-color 0.15s",
-                        }} />
-                        {MONTHS_KR[month - 1]}
-                        <span style={{
-                          marginLeft: "auto",
-                          fontSize: "10px", fontFamily: "Inter, monospace",
-                          color: "var(--text-disabled)",
-                        }}>
-                          {grouped[year][month].length}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
+            <button
+              key={year}
+              onClick={() => selectMonth(year, months[0])}
+              style={{
+                display: "block", background: "none", border: "none",
+                cursor: "pointer", padding: "0 0 20px",
+                fontSize: "26px", fontFamily: "Inter, sans-serif",
+                fontWeight: active ? 800 : 300,
+                color: active ? "var(--text-primary)" : "var(--text-disabled)",
+                letterSpacing: "-0.03em", lineHeight: 1.15,
+                transition: "color 0.2s",
+              }}
+            >
+              {year}
+            </button>
           );
         })}
       </div>
 
-      {/* ── 오른쪽: 브리핑 목록 ── */}
-      <div style={{ paddingLeft: "48px" }} key={animKey}>
+      {/* ── 2열: 월 ── */}
+      <div style={{ paddingTop: "4px" }}>
+        {selectedYear && Object.keys(grouped[selectedYear])
+          .map(Number).sort((a, b) => b - a)
+          .map(month => {
+            const isMonth = selectedMonth === month;
+            return (
+              <button
+                key={month}
+                onClick={() => selectMonth(selectedYear, month)}
+                style={{
+                  display: "block", background: "none", border: "none",
+                  cursor: "pointer", padding: "6px 0",
+                  fontSize: "20px", fontFamily: "Inter, sans-serif",
+                  fontWeight: isMonth ? 700 : 300,
+                  color: isMonth ? "var(--text-primary)" : "var(--text-disabled)",
+                  letterSpacing: "-0.02em", lineHeight: 1.2,
+                  transition: "color 0.15s",
+                }}
+                onMouseEnter={e => { if (!isMonth) (e.currentTarget as HTMLButtonElement).style.color = "var(--text-muted)"; }}
+                onMouseLeave={e => { if (!isMonth) (e.currentTarget as HTMLButtonElement).style.color = "var(--text-disabled)"; }}
+              >
+                {month}
+              </button>
+            );
+          })
+        }
+      </div>
+
+      {/* ── 3열: 브리핑 목록 ── */}
+      <div style={{ paddingLeft: "32px" }} key={animKey}>
         {currentPosts.length === 0 ? (
           <p style={{
             paddingTop: "40px",
