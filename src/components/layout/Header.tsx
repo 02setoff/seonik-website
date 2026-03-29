@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Sun, Moon } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import AuthModal from "@/components/auth/AuthModal";
@@ -26,20 +26,33 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
   const [aboutDropdown, setAboutDropdown] = useState(false);
   const [userDropdown, setUserDropdown] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // ── 다크/라이트 모드 ──
+  const [theme, setTheme] = useState<"light" | "dark" | null>(null);
+  useEffect(() => {
+    const saved = localStorage.getItem("seonik-theme") as "light" | "dark" | null;
+    const t = saved ?? "light";
+    setTheme(t);
+    document.documentElement.setAttribute("data-theme", t);
+  }, []);
+  const toggleTheme = useCallback(() => {
+    setTheme(prev => {
+      const next = prev === "light" ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", next);
+      localStorage.setItem("seonik-theme", next);
+      return next;
+    });
+  }, []);
+
   const aboutRef = useRef<HTMLDivElement>(null);
   const userRef = useRef<HTMLDivElement>(null);
   const { data: session } = useSession();
 
   const openLogin = useCallback(() => {
-    setAuthTab("login");
-    setIsAuthOpen(true);
-    setMobileMenuOpen(false);
+    setAuthTab("login"); setIsAuthOpen(true); setMobileMenuOpen(false);
   }, []);
-
   const openSignup = useCallback(() => {
-    setAuthTab("signup");
-    setIsAuthOpen(true);
-    setMobileMenuOpen(false);
+    setAuthTab("signup"); setIsAuthOpen(true); setMobileMenuOpen(false);
   }, []);
 
   // 외부 클릭 시 드롭다운 닫기
@@ -86,7 +99,6 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
     transition: "color 0.15s",
   };
 
-  // 모바일 메뉴 섹션 라벨
   const mobileSectionLabel: React.CSSProperties = {
     fontSize: "10px", fontFamily: "Inter, sans-serif",
     fontWeight: 700, letterSpacing: "0.18em",
@@ -94,7 +106,6 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
     margin: "0 0 8px",
   };
 
-  // 모바일 메뉴 항목
   const mobileMenuItem: React.CSSProperties = {
     display: "block", width: "100%",
     padding: "14px 0",
@@ -128,7 +139,7 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
           className="h-full flex items-center justify-between mx-auto px-4 md:px-10"
           style={{ maxWidth: "1280px" }}
         >
-          {/* ── 좌측: 로고 ── */}
+          {/* 좌측: 로고 */}
           {onLogoClick ? (
             <button onClick={onLogoClick} style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}>
               {Logo}
@@ -137,10 +148,10 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
             <Link href="/" style={{ textDecoration: "none" }}>{Logo}</Link>
           )}
 
-          {/* ── 우측: 네비게이션 ── */}
+          {/* 우측: 네비게이션 */}
           <div className="flex items-center gap-0.5">
 
-            {/* About 드롭다운 — 데스크탑만 */}
+            {/* About 드롭다운 — 데스크탑 */}
             <div ref={aboutRef} style={{ position: "relative" }} className="hidden md:block">
               <button
                 onClick={() => setAboutDropdown(v => !v)}
@@ -167,7 +178,7 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
               )}
             </div>
 
-            {/* Notice — 데스크탑만 */}
+            {/* Notice — 데스크탑 */}
             <Link
               href="/notice"
               className="hidden md:inline"
@@ -178,7 +189,28 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
               Notice
             </Link>
 
-            {/* ── 인증 영역 — 데스크탑 ── */}
+            {/* 다크/라이트 토글 — 데스크탑 */}
+            {theme !== null && (
+              <button
+                onClick={toggleTheme}
+                className="hidden md:flex items-center"
+                style={{
+                  background: "none", border: "none", cursor: "pointer",
+                  padding: "6px 8px", color: "var(--text-muted)",
+                  transition: "color 0.15s",
+                }}
+                aria-label={theme === "dark" ? "라이트 모드로 전환" : "다크 모드로 전환"}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = "var(--text-primary)"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = "var(--text-muted)"; }}
+              >
+                {theme === "dark"
+                  ? <Sun size={17} strokeWidth={2} />
+                  : <Moon size={17} strokeWidth={2} />
+                }
+              </button>
+            )}
+
+            {/* 인증 영역 — 데스크탑 */}
             {session ? (
               <div ref={userRef} style={{ position: "relative" }} className="hidden md:block">
                 <button
@@ -243,7 +275,7 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
               </div>
             )}
 
-            {/* ── 모바일: 햄버거 버튼 ── */}
+            {/* 모바일: 햄버거 */}
             <button
               onClick={() => setMobileMenuOpen(v => !v)}
               className="flex md:hidden items-center justify-center"
@@ -320,7 +352,7 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
         </div>
 
         {/* Account */}
-        <div>
+        <div style={{ marginBottom: "36px" }}>
           <p style={mobileSectionLabel}>ACCOUNT</p>
           {session ? (
             <button
@@ -352,6 +384,24 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
             </>
           )}
         </div>
+
+        {/* 테마 토글 */}
+        {theme !== null && (
+          <div>
+            <p style={mobileSectionLabel}>DISPLAY</p>
+            <button
+              style={{ ...mobileMenuItem, display: "flex", alignItems: "center", gap: "12px" }}
+              onClick={toggleTheme}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.5"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
+            >
+              {theme === "dark"
+                ? <><Sun size={17} strokeWidth={2} /> 라이트 모드</>
+                : <><Moon size={17} strokeWidth={2} /> 다크 모드</>
+              }
+            </button>
+          </div>
+        )}
       </div>
 
       <AboutOverlay open={aboutKey} onClose={() => setAboutKey(null)} />

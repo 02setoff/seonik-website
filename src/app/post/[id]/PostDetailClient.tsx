@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Check, Link2, Lock, Eye, ArrowLeft } from "lucide-react";
@@ -28,6 +28,35 @@ interface Post {
 function formatDate(iso: string) {
   const d = new Date(iso);
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
+}
+
+// ── 읽기 진행 바 ───────────────────────────────────────────────
+function ReadingProgressBar() {
+  const [progress, setProgress] = useState(0);
+  useEffect(() => {
+    const onScroll = () => {
+      const doc = document.documentElement;
+      const scrolled = doc.scrollTop || document.body.scrollTop;
+      const total = doc.scrollHeight - doc.clientHeight;
+      setProgress(total > 0 ? Math.min((scrolled / total) * 100, 100) : 0);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  return (
+    <div style={{
+      position: "fixed",
+      top: 0, left: 0,
+      height: "2px",
+      width: `${progress}%`,
+      backgroundColor: "var(--text-primary)",
+      zIndex: 9999,
+      transition: "width 0.08s linear",
+      transformOrigin: "left",
+    }} />
+  );
 }
 
 // ── 섹션 헤더 ──────────────────────────────────────────────────
@@ -76,7 +105,6 @@ function LockedBlock() {
       textAlign: "center",
       backgroundColor: "var(--bg-subtle)",
     }}>
-      {/* 레드액션 바 */}
       <div style={{ marginBottom: "20px" }}>
         {[80, 65, 73].map((w, i) => (
           <div key={i} style={{
@@ -122,7 +150,7 @@ export default function PostDetailClient({ post }: { post: Post }) {
   const [copied, setCopied] = useState(false);
 
   // TODO: 유료 전환 시 실제 구독 상태로 교체
-  const isSubscribed = false; // 현재는 유료 구독 기능 미구현 → 5~6단계 잠금 확인용
+  const isSubscribed = false;
 
   const handleLike = useCallback(async () => {
     if (!session || likeLoading) return;
@@ -148,275 +176,214 @@ export default function PostDetailClient({ post }: { post: Post }) {
   );
 
   return (
-    <div style={{
-      backgroundColor: "var(--bg-primary)",
-      minHeight: "100vh",
-      paddingBottom: "120px",
-    }}>
+    <>
+      {/* 읽기 진행 바 */}
+      <ReadingProgressBar />
+
       <div style={{
-        maxWidth: "720px",
-        margin: "0 auto",
-        padding: "40px clamp(16px, 4vw, 40px) 0",
+        backgroundColor: "var(--bg-primary)",
+        minHeight: "100vh",
+        paddingBottom: "120px",
       }}>
-
-        {/* ── 뒤로 가기 ── */}
-        <button
-          onClick={() => router.back()}
-          style={{
-            display: "flex", alignItems: "center", gap: "6px",
-            fontSize: "12px", fontFamily: "Courier New, monospace",
-            letterSpacing: "0.1em", color: "var(--text-placeholder)",
-            background: "none", border: "none", cursor: "pointer",
-            padding: "0", marginBottom: "36px",
-          }}
-        >
-          <ArrowLeft size={12} /> 피드로 돌아가기
-        </button>
-
-        {/* ── 헤더: 타입 + 코드 + 날짜 ── */}
         <div style={{
-          display: "flex", alignItems: "center", gap: "12px",
-          marginBottom: "20px", flexWrap: "wrap",
+          maxWidth: "720px",
+          margin: "0 auto",
+          padding: "40px clamp(16px, 4vw, 40px) 0",
         }}>
-          {post.postType === "BRIEFING" && (
-            <span style={{
-              fontSize: "9px", fontFamily: "Courier New, monospace", fontWeight: 700,
-              letterSpacing: "0.2em", color: "var(--text-primary)",
-              border: "1px solid var(--text-primary)", padding: "2px 8px",
-            }}>BRIEFING</span>
-          )}
-          {post.postType === "NOTICE" && (
-            <span style={{
-              fontSize: "9px", fontFamily: "Courier New, monospace", fontWeight: 700,
-              letterSpacing: "0.18em", color: "#64748B",
-              border: "1px solid #CBD5E1", padding: "2px 8px",
-            }}>공지</span>
-          )}
-          <span style={{
-            fontSize: "10px", fontFamily: "Courier New, monospace",
-            color: "var(--text-placeholder)", letterSpacing: "0.08em",
-          }}>{docCode}</span>
-          <span style={{ width: "1px", height: "10px", backgroundColor: "var(--border)", display: "inline-block" }} />
-          <span style={{
-            fontSize: "10px", fontFamily: "Courier New, monospace",
-            color: "var(--text-placeholder)", letterSpacing: "0.08em",
-          }}>{formatDate(post.createdAt)}</span>
-          <span style={{
-            display: "flex", alignItems: "center", gap: "3px",
-            fontSize: "10px", fontFamily: "Courier New, monospace",
-            color: "var(--text-disabled)", letterSpacing: "0.04em",
-            marginLeft: "auto",
-          }}>
-            <Eye size={10} strokeWidth={1.5} /> {post.viewCount}
-          </span>
-        </div>
 
-        {/* ── 제목 ── */}
-        <h1 style={{
-          fontSize: "clamp(22px, 4vw, 32px)",
-          fontFamily: "'Pretendard', sans-serif",
-          fontWeight: 800,
-          color: "var(--text-primary)",
-          letterSpacing: "-0.03em",
-          lineHeight: 1.3,
-          margin: "0 0 16px",
-          wordBreak: "break-word",
-        }}>
-          {post.title}
-        </h1>
-
-        {/* ── 출처 ── */}
-        {post.source && (
-          <p style={{
-            fontSize: "12px", fontFamily: "Courier New, monospace",
-            color: "var(--text-placeholder)", letterSpacing: "0.06em",
-            marginBottom: "8px",
-          }}>
-            SOURCE · {post.source}
-          </p>
-        )}
-
-        {/* ── 두꺼운 구분선 ── */}
-        <div style={{ borderTop: "2px solid var(--text-primary)", margin: "28px 0 36px" }} />
-
-        {/* ── 구조화된 브리핑 섹션 (BRIEFING 타입) ── */}
-        {hasStructuredContent && (
-          <>
-            {/* 01. 브리핑 요약 */}
-            {post.summary && (
-              <Section num="01" label="브리핑 요약">
-                <p style={{
-                  fontSize: "15px",
-                  fontFamily: "'Pretendard', sans-serif",
-                  color: "var(--text-secondary)",
-                  lineHeight: "1.9",
-                  borderLeft: "3px solid var(--text-primary)",
-                  paddingLeft: "20px",
-                  margin: 0,
-                }}>
-                  {post.summary}
-                </p>
-              </Section>
-            )}
-
-            {/* 02. 비즈니스 모델 해부 */}
-            {post.bmBreakdown && (
-              <Section num="02" label="비즈니스 모델 해부">
-                <div
-                  className="post-content"
-                  style={{
-                    fontSize: "15px", fontFamily: "'Pretendard', sans-serif",
-                    lineHeight: "1.9", color: "var(--text-secondary)",
-                    wordBreak: "break-word",
-                  }}
-                  dangerouslySetInnerHTML={{ __html: post.bmBreakdown }}
-                />
-              </Section>
-            )}
-
-            {/* 03. 실행 가이드 (무료 공개) */}
-            {post.playbook && (
-              <Section num="03" label="실행 가이드">
-                <div
-                  className="post-content"
-                  style={{
-                    fontSize: "15px", fontFamily: "'Pretendard', sans-serif",
-                    lineHeight: "1.9", color: "var(--text-secondary)",
-                    wordBreak: "break-word",
-                  }}
-                  dangerouslySetInnerHTML={{ __html: post.playbook }}
-                />
-              </Section>
-            )}
-
-            {/* 04. 체크리스트 (무료 공개) */}
-            {post.actionItems && (
-              <Section num="04" label="체크리스트">
-                <div
-                  className="post-content"
-                  style={{
-                    fontSize: "15px", fontFamily: "'Pretendard', sans-serif",
-                    lineHeight: "1.9", color: "var(--text-secondary)",
-                    wordBreak: "break-word",
-                  }}
-                  dangerouslySetInnerHTML={{ __html: post.actionItems }}
-                />
-              </Section>
-            )}
-
-            {/* ── 구독자 전용 구분선 ── */}
-            {(post.deepDive || post.seonikNote) && (
-              <div style={{
-                margin: "8px 0 36px",
-                display: "flex", alignItems: "center", gap: "16px",
-              }}>
-                <div style={{ flex: 1, borderTop: "1px dashed var(--border)" }} />
-                <span style={{
-                  fontSize: "9px", fontFamily: "Courier New, monospace",
-                  letterSpacing: "0.18em", color: "var(--text-disabled)",
-                  whiteSpace: "nowrap",
-                }}>SUBSCRIBER ONLY</span>
-                <div style={{ flex: 1, borderTop: "1px dashed var(--border)" }} />
-              </div>
-            )}
-
-            {/* 05. 심층 분석 (구독자 전용) */}
-            {post.deepDive && (
-              <Section num="05" label="심층 분석" locked>
-                {isSubscribed ? (
-                  <div
-                    className="post-content"
-                    style={{
-                      fontSize: "15px", fontFamily: "'Pretendard', sans-serif",
-                      lineHeight: "1.9", color: "var(--text-secondary)",
-                      wordBreak: "break-word",
-                    }}
-                    dangerouslySetInnerHTML={{ __html: post.deepDive }}
-                  />
-                ) : <LockedBlock />}
-              </Section>
-            )}
-
-            {/* 06. 선익 코멘트 (구독자 전용) */}
-            {post.seonikNote && (
-              <Section num="06" label="선익 코멘트" locked>
-                {isSubscribed ? (
-                  <div
-                    className="post-content"
-                    style={{
-                      fontSize: "15px", fontFamily: "'Pretendard', sans-serif",
-                      lineHeight: "1.9", color: "var(--text-secondary)",
-                      wordBreak: "break-word",
-                    }}
-                    dangerouslySetInnerHTML={{ __html: post.seonikNote }}
-                  />
-                ) : <LockedBlock />}
-              </Section>
-            )}
-          </>
-        )}
-
-        {/* ── 일반 본문 (NOTICE / GENERAL 또는 구조화 안 된 브리핑) ── */}
-        {!hasStructuredContent && post.content && (
-          <div
-            className="post-content"
-            style={{
-              fontSize: "15px", fontFamily: "'Pretendard', sans-serif",
-              lineHeight: "1.9", color: "var(--text-secondary)",
-              wordBreak: "break-word",
-            }}
-            dangerouslySetInnerHTML={{ __html: post.content }}
-          />
-        )}
-
-        {/* ── 액션 버튼 ── */}
-        <div style={{
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-          borderTop: "1px solid var(--border)",
-          marginTop: "48px", paddingTop: "20px",
-          flexWrap: "wrap", gap: "12px",
-        }}>
+          {/* 뒤로 가기 */}
           <button
-            onClick={handleCopy}
+            onClick={() => router.back()}
             style={{
               display: "flex", alignItems: "center", gap: "6px",
-              padding: "7px 14px",
-              fontSize: "10px", fontFamily: "Courier New, monospace",
-              fontWeight: 700, letterSpacing: "0.14em",
-              backgroundColor: copied ? "var(--text-primary)" : "transparent",
-              color: copied ? "var(--bg-primary)" : "var(--text-muted)",
-              border: "1px solid var(--border)",
-              cursor: "pointer", transition: "all 0.15s",
+              fontSize: "12px", fontFamily: "Courier New, monospace",
+              letterSpacing: "0.1em", color: "var(--text-placeholder)",
+              background: "none", border: "none", cursor: "pointer",
+              padding: "0", marginBottom: "36px",
             }}
           >
-            <Link2 size={10} />
-            {copied ? "링크 복사됨" : "링크 복사"}
+            <ArrowLeft size={12} /> 피드로 돌아가기
           </button>
 
-          {session && (
+          {/* 헤더: 타입 + 코드 + 날짜 */}
+          <div style={{
+            display: "flex", alignItems: "center", gap: "12px",
+            marginBottom: "20px", flexWrap: "wrap",
+          }}>
+            {post.postType === "BRIEFING" && (
+              <span style={{
+                fontSize: "9px", fontFamily: "Courier New, monospace", fontWeight: 700,
+                letterSpacing: "0.2em", color: "var(--text-primary)",
+                border: "1px solid var(--text-primary)", padding: "2px 8px",
+              }}>BRIEFING</span>
+            )}
+            {post.postType === "NOTICE" && (
+              <span style={{
+                fontSize: "9px", fontFamily: "Courier New, monospace", fontWeight: 700,
+                letterSpacing: "0.18em", color: "#64748B",
+                border: "1px solid #CBD5E1", padding: "2px 8px",
+              }}>공지</span>
+            )}
+            <span style={{
+              fontSize: "10px", fontFamily: "Courier New, monospace",
+              color: "var(--text-placeholder)", letterSpacing: "0.08em",
+            }}>{docCode}</span>
+            <span style={{ width: "1px", height: "10px", backgroundColor: "var(--border)", display: "inline-block" }} />
+            <span style={{
+              fontSize: "10px", fontFamily: "Courier New, monospace",
+              color: "var(--text-placeholder)", letterSpacing: "0.08em",
+            }}>{formatDate(post.createdAt)}</span>
+            <span style={{
+              display: "flex", alignItems: "center", gap: "3px",
+              fontSize: "10px", fontFamily: "Courier New, monospace",
+              color: "var(--text-disabled)", letterSpacing: "0.04em",
+              marginLeft: "auto",
+            }}>
+              <Eye size={10} strokeWidth={1.5} /> {post.viewCount}
+            </span>
+          </div>
+
+          {/* 제목 */}
+          <h1 style={{
+            fontSize: "clamp(22px, 4vw, 32px)",
+            fontFamily: "'Pretendard', sans-serif",
+            fontWeight: 800,
+            color: "var(--text-primary)",
+            letterSpacing: "-0.03em",
+            lineHeight: 1.3,
+            margin: "0 0 16px",
+            wordBreak: "break-word",
+          }}>
+            {post.title}
+          </h1>
+
+          {/* 출처 */}
+          {post.source && (
+            <p style={{
+              fontSize: "12px", fontFamily: "Courier New, monospace",
+              color: "var(--text-placeholder)", letterSpacing: "0.06em",
+              marginBottom: "8px",
+            }}>
+              SOURCE · {post.source}
+            </p>
+          )}
+
+          {/* 두꺼운 구분선 */}
+          <div style={{ borderTop: "2px solid var(--text-primary)", margin: "28px 0 36px" }} />
+
+          {/* 구조화된 브리핑 섹션 */}
+          {hasStructuredContent && (
+            <>
+              {post.summary && (
+                <Section num="01" label="브리핑 요약">
+                  <p style={{
+                    fontSize: "15px", fontFamily: "'Pretendard', sans-serif",
+                    color: "var(--text-secondary)", lineHeight: "1.9",
+                    borderLeft: "3px solid var(--text-primary)", paddingLeft: "20px", margin: 0,
+                  }}>
+                    {post.summary}
+                  </p>
+                </Section>
+              )}
+              {post.bmBreakdown && (
+                <Section num="02" label="비즈니스 모델 해부">
+                  <div className="post-content" style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif", lineHeight: "1.9", color: "var(--text-secondary)", wordBreak: "break-word" }}
+                    dangerouslySetInnerHTML={{ __html: post.bmBreakdown }} />
+                </Section>
+              )}
+              {post.playbook && (
+                <Section num="03" label="실행 가이드">
+                  <div className="post-content" style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif", lineHeight: "1.9", color: "var(--text-secondary)", wordBreak: "break-word" }}
+                    dangerouslySetInnerHTML={{ __html: post.playbook }} />
+                </Section>
+              )}
+              {post.actionItems && (
+                <Section num="04" label="체크리스트">
+                  <div className="post-content" style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif", lineHeight: "1.9", color: "var(--text-secondary)", wordBreak: "break-word" }}
+                    dangerouslySetInnerHTML={{ __html: post.actionItems }} />
+                </Section>
+              )}
+              {(post.deepDive || post.seonikNote) && (
+                <div style={{ margin: "8px 0 36px", display: "flex", alignItems: "center", gap: "16px" }}>
+                  <div style={{ flex: 1, borderTop: "1px dashed var(--border)" }} />
+                  <span style={{ fontSize: "9px", fontFamily: "Courier New, monospace", letterSpacing: "0.18em", color: "var(--text-disabled)", whiteSpace: "nowrap" }}>SUBSCRIBER ONLY</span>
+                  <div style={{ flex: 1, borderTop: "1px dashed var(--border)" }} />
+                </div>
+              )}
+              {post.deepDive && (
+                <Section num="05" label="심층 분석" locked>
+                  {isSubscribed ? (
+                    <div className="post-content" style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif", lineHeight: "1.9", color: "var(--text-secondary)", wordBreak: "break-word" }}
+                      dangerouslySetInnerHTML={{ __html: post.deepDive }} />
+                  ) : <LockedBlock />}
+                </Section>
+              )}
+              {post.seonikNote && (
+                <Section num="06" label="선익 코멘트" locked>
+                  {isSubscribed ? (
+                    <div className="post-content" style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif", lineHeight: "1.9", color: "var(--text-secondary)", wordBreak: "break-word" }}
+                      dangerouslySetInnerHTML={{ __html: post.seonikNote }} />
+                  ) : <LockedBlock />}
+                </Section>
+              )}
+            </>
+          )}
+
+          {/* 일반 본문 */}
+          {!hasStructuredContent && post.content && (
+            <div className="post-content" style={{ fontSize: "15px", fontFamily: "'Pretendard', sans-serif", lineHeight: "1.9", color: "var(--text-secondary)", wordBreak: "break-word" }}
+              dangerouslySetInnerHTML={{ __html: post.content }} />
+          )}
+
+          {/* 액션 버튼 */}
+          <div style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            borderTop: "1px solid var(--border)",
+            marginTop: "48px", paddingTop: "20px",
+            flexWrap: "wrap", gap: "12px",
+          }}>
             <button
-              onClick={handleLike}
-              disabled={likeLoading}
+              onClick={handleCopy}
               style={{
-                display: "flex", alignItems: "center", gap: "7px",
-                padding: "7px 18px",
+                display: "flex", alignItems: "center", gap: "6px",
+                padding: "7px 14px",
                 fontSize: "10px", fontFamily: "Courier New, monospace",
                 fontWeight: 700, letterSpacing: "0.14em",
-                backgroundColor: liked ? "var(--text-primary)" : "transparent",
-                color: liked ? "var(--bg-primary)" : "var(--text-secondary)",
+                backgroundColor: copied ? "var(--text-primary)" : "transparent",
+                color: copied ? "var(--bg-primary)" : "var(--text-muted)",
                 border: "1px solid var(--border)",
-                cursor: likeLoading ? "not-allowed" : "pointer",
-                opacity: likeLoading ? 0.6 : 1, transition: "all 0.15s",
+                cursor: "pointer", transition: "all 0.15s",
               }}
             >
-              <Check size={10} strokeWidth={2.5} />
-              {liked ? "저장됨" : "저장하기"}
-              <span style={{ opacity: 0.5, marginLeft: "2px" }}>{likeCount}</span>
+              <Link2 size={10} />
+              {copied ? "링크 복사됨" : "링크 복사"}
             </button>
-          )}
-        </div>
 
+            {session && (
+              <button
+                onClick={handleLike}
+                disabled={likeLoading}
+                style={{
+                  display: "flex", alignItems: "center", gap: "7px",
+                  padding: "7px 18px",
+                  fontSize: "10px", fontFamily: "Courier New, monospace",
+                  fontWeight: 700, letterSpacing: "0.14em",
+                  backgroundColor: liked ? "var(--text-primary)" : "transparent",
+                  color: liked ? "var(--bg-primary)" : "var(--text-secondary)",
+                  border: "1px solid var(--border)",
+                  cursor: likeLoading ? "not-allowed" : "pointer",
+                  opacity: likeLoading ? 0.6 : 1, transition: "all 0.15s",
+                }}
+              >
+                <Check size={10} strokeWidth={2.5} />
+                {liked ? "저장됨" : "저장하기"}
+                <span style={{ opacity: 0.5, marginLeft: "2px" }}>{likeCount}</span>
+              </button>
+            )}
+          </div>
+
+        </div>
       </div>
-    </div>
+    </>
   );
 }

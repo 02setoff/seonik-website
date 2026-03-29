@@ -21,6 +21,15 @@ function formatDate(iso: string) {
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
 }
 
+// ── 플랫폼 감지 (Mac이면 ⌘, 아니면 Ctrl) ──────────────────────
+function useShortcutLabel() {
+  const [label, setLabel] = useState("Ctrl K");
+  useEffect(() => {
+    if (navigator.platform.toUpperCase().includes("MAC")) setLabel("⌘K");
+  }, []);
+  return label;
+}
+
 export default function BottomSearchBar() {
   const [query, setQuery] = useState("");
   const [posts, setPosts] = useState<SearchResult[]>([]);
@@ -30,6 +39,7 @@ export default function BottomSearchBar() {
   const [selectedPost, setSelectedPost] = useState<PostItem | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const isAI = mode === "ai";
+  const shortcut = useShortcutLabel();
 
   useEffect(() => {
     fetch("/api/posts?take=100")
@@ -37,6 +47,30 @@ export default function BottomSearchBar() {
       .then(data => setPosts(data.posts ?? []))
       .catch(() => {});
   }, []);
+
+  // ── ⌘K / Ctrl+K 단축키 ──────────────────────────────────────
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        // AI 모드면 검색 모드로 전환 후 포커스
+        if (isAI) {
+          setModeAnim(true);
+          setTimeout(() => {
+            setMode("search");
+            setQuery("");
+            setModeAnim(false);
+            setTimeout(() => { inputRef.current?.focus(); setFocused(true); }, 60);
+          }, 180);
+        } else {
+          inputRef.current?.focus();
+          setFocused(true);
+        }
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [isAI]);
 
   const results = query.trim() && !isAI
     ? posts.filter(p =>
@@ -127,7 +161,7 @@ export default function BottomSearchBar() {
         </div>
       )}
 
-      {/* 고정 바 — 떠있는 둥근 알약형 */}
+      {/* 고정 알약형 검색 바 */}
       <div style={{
         position: "fixed",
         bottom: "24px",
@@ -160,7 +194,7 @@ export default function BottomSearchBar() {
           <input
             ref={inputRef}
             type="text"
-            placeholder={isAI ? "창업 AI — 서비스 준비 중입니다" : "브리핑 검색..."}
+            placeholder={isAI ? "창업 AI — 서비스 준비 중입니다" : `브리핑 검색...  ${shortcut}`}
             value={query}
             onChange={e => { if (!isAI) setQuery(e.target.value); }}
             onFocus={() => setFocused(true)}
