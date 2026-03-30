@@ -193,6 +193,13 @@ export default function BottomSearchBar() {
             }}
           />
 
+          {/* 구분선 */}
+          <div style={{
+            width: "1px", height: "14px",
+            backgroundColor: "var(--border)",
+            flexShrink: 0, opacity: 0.7,
+          }} />
+
           {/* 창업 AI 토글 버튼 */}
           <button
             onMouseDown={e => { e.preventDefault(); handleModeToggle(); }}

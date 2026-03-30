@@ -136,7 +136,7 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
           borderBottom: "1px solid var(--header-border)",
         }}
       >
-        {/* 가운데: 화살표 로고마크 */}
+        {/* 가운데: 선익 로고마크 */}
         <div style={{
           position: "absolute",
           left: "50%",
@@ -146,10 +146,10 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          color: "var(--text-primary)",
         }}>
-          <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M5 17L17 5" stroke="#EAB308" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M7 5H17V15" stroke="#EAB308" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <svg width="22" height="22" viewBox="0 0 166 166" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M165.156 0.5V136.585H140.93L140.931 136.084L141.142 41.8418L18.4197 164.776L18.0652 165.131L17.7117 164.776L1.09251 148.157L0.738998 147.805L1.09251 147.451L123.82 24.5117H29.0661L29.071 24.0068L29.2839 0.995117L29.2888 0.5H165.156Z" fill="currentColor" stroke="currentColor" strokeWidth="0.5"/>
           </svg>
         </div>
 
