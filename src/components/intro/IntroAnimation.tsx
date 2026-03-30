@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, Sun, Moon, Menu, X } from "lucide-react";
+import { ChevronDown, Sun, Moon, Menu, X, BookOpen } from "lucide-react";
 import { useTheme } from "@/components/ThemeProvider";
 import AboutOverlay, { AboutKey } from "./AboutOverlay";
 
@@ -236,6 +236,7 @@ export default function IntroAnimation({
           SECTION 1 — HERO
       ══════════════════════════════════════════ */}
       <section style={{
+        position: "relative",
         height: "100vh", backgroundColor: "var(--bg-primary)",
         display: "flex", alignItems: "center", justifyContent: "center",
       }}>
@@ -273,18 +274,58 @@ export default function IntroAnimation({
             </motion.p>
           </div>
 
-          {/* 스크롤 유도 */}
-          <motion.div style={{ marginTop: "56px", display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            transition={{ delay: 1.3, duration: 0.5 }}>
-            <span style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", letterSpacing: "0.14em", color: "var(--text-disabled)" }}>SCROLL</span>
-            <motion.div
-              animate={{ y: [0, 8, 0] }}
-              transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}>
-              <ChevronDown size={18} style={{ color: "var(--text-disabled)" }} />
-            </motion.div>
+          {/* 브리핑 열람하기 박스 */}
+          <motion.div
+            style={{ marginTop: "48px", display: "flex", justifyContent: "center" }}
+            initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.9, duration: 0.55, ease: EASE }}
+          >
+            <button
+              onClick={onLoginClick}
+              style={{
+                display: "inline-flex", alignItems: "center", gap: "12px",
+                padding: "16px 36px",
+                border: "1px solid var(--border)",
+                backgroundColor: "transparent",
+                cursor: "pointer",
+                fontFamily: "'Pretendard', sans-serif",
+                fontSize: "15px", fontWeight: 500,
+                color: "var(--text-primary)",
+                letterSpacing: "-0.01em",
+                transition: "border-color 0.2s, background-color 0.2s",
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--text-primary)";
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor = "var(--bg-hover)";
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)";
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent";
+              }}
+            >
+              <BookOpen size={15} strokeWidth={1.8} style={{ color: "#EAB308" }} />
+              브리핑 열람하기
+              <span style={{ color: "#EAB308", fontSize: "16px", lineHeight: 1 }}>→</span>
+            </button>
           </motion.div>
         </div>
+
+        {/* 스크롤 유도 — 하단 고정 */}
+        <motion.div
+          style={{
+            position: "absolute", bottom: "36px", left: "50%",
+            transform: "translateX(-50%)",
+            display: "flex", flexDirection: "column", alignItems: "center", gap: "8px",
+          }}
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+          transition={{ delay: 1.4, duration: 0.5 }}>
+          <span style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", letterSpacing: "0.14em", color: "var(--text-disabled)" }}>SCROLL</span>
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}>
+            <ChevronDown size={18} style={{ color: "var(--text-disabled)" }} />
+          </motion.div>
+        </motion.div>
       </section>
 
 
