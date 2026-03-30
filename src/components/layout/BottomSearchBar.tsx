@@ -145,18 +145,17 @@ export default function BottomSearchBar() {
         left: "50%",
         transform: "translateX(-50%)",
         zIndex: 100,
-        width: "min(640px, calc(100vw - 48px))",
+        width: "min(640px, calc(100vw - 24px))",
       }}>
         <div style={{
           display: "flex",
           alignItems: "center",
-          gap: "10px",
+          gap: "8px",
           backgroundColor: "var(--bg-card)",
           border: "1px solid var(--border)",
           borderRadius: "999px",
-          padding: "12px 16px",
+          padding: "11px 14px",
           boxShadow: "0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06)",
-          overflow: "hidden",
         }}>
           {/* 돋보기 아이콘 */}
           <Search
@@ -205,11 +204,11 @@ export default function BottomSearchBar() {
             onMouseDown={e => { e.preventDefault(); handleModeToggle(); }}
             style={{
               flexShrink: 0,
-              padding: "5px 11px",
-              fontSize: "10px",
-              fontFamily: "Inter, sans-serif",
+              padding: "5px 10px",
+              fontSize: "11px",
+              fontFamily: "'Pretendard', sans-serif",
               fontWeight: 700,
-              letterSpacing: "0.07em",
+              letterSpacing: "0.02em",
               border: "1px solid",
               borderRadius: "20px",
               cursor: "pointer",
