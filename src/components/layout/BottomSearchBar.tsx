@@ -150,12 +150,13 @@ export default function BottomSearchBar() {
         <div style={{
           display: "flex",
           alignItems: "center",
-          gap: "12px",
+          gap: "10px",
           backgroundColor: "var(--bg-card)",
           border: "1px solid var(--border)",
           borderRadius: "999px",
-          padding: "12px 20px",
+          padding: "12px 16px",
           boxShadow: "0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06)",
+          overflow: "hidden",
         }}>
           {/* 돋보기 아이콘 */}
           <Search
@@ -197,11 +198,11 @@ export default function BottomSearchBar() {
             onMouseDown={e => { e.preventDefault(); handleModeToggle(); }}
             style={{
               flexShrink: 0,
-              padding: "6px 16px",
-              fontSize: "11px",
+              padding: "5px 11px",
+              fontSize: "10px",
               fontFamily: "Inter, sans-serif",
               fontWeight: 700,
-              letterSpacing: "0.08em",
+              letterSpacing: "0.07em",
               border: "1px solid",
               borderRadius: "20px",
               cursor: "pointer",
@@ -211,6 +212,7 @@ export default function BottomSearchBar() {
               backgroundColor: isAI ? "#EAB308" : "transparent",
               color: isAI ? "#0F172A" : "var(--text-placeholder)",
               borderColor: isAI ? "#EAB308" : "var(--border)",
+              whiteSpace: "nowrap",
             }}
             onMouseEnter={e => {
               if (!isAI) {

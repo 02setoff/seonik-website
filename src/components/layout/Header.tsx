@@ -130,11 +130,29 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
       <header
         className="sticky top-0 z-50"
         style={{
+          position: "relative",
           height: "64px",
           backgroundColor: "var(--header-bg)",
           borderBottom: "1px solid var(--header-border)",
         }}
       >
+        {/* 가운데: 화살표 로고마크 */}
+        <div style={{
+          position: "absolute",
+          left: "50%",
+          top: "50%",
+          transform: "translate(-50%, -50%)",
+          pointerEvents: "none",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}>
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 17L17 5" stroke="#EAB308" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M7 5H17V15" stroke="#EAB308" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+
         <div
           className="h-full flex items-center justify-between mx-auto px-4 md:px-10"
           style={{ maxWidth: "1280px" }}

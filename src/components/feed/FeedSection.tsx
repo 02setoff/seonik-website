@@ -68,7 +68,7 @@ function WelcomeSection({ name, memberCount }: { name: string; memberCount: numb
       textAlign: "center",
     }}>
       <h1 style={{
-        fontSize: "clamp(26px, 3.5vw, 42px)",
+        fontSize: "clamp(38px, 5vw, 62px)",
         fontFamily: "'Pretendard', sans-serif",
         fontWeight: 900,
         color: "var(--text-primary)",
@@ -84,7 +84,7 @@ function WelcomeSection({ name, memberCount }: { name: string; memberCount: numb
       {memberCount !== null && (
         <p style={{
           marginTop: "20px",
-          fontSize: "14px",
+          fontSize: "16px",
           fontFamily: "'Pretendard', sans-serif",
           color: "var(--text-placeholder)",
           lineHeight: 1.7,
