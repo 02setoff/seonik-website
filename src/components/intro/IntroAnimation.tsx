@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, Sun, Moon } from "lucide-react";
+import { ChevronDown, Sun, Moon, Menu, X } from "lucide-react";
 import { useTheme } from "@/components/ThemeProvider";
 import AboutOverlay, { AboutKey } from "./AboutOverlay";
 
@@ -48,8 +48,9 @@ export default function IntroAnimation({
   onLoginClick, onSignupClick,
 }: IntroAnimationProps) {
   const { theme, toggleTheme } = useTheme();
-  const [aboutOpen, setAboutOpen]       = useState<AboutKey | null>(null);
+  const [aboutOpen, setAboutOpen]         = useState<AboutKey | null>(null);
   const [aboutDropdown, setAboutDropdown] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const aboutRef = useRef<HTMLDivElement>(null);
 
   // 외부 클릭 시 About 드롭다운 닫기
@@ -61,6 +62,12 @@ export default function IntroAnimation({
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
+
+  // 모바일 메뉴 열릴 때 body 스크롤 잠금
+  useEffect(() => {
+    document.body.style.overflow = mobileMenuOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileMenuOpen]);
 
   // about-tab-change 이벤트 수신
   useEffect(() => {
@@ -113,20 +120,22 @@ export default function IntroAnimation({
               <div style={{
                 position: "absolute", top: "calc(100% + 6px)", left: 0,
                 backgroundColor: "var(--bg-card)", border: "1px solid var(--border)",
-                boxShadow: "0 8px 32px rgba(0,0,0,0.12)", zIndex: 300,
-                padding: "5px 0", minWidth: "100px",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.14)", zIndex: 300,
+                padding: "5px 0", minWidth: "110px",
               }}>
                 {ABOUT_ITEMS.map(item => (
                   <button key={item.key}
                     onClick={() => { setAboutOpen(item.key); setAboutDropdown(false); }}
                     style={{
-                      display: "block", width: "100%", padding: "9px 16px",
-                      fontSize: "13px", fontFamily: "'Pretendard', sans-serif",
-                      color: "var(--text-secondary)", background: "none", border: "none",
-                      cursor: "pointer", textAlign: "left", transition: "background 0.1s, color 0.1s",
+                      display: "block", width: "100%", padding: "10px 18px",
+                      fontSize: "14px", fontFamily: "'Pretendard', sans-serif",
+                      fontWeight: 500,
+                      color: "var(--text-primary)", background: "none", border: "none",
+                      cursor: "pointer", textAlign: "left", transition: "background 0.1s",
+                      whiteSpace: "nowrap",
                     }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "var(--bg-hover)"; (e.currentTarget as HTMLButtonElement).style.color = "var(--text-primary)"; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent"; (e.currentTarget as HTMLButtonElement).style.color = "var(--text-secondary)"; }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "var(--bg-hover)"; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent"; }}
                   >{item.label}</button>
                 ))}
               </div>
@@ -172,8 +181,55 @@ export default function IntroAnimation({
             style={{ padding: "6px 14px", fontSize: "12px", fontFamily: "'Pretendard'", fontWeight: 600, backgroundColor: "var(--text-primary)", color: "var(--bg-primary)", border: "none", borderRadius: "2px", cursor: "pointer" }}>
             가입
           </button>
+          {/* 햄버거 메뉴 */}
+          <button
+            onClick={() => setMobileMenuOpen(v => !v)}
+            style={{ background: "none", border: "none", cursor: "pointer", padding: "6px 4px", color: "var(--text-primary)", display: "flex", alignItems: "center" }}
+            aria-label="메뉴"
+          >
+            {mobileMenuOpen ? <X size={20} strokeWidth={2} /> : <Menu size={20} strokeWidth={2} />}
+          </button>
         </div>
       </header>
+
+      {/* 모바일 메뉴 오버레이 */}
+      {mobileMenuOpen && (
+        <div className="md:hidden" style={{
+          position: "fixed", top: "64px", left: 0, right: 0, bottom: 0,
+          backgroundColor: "var(--bg-card)",
+          zIndex: 190,
+          overflowY: "auto",
+          padding: "28px 28px 48px",
+        }}>
+          {/* ABOUT 섹션 */}
+          <p style={{
+            fontSize: "10px", fontFamily: "Inter, sans-serif",
+            fontWeight: 700, letterSpacing: "0.18em",
+            color: "var(--text-disabled)",
+            margin: "0 0 10px",
+          }}>ABOUT</p>
+          {ABOUT_ITEMS.map(item => (
+            <button
+              key={item.key}
+              onClick={() => { setAboutOpen(item.key); setMobileMenuOpen(false); }}
+              style={{
+                display: "block", width: "100%",
+                padding: "16px 0",
+                fontSize: "18px", fontFamily: "'Pretendard', sans-serif",
+                fontWeight: 600, color: "var(--text-primary)",
+                background: "none", border: "none",
+                borderBottom: "1px solid var(--border-light)",
+                cursor: "pointer", textAlign: "left",
+                transition: "opacity 0.15s",
+              }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.6"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      )}
 
 
       {/* ══════════════════════════════════════════
@@ -374,12 +430,6 @@ export default function IntroAnimation({
         padding: "100px clamp(28px, 8vw, 120px)",
       }}>
         <div style={{ maxWidth: "680px", width: "100%" }}>
-
-          <FadeUp>
-            <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", letterSpacing: "0.2em", color: "#EAB308", margin: "0 0 28px", fontWeight: 700 }}>
-              VISION
-            </p>
-          </FadeUp>
 
           <FadeUp delay={0.1}>
             <p style={{
