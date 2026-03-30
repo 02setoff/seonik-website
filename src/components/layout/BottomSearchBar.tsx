@@ -2,18 +2,14 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { Search } from "lucide-react";
-import PostModal from "@/components/feed/PostModal";
-import { PostItem } from "@/components/feed/PostModal";
+import { useRouter } from "next/navigation";
 
 interface SearchResult {
   id: string;
   title: string;
   summary: string | null;
-  content: string | null;
   category: string;
   createdAt: string;
-  viewCount: number;
-  _count: { likes: number };
 }
 
 function formatDate(iso: string) {
@@ -21,25 +17,15 @@ function formatDate(iso: string) {
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
 }
 
-// ── 플랫폼 감지 (Mac이면 ⌘, 아니면 Ctrl) ──────────────────────
-function useShortcutLabel() {
-  const [label, setLabel] = useState("Ctrl K");
-  useEffect(() => {
-    if (navigator.platform.toUpperCase().includes("MAC")) setLabel("⌘K");
-  }, []);
-  return label;
-}
-
 export default function BottomSearchBar() {
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [posts, setPosts] = useState<SearchResult[]>([]);
   const [mode, setMode] = useState<"search" | "ai">("search");
   const [modeAnim, setModeAnim] = useState(false);
   const [focused, setFocused] = useState(false);
-  const [selectedPost, setSelectedPost] = useState<PostItem | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const isAI = mode === "ai";
-  const shortcut = useShortcutLabel();
 
   useEffect(() => {
     fetch("/api/posts?take=100")
@@ -90,19 +76,10 @@ export default function BottomSearchBar() {
   };
 
   const handleSelect = useCallback((result: SearchResult) => {
-    setSelectedPost({
-      id: result.id,
-      title: result.title,
-      summary: result.summary,
-      content: result.content,
-      category: result.category,
-      createdAt: result.createdAt,
-      viewCount: result.viewCount,
-      likeCount: result._count.likes,
-    });
     setQuery("");
     setFocused(false);
-  }, []);
+    router.push(`/post/${result.id}`);
+  }, [router]);
 
   const showResults = focused && !isAI && results.length > 0;
 
@@ -194,7 +171,7 @@ export default function BottomSearchBar() {
           <input
             ref={inputRef}
             type="text"
-            placeholder={isAI ? "선익 AI — 서비스 준비 중입니다" : `브리핑 검색  ${shortcut}`}
+            placeholder={isAI ? "창업 AI — 서비스 준비 중입니다" : "브리핑 검색"}
             value={query}
             onChange={e => { if (!isAI) setQuery(e.target.value); }}
             onFocus={() => setFocused(true)}
@@ -248,12 +225,11 @@ export default function BottomSearchBar() {
               }
             }}
           >
-            {isAI ? "검색" : "선익 AI"}
+            {isAI ? "검색" : "창업 AI"}
           </button>
         </div>
       </div>
 
-      <PostModal post={selectedPost} onClose={() => setSelectedPost(null)} />
     </>
   );
 }

@@ -155,11 +155,12 @@ function BriefingRow({
         <span style={{
           fontSize: "10px",
           fontFamily: "Courier New, monospace",
-          color: "var(--text-disabled)",
+          color: "#EAB308",
           flexShrink: 0,
           minWidth: "18px",
           letterSpacing: "0.02em",
           lineHeight: "28px",
+          opacity: 0.75,
         }}>
           {String(index + 1).padStart(2, "0")}
         </span>
@@ -181,7 +182,7 @@ function BriefingRow({
         <span style={{
           fontSize: "11px",
           fontFamily: "Inter, monospace",
-          color: "var(--text-disabled)",
+          color: "#94A3B8",
           flexShrink: 0,
           letterSpacing: "0.05em",
           lineHeight: "28px",
@@ -283,7 +284,7 @@ function DesktopArchive({
                 </button>
                 <p style={{
                   fontSize: "10px", fontFamily: "Inter, monospace",
-                  color: "var(--text-disabled)", letterSpacing: "0.08em",
+                  color: "#94A3B8", letterSpacing: "0.08em",
                   margin: "3px 0 0", textAlign: "right", lineHeight: 1,
                 }}>
                   · {total}건
@@ -333,9 +334,9 @@ function DesktopArchive({
                   </span>
                   <span style={{
                     fontSize: "10px", fontFamily: "Inter, monospace",
-                    color: "var(--text-disabled)", letterSpacing: "0.05em",
+                    color: "#94A3B8", letterSpacing: "0.05em",
                   }}>
-                    · {count}
+                    · {count}건
                   </span>
                 </button>
               );
@@ -486,7 +487,7 @@ function MobileArchive({
                 <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
                   <span style={{
                     fontSize: "10px", fontFamily: "Courier New, monospace",
-                    color: "var(--text-disabled)", flexShrink: 0,
+                    color: "#EAB308", opacity: 0.75, flexShrink: 0,
                   }}>
                     {String(i + 1).padStart(2, "0")}
                   </span>
@@ -501,7 +502,7 @@ function MobileArchive({
                   </p>
                   <span style={{
                     fontSize: "11px", fontFamily: "Inter, monospace",
-                    color: "var(--text-disabled)", flexShrink: 0,
+                    color: "#94A3B8", flexShrink: 0,
                     letterSpacing: "0.04em",
                   }}>
                     {shortDate(post.createdAt)}
