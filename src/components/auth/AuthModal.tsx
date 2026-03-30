@@ -388,6 +388,12 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
         </button>
 
         <div style={{ textAlign: "center", marginBottom: "28px" }}>
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: "12px" }}>
+            <svg width="42" height="42" viewBox="0 0 166 166" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect y="24.6818" width="141" height="141" fill="#E2E8F0"/>
+              <path d="M165.156 0.5V136.585H140.93L140.931 136.084L141.142 41.8418L18.4197 164.776L18.0652 165.131L17.7117 164.776L1.09251 148.157L0.738998 147.805L1.09251 147.451L123.82 24.5117H29.0661L29.071 24.0068L29.2839 0.995117L29.2888 0.5H165.156Z" fill="#0F172A" stroke="#0F172A" strokeWidth="0.5"/>
+            </svg>
+          </div>
           <p style={{ fontSize: "20px", fontFamily: "'Pretendard', sans-serif", fontWeight: 700, color: "#0F172A", lineHeight: 1 }}>선익</p>
           <p style={{ fontSize: "11px", fontFamily: "Inter, sans-serif", fontWeight: 600, color: "#94A3B8", letterSpacing: "0.15em", marginTop: "3px" }}>SEONIK</p>
         </div>
