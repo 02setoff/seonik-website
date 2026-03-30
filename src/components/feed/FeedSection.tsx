@@ -14,6 +14,11 @@ interface FeedPost {
   likeCount: number;
 }
 
+function shortDate(iso: string) {
+  const d = new Date(iso);
+  return `${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
+}
+
 function groupByYearMonth(posts: FeedPost[]) {
   const grouped: Record<number, Record<number, FeedPost[]>> = {};
   for (const post of posts) {
@@ -103,7 +108,7 @@ function WelcomeSection({ name, memberCount }: { name: string; memberCount: numb
 
 // ── 브리핑 행 (데스크탑 + 모바일 공용) ──────────────────────────
 function BriefingRow({
-  post, animDelay, onClick,
+  post, index, animDelay, onClick,
 }: {
   post: FeedPost; index: number; animDelay: number; onClick: () => void;
 }) {
@@ -128,25 +133,50 @@ function BriefingRow({
         transition: "opacity 0.3s ease, transform 0.3s ease",
       }}
     >
-      {/* 제목 */}
-      <p style={{
-        fontSize: "clamp(15px, 1.8vw, 19px)",
-        fontFamily: "'Pretendard', sans-serif",
-        fontWeight: 700,
-        color: "var(--text-primary)",
-        letterSpacing: "-0.02em",
-        lineHeight: "28px",
-        margin: 0,
-        opacity: hovered ? 0.45 : 1,
-        transition: "opacity 0.15s",
-        wordBreak: "keep-all",
-      }}>
-        {post.title}
-      </p>
+      {/* 인덱스 + 제목 + 날짜 */}
+      <div style={{ display: "flex", alignItems: "baseline", gap: "10px" }}>
+        <span style={{
+          fontSize: "10px",
+          fontFamily: "Courier New, monospace",
+          color: "var(--text-disabled)",
+          flexShrink: 0,
+          minWidth: "18px",
+          letterSpacing: "0.02em",
+          lineHeight: "28px",
+        }}>
+          {String(index + 1).padStart(2, "0")}
+        </span>
+        <p style={{
+          flex: 1,
+          fontSize: "clamp(15px, 1.8vw, 19px)",
+          fontFamily: "'Pretendard', sans-serif",
+          fontWeight: 700,
+          color: "var(--text-primary)",
+          letterSpacing: "-0.02em",
+          lineHeight: "28px",
+          margin: 0,
+          opacity: hovered ? 0.45 : 1,
+          transition: "opacity 0.15s",
+          wordBreak: "keep-all",
+        }}>
+          {post.title}
+        </p>
+        <span style={{
+          fontSize: "11px",
+          fontFamily: "Inter, monospace",
+          color: "var(--text-disabled)",
+          flexShrink: 0,
+          letterSpacing: "0.05em",
+          lineHeight: "28px",
+        }}>
+          {shortDate(post.createdAt)}
+        </span>
+      </div>
 
       {/* 요약 미리보기 — 호버 시 슬라이드 다운 */}
       {post.summary && (
         <div style={{
+          paddingLeft: "28px",
           overflow: "hidden",
           maxHeight: hovered ? "44px" : "0",
           opacity: hovered ? 0.6 : 0,
@@ -172,8 +202,8 @@ function BriefingRow({
   );
 }
 
-// ── 데스크탑 아카이브 (3열 그리드) ───────────────────────────────
-const LABEL_BLOCK_H = 48; // 브리핑 목차 라벨 높이(28px) + marginBottom(20px)
+// ── 데스크탑 아카이브 (flex + 세로 구분선) ───────────────────────
+const COL_PAD = "clamp(20px, 3vw, 40px)";
 
 function DesktopArchive({
   grouped, years, selectedYear, selectedMonth, currentPosts, animKey, selectMonth,
@@ -188,96 +218,132 @@ function DesktopArchive({
 }) {
   const router = useRouter();
   return (
-    <div style={{
-      display: "grid",
-      gridTemplateColumns: "1fr 1fr 1fr",
-      columnGap: "clamp(16px, 3vw, 40px)",
-      paddingTop: "48px",
-      paddingBottom: "120px",
-      minHeight: "360px",
-    }}>
-      {/* 1열: 연도 */}
-      <div style={{ display: "flex", flexDirection: "column", paddingTop: `${LABEL_BLOCK_H}px` }}>
-        {years.map(year => {
-          const months = Object.keys(grouped[year]).map(Number).sort((a, b) => b - a);
-          const active = selectedYear === year;
-          return (
-            <button
-              key={year}
-              onClick={() => selectMonth(year, months[0])}
-              style={{
-                display: "block", background: "none", border: "none", cursor: "pointer",
-                padding: "0", margin: "0 0 16px",
-                fontSize: "20px", fontFamily: "Inter, sans-serif",
-                fontWeight: active ? 800 : 300,
-                color: active ? "var(--text-primary)" : "var(--text-disabled)",
-                letterSpacing: "-0.03em", lineHeight: "28px",
-                transition: "color 0.2s", textAlign: "right",
-              }}
-            >
-              {year}
-            </button>
-          );
-        })}
-      </div>
+    <div style={{ paddingTop: "48px", paddingBottom: "120px" }}>
 
-      {/* 2열: 브리핑 목차 라벨 + 월 */}
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <p style={{
-          fontSize: "clamp(20px, 2.8vw, 34px)",
-          fontFamily: "'Pretendard', sans-serif",
-          fontWeight: 800,
-          color: "var(--text-primary)",
-          letterSpacing: "-0.03em",
-          lineHeight: "28px",
-          margin: `0 0 ${LABEL_BLOCK_H - 28}px`,
-          whiteSpace: "nowrap",
+      {/* 섹션 헤더 */}
+      <p style={{
+        fontSize: "clamp(20px, 2.8vw, 34px)",
+        fontFamily: "'Pretendard', sans-serif",
+        fontWeight: 800,
+        color: "var(--text-primary)",
+        letterSpacing: "-0.03em",
+        margin: "0 0 20px",
+      }}>
+        브리핑 목차
+      </p>
+      <div style={{ height: "1px", backgroundColor: "var(--border)", marginBottom: "32px" }} />
+
+      {/* 3열 flex */}
+      <div style={{ display: "flex", alignItems: "flex-start", minHeight: "280px" }}>
+
+        {/* 1열: 연도 */}
+        <div style={{
+          flexShrink: 0,
+          paddingRight: COL_PAD,
+          textAlign: "right",
+          minWidth: "60px",
         }}>
-          브리핑 목차
-        </p>
-        {selectedYear && Object.keys(grouped[selectedYear])
-          .map(Number).sort((a, b) => b - a)
-          .map(month => {
-            const isMonth = selectedMonth === month;
+          {years.map(year => {
+            const months = Object.keys(grouped[year]).map(Number).sort((a, b) => b - a);
+            const active = selectedYear === year;
+            const total = Object.values(grouped[year]).flat().length;
             return (
-              <button
-                key={month}
-                onClick={() => selectMonth(selectedYear, month)}
-                style={{
-                  display: "block", background: "none", border: "none", cursor: "pointer",
-                  padding: "0", margin: "0 0 16px",
-                  fontSize: "20px", fontFamily: "Inter, sans-serif",
-                  fontWeight: isMonth ? 700 : 300,
-                  color: isMonth ? "var(--text-primary)" : "var(--text-disabled)",
-                  letterSpacing: "-0.02em", lineHeight: "28px",
-                  transition: "color 0.15s", textAlign: "center",
-                }}
-                onMouseEnter={e => { if (!isMonth) (e.currentTarget as HTMLButtonElement).style.color = "var(--text-muted)"; }}
-                onMouseLeave={e => { if (!isMonth) (e.currentTarget as HTMLButtonElement).style.color = "var(--text-disabled)"; }}
-              >
-                {month}
-              </button>
+              <div key={year} style={{ marginBottom: "20px" }}>
+                <button
+                  onClick={() => selectMonth(year, months[0])}
+                  style={{
+                    display: "block", width: "100%",
+                    background: "none", border: "none", cursor: "pointer",
+                    padding: "0", margin: "0",
+                    fontSize: "20px", fontFamily: "Inter, sans-serif",
+                    fontWeight: active ? 800 : 300,
+                    color: active ? "var(--text-primary)" : "var(--text-disabled)",
+                    letterSpacing: "-0.03em", lineHeight: "28px",
+                    transition: "color 0.2s", textAlign: "right",
+                  }}
+                >
+                  {year}
+                </button>
+                <p style={{
+                  fontSize: "10px", fontFamily: "Inter, monospace",
+                  color: "var(--text-disabled)", letterSpacing: "0.08em",
+                  margin: "3px 0 0", textAlign: "right", lineHeight: 1,
+                }}>
+                  · {total}건
+                </p>
+              </div>
             );
           })}
-      </div>
+        </div>
 
-      {/* 3열: 브리핑 목록 */}
-      <div key={animKey} style={{ paddingTop: `${LABEL_BLOCK_H}px` }}>
-        {currentPosts.length === 0 ? (
-          <p style={{
-            fontSize: "11px", fontFamily: "Inter, monospace",
-            color: "var(--text-disabled)", letterSpacing: "0.2em",
-          }}>NO BRIEFINGS</p>
-        ) : (
-          <>
-            {currentPosts.map((post, i) => (
+        {/* 구분선 1 */}
+        <div style={{ width: "1px", backgroundColor: "var(--border)", alignSelf: "stretch", flexShrink: 0 }} />
+
+        {/* 2열: 월 */}
+        <div style={{
+          flexShrink: 0,
+          padding: `0 ${COL_PAD}`,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}>
+          {selectedYear && Object.keys(grouped[selectedYear])
+            .map(Number).sort((a, b) => b - a)
+            .map(month => {
+              const isMonth = selectedMonth === month;
+              const count = grouped[selectedYear][month].length;
+              return (
+                <button
+                  key={month}
+                  onClick={() => selectMonth(selectedYear, month)}
+                  style={{
+                    display: "flex", alignItems: "baseline", gap: "5px",
+                    background: "none", border: "none", cursor: "pointer",
+                    padding: "0", margin: "0 0 16px",
+                    transition: "opacity 0.15s",
+                  }}
+                  onMouseEnter={e => { if (!isMonth) (e.currentTarget as HTMLButtonElement).style.opacity = "0.65"; }}
+                  onMouseLeave={e => { if (!isMonth) (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
+                >
+                  <span style={{
+                    fontSize: "20px", fontFamily: "Inter, sans-serif",
+                    fontWeight: isMonth ? 700 : 300,
+                    color: isMonth ? "var(--text-primary)" : "var(--text-disabled)",
+                    letterSpacing: "-0.02em", lineHeight: "28px",
+                    transition: "color 0.15s",
+                  }}>
+                    {month}
+                  </span>
+                  <span style={{
+                    fontSize: "10px", fontFamily: "Inter, monospace",
+                    color: "var(--text-disabled)", letterSpacing: "0.05em",
+                  }}>
+                    · {count}
+                  </span>
+                </button>
+              );
+            })}
+        </div>
+
+        {/* 구분선 2 */}
+        <div style={{ width: "1px", backgroundColor: "var(--border)", alignSelf: "stretch", flexShrink: 0 }} />
+
+        {/* 3열: 브리핑 목록 */}
+        <div key={animKey} style={{ flex: 1, paddingLeft: COL_PAD }}>
+          {currentPosts.length === 0 ? (
+            <p style={{
+              fontSize: "11px", fontFamily: "Inter, monospace",
+              color: "var(--text-disabled)", letterSpacing: "0.2em",
+            }}>NO BRIEFINGS</p>
+          ) : (
+            currentPosts.map((post, i) => (
               <BriefingRow
                 key={post.id} post={post} index={i} animDelay={i * 50}
                 onClick={() => router.push(`/post/${post.id}`)}
               />
-            ))}
-          </>
-        )}
+            ))
+          )}
+        </div>
       </div>
     </div>
   );
@@ -353,6 +419,7 @@ function MobileArchive({
       }}>
         {months.map(month => {
           const active = selectedMonth === month;
+          const count = grouped[selectedYear!][month].length;
           return (
             <button
               key={month}
@@ -371,7 +438,7 @@ function MobileArchive({
                 transition: "all 0.15s",
               }}
             >
-              {month}월
+              {month}월 · {count}
             </button>
           );
         })}
@@ -399,17 +466,33 @@ function MobileArchive({
                   cursor: "pointer",
                 }}
               >
-                <p style={{
-                  fontSize: "16px", fontFamily: "'Pretendard', sans-serif",
-                  fontWeight: 700, color: "var(--text-primary)",
-                  letterSpacing: "-0.02em", lineHeight: 1.4,
-                  margin: 0, wordBreak: "keep-all",
-                }}>
-                  {post.title}
-                </p>
+                <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
+                  <span style={{
+                    fontSize: "10px", fontFamily: "Courier New, monospace",
+                    color: "var(--text-disabled)", flexShrink: 0,
+                  }}>
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <p style={{
+                    flex: 1,
+                    fontSize: "16px", fontFamily: "'Pretendard', sans-serif",
+                    fontWeight: 700, color: "var(--text-primary)",
+                    letterSpacing: "-0.02em", lineHeight: 1.4,
+                    margin: 0, wordBreak: "keep-all",
+                  }}>
+                    {post.title}
+                  </p>
+                  <span style={{
+                    fontSize: "11px", fontFamily: "Inter, monospace",
+                    color: "var(--text-disabled)", flexShrink: 0,
+                    letterSpacing: "0.04em",
+                  }}>
+                    {shortDate(post.createdAt)}
+                  </span>
+                </div>
                 {post.summary && (
                   <p style={{
-                    marginTop: "6px",
+                    paddingLeft: "22px",
                     fontSize: "13px", fontFamily: "'Pretendard', sans-serif",
                     color: "var(--text-muted)", lineHeight: 1.55,
                     margin: "6px 0 0",
