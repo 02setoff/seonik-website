@@ -201,6 +201,13 @@ body {
 [data-theme="dark"] .intel-doc .post-content img { border-color: #E2E8F0; }
 [data-theme="dark"] .intel-doc .post-content hr { border-top-color: #E2E8F0; }
 
+/* ── 스크롤 유도 화살표 bounce ── */
+@keyframes seonik-bounce {
+  0%, 100% { transform: translateY(0); opacity: 0.35; }
+  50%       { transform: translateY(7px); opacity: 0.85; }
+}
+.scroll-hint { animation: seonik-bounce 2s ease-in-out infinite; }
+
 /* ── About 모달 스크롤바 숨김 ── */
 .about-modal-body,
 .about-modal-tabs {

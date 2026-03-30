@@ -102,6 +102,23 @@ function WelcomeSection({ name, memberCount }: { name: string; memberCount: numb
         backgroundColor: "var(--border)",
         margin: "40px auto 0",
       }} />
+
+      {/* 스크롤 유도 화살표 */}
+      <button
+        className="scroll-hint"
+        onClick={() => window.scrollBy({ top: window.innerHeight, behavior: "smooth" })}
+        aria-label="브리핑 목차로 이동"
+        style={{
+          marginTop: "28px",
+          background: "none", border: "none", cursor: "pointer",
+          padding: "4px", display: "flex", alignItems: "center", justifyContent: "center",
+          color: "var(--text-disabled)",
+        }}
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </button>
     </div>
   );
 }
