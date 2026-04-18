@@ -27,6 +27,10 @@ model User {
   loginLockedUntil         DateTime?
   mustResetPassword        Boolean   @default(false)
   theme                    String    @default("light")
+  region                   String?
+  affiliation              String?
+  startupStage             String?
+  onboarded                Boolean   @default(false)
   createdAt                DateTime  @default(now())
 
   accounts  Account[]
@@ -163,4 +167,23 @@ model Notice {
   scheduledAt DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+}
+
+model Announcement {
+  id           String    @id @default(cuid())
+  title        String
+  description  String?
+  region       String    @default("전국")
+  affiliation  String    @default("전체")
+  stage        String    @default("전체")
+  deadline     DateTime?
+  applyUrl     String?
+  organization String?
+  source       String    @default("수동")
+  sourceId     String?
+  published    Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([published, deadline])
 }

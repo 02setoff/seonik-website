@@ -197,6 +197,17 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
               )}
             </div>
 
+            {/* 공고 — 데스크탑 */}
+            <Link
+              href="/announcements"
+              className="hidden md:inline"
+              style={{ ...navBtn, fontWeight: 700, color: "#1E40AF" } as React.CSSProperties}
+              onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#1E3A8A"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "#1E40AF"; }}
+            >
+              공고
+            </Link>
+
             {/* Notice — 데스크탑 */}
             <Link
               href="/notice"
@@ -348,6 +359,15 @@ export default function FeedHeader({ onLogoClick }: FeedHeaderProps) {
         {/* Navigate */}
         <div style={{ marginBottom: "36px" }}>
           <p style={mobileSectionLabel}>NAVIGATE</p>
+          <Link
+            href="/announcements"
+            style={{ ...mobileMenuItem, color: "#1E40AF", fontWeight: 700 }}
+            onClick={() => setMobileMenuOpen(false)}
+            onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = "0.5"; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.opacity = "1"; }}
+          >
+            공고
+          </Link>
           <Link
             href="/notice"
             style={mobileMenuItem}
