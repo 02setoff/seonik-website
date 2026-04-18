@@ -113,13 +113,13 @@ async function fetchKStartup(key: string): Promise<number> {
     if (!res.ok) break;
 
     const xml = await res.text();
-    const itemMatches = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)];
+    const itemMatches = Array.from(xml.matchAll(/<item>([\s\S]*?)<\/item>/g));
     if (itemMatches.length === 0) break;
 
     for (const [, itemXml] of itemMatches) {
       // col 방식: <col name="key">value</col>
       const cols: Record<string, string> = {};
-      for (const [, name, val] of itemXml.matchAll(/<col name="([^"]+)"[^>]*>([\s\S]*?)<\/col>/g)) {
+      for (const [, name, val] of Array.from(itemXml.matchAll(/<col name="([^"]+)"[^>]*>([\s\S]*?)<\/col>/g))) {
         cols[name] = val.replace(/<!\[CDATA\[|\]\]>/g, "").replace(/<[^>]+>/g, "").trim();
       }
 
@@ -158,7 +158,7 @@ async function fetchBizInfo(key: string): Promise<number> {
     if (!res.ok) break;
 
     const xml = await res.text();
-    const itemMatches = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)];
+    const itemMatches = Array.from(xml.matchAll(/<item>([\s\S]*?)<\/item>/g));
     if (itemMatches.length === 0) break;
 
     for (const [, itemXml] of itemMatches) {
