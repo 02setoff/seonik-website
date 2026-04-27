@@ -33,7 +33,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <head>
+      <body className="antialiased">
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-Y181T0D19F"
           strategy="afterInteractive"
@@ -46,8 +46,6 @@ export default function RootLayout({
             gtag('config', 'G-Y181T0D19F');
           `}
         </Script>
-      </head>
-      <body className="antialiased">
         <SeonikHeader />
         <main style={{ minHeight: "calc(100vh - 120px)" }}>
           {children}
