@@ -1,30 +1,17 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import LayoutWrapper from "@/components/LayoutWrapper";
-import SessionProvider from "@/components/SessionProvider";
-import { ThemeProvider } from "@/components/ThemeProvider";
+import SeonikHeader from "@/components/SeonikHeader";
+import SeonikFooter from "@/components/SeonikFooter";
 
 export const metadata: Metadata = {
-  title: "선익 SEONIK",
-  description:
-    "AI 네이티브 프라이빗 싱크탱크. 앞서나가는 정보로 실행가들을 이롭게.",
-  keywords: [
-    "선익",
-    "SEONIK",
-    "비즈니스 인텔리전스",
-    "AI 분석",
-    "시장 분석",
-    "창업",
-    "싱크탱크",
-  ],
+  title: "선익 SEONIK — 창업 공고 피드",
+  description: "K-스타트업, 기업마당 최신 창업 지원 공고를 한눈에. 지역·단계별 필터로 내게 맞는 공고만 빠르게.",
+  keywords: ["창업 공고", "스타트업 지원", "K-스타트업", "기업마당", "선익", "SEONIK"],
   metadataBase: new URL("https://seonik.kr"),
-  alternates: {
-    canonical: "/",
-  },
+  alternates: { canonical: "/" },
   openGraph: {
-    title: "선익 SEONIK",
-    description:
-      "AI 네이티브 프라이빗 싱크탱크. 앞서나가는 정보로 실행가들을 이롭게.",
+    title: "선익 SEONIK — 창업 공고 피드",
+    description: "K-스타트업, 기업마당 최신 창업 지원 공고를 한눈에.",
     url: "https://seonik.kr",
     type: "website",
     locale: "ko_KR",
@@ -32,33 +19,25 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "선익 SEONIK",
-    description:
-      "AI 네이티브 프라이빗 싱크탱크. 앞서나가는 정보로 실행가들을 이롭게.",
+    title: "선익 SEONIK — 창업 공고 피드",
+    description: "K-스타트업, 기업마당 최신 창업 지원 공고를 한눈에.",
   },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-    },
-  },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="ko" suppressHydrationWarning>
+    <html lang="ko">
       <body className="antialiased">
-        <SessionProvider>
-          <ThemeProvider>
-            <LayoutWrapper>{children}</LayoutWrapper>
-          </ThemeProvider>
-        </SessionProvider>
+        <SeonikHeader />
+        <main style={{ minHeight: "calc(100vh - 120px)" }}>
+          {children}
+        </main>
+        <SeonikFooter />
       </body>
     </html>
   );
