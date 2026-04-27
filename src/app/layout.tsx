@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import "./globals.css";
 import SeonikHeader from "@/components/SeonikHeader";
 import SeonikFooter from "@/components/SeonikFooter";
@@ -33,19 +32,21 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body className="antialiased">
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-Y181T0D19F"
-          strategy="afterInteractive"
+      <head>
+        {/* Google Analytics — 서버 HTML에 직접 포함 (GA 감지 보장) */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y181T0D19F" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-Y181T0D19F');
+            `,
+          }}
         />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-Y181T0D19F');
-          `}
-        </Script>
+      </head>
+      <body className="antialiased">
         <SeonikHeader />
         <main style={{ minHeight: "calc(100vh - 120px)" }}>
           {children}
