@@ -1,6 +1,6 @@
 "use client";
 
-import { ExternalLink, Calendar, Building2 } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 
 export interface AnnouncementItem {
   id: string;
@@ -21,158 +21,122 @@ function daysLeft(deadline: string): number {
   return Math.ceil(diff / (1000 * 60 * 60 * 24));
 }
 
-function formatDate(iso: string) {
-  const d = new Date(iso);
-  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
+function DayBadge({ deadline }: { deadline: string | null }) {
+  if (!deadline) return <span style={{ fontFamily: "Inter, sans-serif", fontSize: "11px", color: "#CBD5E1", minWidth: "44px" }}>—</span>;
+  const d = daysLeft(deadline);
+  const color = d <= 0 ? "#94A3B8" : d <= 3 ? "#DC2626" : d <= 7 ? "#EA580C" : d <= 14 ? "#D97706" : "#475569";
+  const bg    = d <= 0 ? "#F1F5F9" : d <= 3 ? "#FEF2F2" : d <= 7 ? "#FFF7ED" : d <= 14 ? "#FFFBEB" : "#F8F9FA";
+  const label = d <= 0 ? "마감" : `D-${d}`;
+  return (
+    <span style={{
+      fontFamily: "Inter, sans-serif", fontSize: "11px", fontWeight: 700,
+      color, backgroundColor: bg, border: `1px solid ${color}20`,
+      padding: "2px 7px", whiteSpace: "nowrap", minWidth: "44px", textAlign: "center",
+    }}>
+      {label}
+    </span>
+  );
 }
 
-const SOURCE_COLORS: Record<string, string> = {
+const SOURCE_DOT: Record<string, string> = {
   "K-스타트업": "#0369A1",
-  "기업마당": "#047857",
-  "보조금24": "#7C3AED",
-  "수동": "#374151",
+  "기업마당":   "#047857",
+  "수동":       "#374151",
 };
 
-export default function AnnouncementCard({ item }: { item: AnnouncementItem }) {
-  const days = item.deadline ? daysLeft(item.deadline) : null;
-  const urgent = days !== null && days <= 7;
+export default function AnnouncementRow({ item, urgent }: { item: AnnouncementItem; urgent?: boolean }) {
+  const dotColor = SOURCE_DOT[item.source] ?? "#94A3B8";
+  const regionTags = item.region === "전국" ? ["전국"] : item.region.split(",").map((r) => r.trim()).filter(Boolean);
+  const stageTags  = item.stage  !== "전체"  ? item.stage.split(",").map((s) => s.trim()).filter(Boolean) : [];
 
   return (
     <div
+      className="ann-row"
       style={{
-        backgroundColor: "var(--bg-card)",
-        border: "1px solid var(--border)",
-        padding: "20px 20px 16px",
-        display: "flex", flexDirection: "column", gap: "12px",
-        transition: "box-shadow 0.2s, transform 0.2s",
+        borderBottom: "1px solid #E2E8F0",
+        padding: "14px 0",
+        display: "flex",
+        alignItems: "flex-start",
+        gap: "14px",
+        backgroundColor: urgent ? "#FFFBFA" : "transparent",
+        transition: "background-color 0.1s",
       }}
-      onMouseEnter={(e) => {
-        (e.currentTarget as HTMLDivElement).style.boxShadow = "0 4px 16px rgba(0,0,0,0.1)";
-        (e.currentTarget as HTMLDivElement).style.transform = "translateY(-2px)";
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
-        (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)";
-      }}
+      onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = urgent ? "#FFF5F5" : "#F8F9FA"; }}
+      onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = urgent ? "#FFFBFA" : "transparent"; }}
     >
-      {/* 소스 뱃지 */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <span style={{
-          fontSize: "11px", fontFamily: "Inter, sans-serif",
-          fontWeight: 600, letterSpacing: "0.06em",
-          color: SOURCE_COLORS[item.source] ?? "#374151",
-          textTransform: "uppercase",
-        }}>
-          {item.source}
-        </span>
-        {days !== null && (
-          <span style={{
-            fontSize: "11px", fontFamily: "Inter, sans-serif",
-            fontWeight: 700, padding: "2px 8px",
-            backgroundColor: urgent ? "#FEF2F2" : "var(--bg-surface, #F8FAFC)",
-            color: urgent ? "#DC2626" : "var(--text-muted)",
-            border: `1px solid ${urgent ? "#FECACA" : "var(--border)"}`,
+      {/* D-day 배지 */}
+      <div style={{ paddingTop: "2px", flexShrink: 0 }}>
+        <DayBadge deadline={item.deadline} />
+      </div>
+
+      {/* 본문 */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        {/* 출처 점 + 제목 */}
+        <div style={{ display: "flex", alignItems: "flex-start", gap: "8px" }}>
+          <span style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: dotColor, flexShrink: 0, marginTop: "6px" }} />
+          <p style={{
+            fontFamily: "'Pretendard', sans-serif", fontWeight: 600, fontSize: "14px",
+            color: "#0F172A", margin: 0, lineHeight: 1.5,
+            overflow: "hidden", display: "-webkit-box",
+            WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
           }}>
-            {days <= 0 ? "마감" : urgent ? `D-${days}` : `${days}일 남음`}
-          </span>
-        )}
-      </div>
-
-      {/* 제목 */}
-      <h3 style={{
-        fontSize: "15px", fontFamily: "'Pretendard', sans-serif",
-        fontWeight: 600, lineHeight: 1.5,
-        color: "var(--text-primary)",
-        margin: 0, flex: 1,
-        display: "-webkit-box",
-        WebkitLineClamp: 3,
-        WebkitBoxOrient: "vertical",
-        overflow: "hidden",
-      }}>
-        {item.title}
-      </h3>
-
-      {/* 설명 */}
-      {item.description && (
-        <p style={{
-          fontSize: "13px", fontFamily: "'Pretendard', sans-serif",
-          color: "var(--text-muted)", margin: 0, lineHeight: 1.6,
-          display: "-webkit-box",
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: "vertical",
-          overflow: "hidden",
-        }}>
-          {item.description}
-        </p>
-      )}
-
-      {/* 태그 */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
-        {item.region !== "전국" && item.region.split(",").map((r) => (
-          <Tag key={r} label={r.trim()} />
-        ))}
-        {item.region === "전국" && <Tag label="전국" color="#0369A1" />}
-        {item.stage !== "전체" && item.stage.split(",").map((s) => (
-          <Tag key={s} label={s.trim()} color="#7C3AED" />
-        ))}
-      </div>
-
-      {/* 하단: 기관 + 마감일 + 신청 */}
-      <div style={{
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        borderTop: "1px solid var(--border)", paddingTop: "12px", gap: "8px",
-      }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: "3px", minWidth: 0 }}>
-          {item.organization && (
-            <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-              <Building2 size={11} color="var(--text-placeholder)" />
-              <span style={{ fontSize: "12px", fontFamily: "'Pretendard', sans-serif", color: "var(--text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {item.organization}
-              </span>
-            </div>
-          )}
-          {item.deadline && (
-            <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-              <Calendar size={11} color="var(--text-placeholder)" />
-              <span style={{ fontSize: "12px", fontFamily: "Inter, sans-serif", color: "var(--text-placeholder)" }}>
-                {formatDate(item.deadline)}
-              </span>
-            </div>
-          )}
+            {item.title}
+          </p>
         </div>
 
-        {item.applyUrl && (
-          <a
-            href={item.applyUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: "flex", alignItems: "center", gap: "5px",
-              padding: "8px 14px", fontSize: "13px", fontWeight: 600,
-              fontFamily: "'Pretendard', sans-serif",
-              backgroundColor: "#1E40AF", color: "white",
-              textDecoration: "none", flexShrink: 0,
-              transition: "background-color 0.15s",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#1E3A8A")}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#1E40AF")}
-          >
-            신청하기 <ExternalLink size={12} />
-          </a>
-        )}
+        {/* 기관 + 태그 */}
+        <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "6px", marginTop: "6px", paddingLeft: "14px" }}>
+          {item.organization && (
+            <span style={{ fontFamily: "'Pretendard', sans-serif", fontSize: "12px", color: "#64748B" }}>
+              {item.organization}
+            </span>
+          )}
+          {(regionTags.length > 0 || stageTags.length > 0) && item.organization && (
+            <span style={{ color: "#CBD5E1", fontSize: "12px" }}>·</span>
+          )}
+          {regionTags.map((r) => (
+            <Tag key={r} label={r} />
+          ))}
+          {stageTags.map((s) => (
+            <Tag key={s} label={s} blue />
+          ))}
+        </div>
       </div>
+
+      {/* 신청 버튼 */}
+      {item.applyUrl && (
+        <a
+          href={item.applyUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            flexShrink: 0,
+            display: "flex", alignItems: "center", gap: "4px",
+            padding: "6px 12px",
+            fontFamily: "'Pretendard', sans-serif", fontSize: "12px", fontWeight: 600,
+            backgroundColor: "#0F172A", color: "#FFFFFF",
+            textDecoration: "none",
+            whiteSpace: "nowrap",
+            transition: "background-color 0.15s",
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#1E293B")}
+          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#0F172A")}
+        >
+          신청 <ExternalLink size={11} />
+        </a>
+      )}
     </div>
   );
 }
 
-function Tag({ label, color }: { label: string; color?: string }) {
+function Tag({ label, blue }: { label: string; blue?: boolean }) {
   return (
     <span style={{
-      fontSize: "11px", fontFamily: "'Pretendard', sans-serif",
-      padding: "2px 8px",
-      backgroundColor: "var(--bg-surface, #F8FAFC)",
-      color: color ?? "var(--text-muted)",
-      border: "1px solid var(--border)",
+      fontFamily: "'Pretendard', sans-serif", fontSize: "11px",
+      padding: "1px 6px",
+      backgroundColor: blue ? "#EFF6FF" : "#F1F5F9",
+      color: blue ? "#1E40AF" : "#64748B",
+      border: `1px solid ${blue ? "#BFDBFE" : "#E2E8F0"}`,
     }}>
       {label}
     </span>
